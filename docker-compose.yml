@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dubai-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    restart: always
+    networks:
+      - dubai-network
+
+  dubai_dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dubai-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=100
+      - WATCHPACK_POLLING=true
+    command:
+      [
+        "sh",
+        "-c",
+        "npm install && (chmod +x node_modules/.bin/vite node_modules/esbuild/bin/esbuild node_modules/@esbuild/linux-x64/bin/esbuild 2>/dev/null || true) && npm run dev",
+      ]
+    depends_on:
+      - backend
+    networks:
+      - dubai-network
+networks:
+  dubai-network:
+    driver: bridge
