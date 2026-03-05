@@ -1,4 +1,5 @@
 import Layout from '../components/Layout';
+import { Link } from 'react-router';
 import { Shield, Lock, UserCheck, Eye } from 'lucide-react';
 
 export default function About() {
@@ -11,7 +12,7 @@ export default function About() {
               Sobre Dubai Escorts Ecuador
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-                Gracias a Dubai vive y discruta una experiencia premium con las mejores escorts de Ecuador!            
+                Gracias a Dubai vive y disfruta una experiencia premium con las mejores escorts de Ecuador!            
             </p>
           </div>
         </div>
@@ -20,8 +21,7 @@ export default function About() {
           <section className="mb-16">
             <h2 className="text-4xl text-white mb-6">Nuestra misión</h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
-              DUBAI es una plataforma de directorio premium diseñada para conectar acompañantes
-              adultas verificadas con personas exigentes que buscan compañía sofisticada en Ecuador.
+              DUBAI es una plataforma de escorts premium diseñada para conectar con modelos verificadas y sus servicios de calidad en Ecuador.
               Priorizamos la seguridad, la discreción y el profesionalismo en cada interacción.
             </p>
           </section>
@@ -32,32 +32,30 @@ export default function About() {
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">1. Explora perfiles verificados</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Busca en nuestra selección curada de acompañantes verificadas en las principales
-                  ciudades del Ecuador. Filtra por ubicación, disponibilidad y preferencias.
+                  Busca en nuestra selección premium de escorts verificadas en las principales
+                  ciudades del Ecuador.
                 </p>
               </div>
 
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">2. Revisa los detalles</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Cada perfil incluye información sobre disponibilidad, zona de ubicación y reseñas
-                  de clientes anteriores para ayudarte a tomar decisiones informadas.
+                  Cada perfil incluye información sobre la zona de ubicación e informacion de la modelo.
                 </p>
               </div>
 
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">3. Contacta directamente</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Conecta por WhatsApp, teléfono o formulario de mensaje. Todos los acuerdos,
-                  incluidos horarios y precios, se gestionan directamente entre las partes.
+                  Conecta por WhatsApp. Todos los acuerdos,
+                  incluidos horarios y precios, se gestionan con confidencialidad.
                 </p>
               </div>
 
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
-                <h3 className="text-xl text-white mb-2">4. Reúnete con seguridad</h3>
+                <h3 className="text-xl text-white mb-2">4. Reúnete y vive la experiencia DUBAI - VIP</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Sigue nuestras guías de seguridad: reúnanse primero en lugares públicos, verifica
-                  identidad, respeta límites y mantén discreción en todo momento.
+                  Reunete con tu modelo, paga de forma segura y disfruta de una experiencia premium con la máxima discreción.
                 </p>
               </div>
             </div>
@@ -71,10 +69,37 @@ export default function About() {
               actividad ilegal en nuestra plataforma.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed">
-              Todas las personas publicadas son adultas verificadas (18+) que operan de manera
-              independiente. Promovemos el comportamiento responsable, el respeto mutuo y el
-              cumplimiento de las leyes y regulaciones locales.
+              Todas las modelos publicadas son verificadas y mayores de edad (18+). Promovemos el comportamiento responsable y el respeto mutuo.
             </p>
+          </section>
+
+          <section className="mt-10 rounded-2xl p-8 border border-[#d4af37]/40 bg-gradient-to-r from-[#a83d8e]/20 to-[#d4af37]/15 text-center">
+            <div className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/40 px-4 py-1 mb-5">
+              <span className="text-[#d4af37] text-xs tracking-[0.2em]">EXCLUSIVO DUBAI</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-semibold text-white leading-tight mb-4">
+              Evita extorsiones y estafas.
+              <span className="block bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+                Elige Dubai Escorts Ecuador.
+              </span>
+            </h2>
+            <p className="text-gray-200 text-base md:text-lg max-w-3xl mx-auto mb-7">
+              Accede a perfiles verificados, trato discreto y experiencia VIP en un solo lugar.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                to="/profiles"
+                className="inline-flex items-center justify-center w-full sm:w-auto bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-10 py-3 rounded-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.65)]"
+              >
+                Ver perfiles VIP
+              </Link>
+              <Link
+                to="/safety"
+                className="inline-flex items-center justify-center w-full sm:w-auto border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-3 rounded-lg transition-all"
+              >
+                Ver guía de seguridad
+              </Link>
+            </div>
           </section>
         </div>
       </div>

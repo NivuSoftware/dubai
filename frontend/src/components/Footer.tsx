@@ -8,7 +8,7 @@ export default function Footer() {
           <div>
             <h3 className="text-2xl tracking-wider text-[#a83d8e] mb-4">DUBAI</h3>
             <p className="text-gray-400 text-sm">
-              Directorio premium y discreto de adultos verificados en Ecuador
+              Escorts premium y verficadas en Ecuador.
             </p>
           </div>
           
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-[#a83d8e]/20 pt-6 text-center text-sm text-gray-500">
-          <p>© 2026 DUBAI. Ecuador — Directorio premium y discreto. Todos los derechos reservados.</p>
+          <p>© 2026 DUBAI - Escorts Ecuador - Vive la experiecia VIP. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

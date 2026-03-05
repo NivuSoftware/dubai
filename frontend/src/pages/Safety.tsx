@@ -1,14 +1,12 @@
 import Layout from '../components/Layout';
+import { Link } from 'react-router';
 import {
-  Shield,
   AlertTriangle,
-  Phone,
-  MapPin,
-  Lock,
-  Eye,
   Flag,
-  UserX,
-  CheckCircle,
+  ShieldCheck,
+  BadgeCheck,
+  HeartPulse,
+  Sparkles,
 } from 'lucide-react';
 
 export default function Safety() {
@@ -18,7 +16,7 @@ export default function Safety() {
         <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">
             <h1 className="text-6xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
-              Guías de seguridad
+              Seguridad y confianza en DUBAI Escorts Ecuador
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
               Tu seguridad es nuestra prioridad. Sigue estas pautas para una experiencia segura.
@@ -28,61 +26,60 @@ export default function Safety() {
 
         <div className="max-w-[1200px] mx-auto px-8 py-20">
           <section className="mb-16">
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
-              <h2 className="text-4xl text-white mb-8 flex items-center gap-3">
-                <Shield className="w-10 h-10 text-[#a83d8e]" />
-                Lista esencial de seguridad
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-r from-[#a83d8e]/15 to-[#d4af37]/10 rounded-2xl p-8 border border-[#a83d8e]/30">
+              <h2 className="text-3xl text-white mb-6">Compromiso oficial de seguridad</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   {
-                    icon: MapPin,
-                    title: 'Reúnete primero en lugares públicos',
+                    icon: ShieldCheck,
+                    title: 'Sitio oficial y perfiles verificados',
                     description:
-                      'Organiza los primeros encuentros en lugares públicos y concurridos. Cafeterías, restaurantes y lobbies de hoteles son espacios seguros ideales.',
+                      'Este es nuestro único sitio oficial. Todas las modelos están verificadas para ayudarte a evitar estafas y extorsiones.',
                   },
                   {
-                    icon: Eye,
-                    title: 'Verifica la identidad',
+                    icon: BadgeCheck,
+                    title: 'Mayores de edad y control sanitario',
                     description:
-                      'Confirma la identidad de la persona con la que te reunirás. Busca insignias de verificación y solicita validación adicional si es necesario.',
+                      'Todas las modelos son mayores de edad y cuentan con carné de salud vigente.',
                   },
                   {
-                    icon: Lock,
-                    title: 'Protege tu privacidad',
+                    icon: HeartPulse,
+                    title: 'Protección obligatoria',
                     description:
-                      'Nunca compartas información personal sensible como tu dirección, datos financieros o lugar de trabajo.',
-                  },
-                  {
-                    icon: Phone,
-                    title: 'Avisa a alguien',
-                    description:
-                      'Informa a una persona de confianza a dónde vas, con quién te reunirás y cuándo esperas volver.',
-                  },
-                  {
-                    icon: CheckCircle,
-                    title: 'Confía en tu intuición',
-                    description:
-                      'Si algo se siente mal o incómodo, retírate de inmediato. Tu seguridad es más importante que cualquier compromiso social.',
-                  },
-                  {
-                    icon: AlertTriangle,
-                    title: 'Mantente sobria/o',
-                    description:
-                      'Mantén la claridad mental. Evita el consumo excesivo de alcohol o sustancias que puedan afectar tu juicio.',
+                      'Todos los servicios se realizan con protección, cuidando tu salud y la de nuestras modelos.',
                   },
                 ].map((item, index) => (
                   <div
                     key={index}
-                    className="bg-[#0a0a0a] rounded-xl p-6 border border-[#a83d8e]/30"
+                    className="bg-[#0a0a0a]/80 rounded-xl p-5 border border-[#a83d8e]/40 shadow-[0_0_24px_rgba(168,61,142,0.18)]"
                   >
-                    <div className="w-12 h-12 rounded-lg bg-[#a83d8e]/20 flex items-center justify-center mb-4">
-                      <item.icon className="w-6 h-6 text-[#a83d8e]" />
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#a83d8e]/30 to-[#d4af37]/20 border border-[#a83d8e]/50 flex items-center justify-center mb-4">
+                      <item.icon className="w-6 h-6 text-[#d4af37]" />
                     </div>
-                    <h3 className="text-xl text-white mb-2">{item.title}</h3>
-                    <p className="text-gray-400 leading-relaxed">{item.description}</p>
+                    <h3 className="text-white text-lg mb-2">{item.title}</h3>
+                    <p className="text-gray-300 leading-relaxed text-sm">{item.description}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-8 rounded-xl border border-[#d4af37]/50 bg-gradient-to-r from-[#a83d8e]/30 via-[#a83d8e]/15 to-[#d4af37]/20 p-6 md:p-7 shadow-[0_0_35px_rgba(212,175,55,0.2)]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#d4af37]/50 bg-[#0a0a0a]/40 px-3 py-1 text-xs text-[#d4af37] mb-4">
+                  <Sparkles className="w-4 h-4" />
+                  EXPERIENCIA PREMIUM
+                </div>
+                <p className="text-white text-2xl md:text-3xl font-semibold leading-tight">
+                  Solo DUBAI te da este nivel de seguridad, discreción y experiencia VIP.
+                </p>
+                <p className="text-gray-200 mt-3 text-sm md:text-base">
+                  Perfiles verificados, atención privada y selección exclusiva para que conectes con confianza.
+                </p>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <Link
+                    to="/profiles"
+                    className="inline-flex items-center justify-center bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-6 py-3 rounded-lg transition-all hover:shadow-[0_0_24px_rgba(168,61,142,0.6)]"
+                  >
+                    Ver perfiles
+                  </Link>
+                </div>
               </div>
             </div>
           </section>
@@ -110,114 +107,6 @@ export default function Safety() {
                     <span className="text-gray-300">{rule}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="mb-16">
-            <h2 className="text-4xl text-white mb-8 flex items-center gap-3">
-              <Flag className="w-10 h-10 text-red-500" />
-              Señales de alerta
-            </h2>
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-red-500/20">
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                Ten precaución si encuentras cualquiera de estas señales:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  'Presión para reunirse de inmediato sin verificación',
-                  'Solicitudes de dinero o información financiera por adelantado',
-                  'Resistencia a videollamar o verificar identidad',
-                  'Comunicación agresiva o irrespetuosa',
-                  'Negativa a reunirse en lugares públicos',
-                  'Información inconsistente en el perfil o mensajes',
-                  'Solicitudes para usar métodos de pago no oficiales',
-                  'Señales de coerción o angustia',
-                ].map((flag, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-400">{flag}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="mb-16">
-            <h2 className="text-4xl text-white mb-8 flex items-center gap-3">
-              <UserX className="w-10 h-10 text-[#a83d8e]" />
-              Reportar actividad sospechosa
-            </h2>
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
-              <p className="text-gray-300 mb-6 leading-relaxed text-lg">
-                Si encuentras conductas sospechosas, perfiles que violen nuestras pautas o crees
-                que alguien está en peligro, repórtalo de inmediato.
-              </p>
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#a83d8e]/20 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-[#a83d8e]">1</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white mb-1">Usa el botón de reporte</h3>
-                    <p className="text-gray-400">
-                      Cada perfil tiene un botón "Reportar perfil" para reportes rápidos.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#a83d8e]/20 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-[#a83d8e]">2</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white mb-1">Contacta a soporte</h3>
-                    <p className="text-gray-400">
-                      Escríbenos desde la página de contacto para temas urgentes.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#a83d8e]/20 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-[#a83d8e]">3</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white mb-1">Situaciones de emergencia</h3>
-                    <p className="text-gray-400">
-                      Si estás en peligro inmediato, contacta a las autoridades locales (911 en Ecuador).
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <button className="flex-1 bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-6 py-3 rounded-lg transition-all hover:shadow-[0_0_20px_rgba(168,61,142,0.5)]">
-                  Reportar un perfil
-                </button>
-                <button className="flex-1 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-6 py-3 rounded-lg transition-all">
-                  Contacta a soporte
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-2xl p-8 border border-red-500/30">
-              <h2 className="text-3xl text-white mb-4">Contactos de emergencia</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🚨</div>
-                  <h3 className="text-white mb-1">Emergencias</h3>
-                  <p className="text-2xl text-red-400">911</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl mb-2">👮</div>
-                  <h3 className="text-white mb-1">Policía</h3>
-                  <p className="text-2xl text-red-400">101</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🏥</div>
-                  <h3 className="text-white mb-1">Médico</h3>
-                  <p className="text-2xl text-red-400">131</p>
-                </div>
               </div>
             </div>
           </section>
