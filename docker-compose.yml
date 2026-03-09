@@ -1,15 +1,50 @@
 services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
+    container_name: dubai-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: dubai_db
+      POSTGRES_USER: dubai_user
+      POSTGRES_PASSWORD: dubai_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dubai_user -d dubai_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dubai-network
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-dubai-backend:latest}
     container_name: dubai-backend
     env_file:
       - ./backend/.env
+    environment:
+      - FLASK_APP=app
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
     ports:
       - "5000:5000"
     volumes:
       - ./backend:/app
+    command:
+      [
+        "sh",
+        "-c",
+        "flask --app app db upgrade && flask --app app run --host=0.0.0.0 --port=5000 --debug",
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: always
     networks:
       - dubai-network
@@ -18,6 +53,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE:-node:20-alpine}
     container_name: dubai-frontend
     working_dir: /app
     volumes:
@@ -30,11 +67,12 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - CHOKIDAR_INTERVAL=100
       - WATCHPACK_POLLING=true
+      - WDS_SOCKET_PORT=5173
     command:
       [
         "sh",
         "-c",
-        "npm install && (chmod +x node_modules/.bin/vite node_modules/esbuild/bin/esbuild node_modules/@esbuild/linux-x64/bin/esbuild 2>/dev/null || true) && npm run dev",
+        "npm install && (chmod +x node_modules/.bin/vite node_modules/esbuild/bin/esbuild node_modules/@esbuild/linux-x64/bin/esbuild 2>/dev/null || true) && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort",
       ]
     depends_on:
       - backend
@@ -43,3 +81,6 @@ services:
 networks:
   dubai-network:
     driver: bridge
+
+volumes:
+  postgres_data:

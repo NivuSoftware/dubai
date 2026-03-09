@@ -2,8 +2,6 @@ import Layout from '../components/Layout';
 import { 
   BadgeCheck, 
   Shield, 
-  Phone, 
-  AlertTriangle,
   ChevronDown,
   Search,
   MapPin,
@@ -20,6 +18,7 @@ import CityCard from '../components/CityCard';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
+import { CONTACT_WHATSAPP_URL } from '../constants/contact';
 
 const HERO_IMAGE = 'https://images.unsplash.com/photo-1760008218224-f8614778fec4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxEdWJhaSUyMHNreWxpbmUlMjBuaWdodCUyMG5lb24lMjBsaWdodHN8ZW58MXx8fHwxNzcyNTgyMjkzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
 
@@ -31,6 +30,7 @@ const FEATURED_PROFILES = [
     city: 'Quito',
     verified: true,
     tagline: 'Acompañante elegante para ocasiones sofisticadas',
+    price: '$120 / 1 hora',
     tags: ['Nuevo', 'Mejor valorado'],
   },
   {
@@ -40,6 +40,7 @@ const FEATURED_PROFILES = [
     city: 'Guayaquil',
     verified: true,
     tagline: 'Compañía profesional y discreta',
+    price: '$120 / 1 hora',
     tags: ['Mejor valorado'],
   },
   {
@@ -49,6 +50,7 @@ const FEATURED_PROFILES = [
     city: 'Cuenca',
     verified: true,
     tagline: 'Presencia sofisticada y encantadora',
+    price: '$120 / 1 hora',
     tags: ['Nuevo'],
   },
   {
@@ -58,6 +60,7 @@ const FEATURED_PROFILES = [
     city: 'Quito',
     verified: true,
     tagline: 'Acompañante refinada para eventos exclusivos',
+    price: '$120 / 1 hora',
   },
   {
     id: '5',
@@ -331,11 +334,11 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
               icon={BadgeCheck}
-              title="Verificación de adultos"
-              description="Un proceso estricto de verificación de identidad y edad asegura que todos los perfiles sean auténticos y cumplan las normas."
+              title="Sitio oficial y perfiles verificados"
+              description="Este es nuestro único sitio oficial. Todas las modelos están verificadas para ayudarte a evitar estafas y extorsiones."
             />
             <FeatureCard
               icon={Lock}
@@ -343,14 +346,9 @@ export default function Home() {
               description="Sistema de contacto privado que protege tu identidad y mantiene total confidencialidad."
             />
             <FeatureCard
-              icon={Phone}
-              title="Contacto directo"
-              description="Conecta directamente por WhatsApp o teléfono sin intermediarios."
-            />
-            <FeatureCard
               icon={Shield}
-              title="Seguridad primero"
-              description="Reporte comunitario y moderación activa para mantener un entorno seguro para todas las personas."
+              title="Mayores de edad y control sanitario"
+              description="Todas las modelos son mayores de edad y cuentan con carné de salud vigente."
             />
           </div>
         </div>
@@ -358,33 +356,77 @@ export default function Home() {
 
 
 
-      {/* Seguridad y reglas */}
+      {/* Trabaja con nosotros y compromiso de seguridad */}
       <section className="py-20 px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
-              Seguridad y reglas de la comunidad
+              Oportunidad y confianza en un solo lugar
             </h2>
             <p className="text-gray-400 text-lg">
-              Pautas para garantizar una experiencia segura y respetuosa
+              Únete al directorio y conoce nuestro compromiso oficial de seguridad
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Lista de seguridad */}
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
-              <h3 className="text-2xl text-white mb-6 flex items-center gap-3">
-                <Shield className="w-7 h-7 text-[#a83d8e]" />
-                Lista de seguridad
+            <div className="rounded-2xl p-6 sm:p-8 border border-[#229ED9]/30 bg-gradient-to-r from-[#051017] via-[#0a0a0a] to-[#151008] shadow-[0_0_40px_rgba(34,158,217,0.15)]">
+              <div className="inline-flex items-center rounded-full border border-[#229ED9]/50 bg-[#229ED9]/10 px-4 py-1 mb-4">
+                <span className="text-[#7dd3fc] text-xs tracking-[0.2em]">NUEVAS VACANTES</span>
+              </div>
+              <h3 className="text-2xl sm:text-4xl text-white leading-tight mb-3">
+                ¿QUIERES TRABAJAR CON NOSOTROS?
               </h3>
+              <p className="text-base sm:text-lg text-gray-200 mb-6">
+                Escanea el código QR y envíanos un mensaje por Telegram. Proceso directo,
+                reservado y rápido.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 place-items-center">
+                <a
+                  href="https://t.me/DBE593"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block w-full"
+                >
+                  <img
+                    src="/images/telegram.png"
+                    alt="Código QR de Telegram"
+                    className="w-full max-w-[320px] mx-auto"
+                  />
+                </a>
+                <img
+                  src="/images/wpp.png"
+                  alt="Código QR de WhatsApp"
+                  className="w-full max-w-[320px] mx-auto"
+                />
+              </div>
+              <div className="mt-5 text-center">
+                <a
+                  href="https://t.me/DBE593"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-2.5 text-sm font-medium transition-all shadow-[0_0_24px_rgba(36,161,222,0.45)]"
+                >
+                  Escribir por Telegram @DBE593
+                </a>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
+              <h3 className="text-2xl text-white mb-3 flex items-center gap-3">
+                <Shield className="w-7 h-7 text-[#a83d8e]" />
+                Compromiso oficial de seguridad
+              </h3>
+              <p className="text-gray-300 mb-6">
+                En DUBAI mantenemos control estricto de perfiles para proteger la privacidad,
+                la discreción y el bienestar de toda la comunidad.
+              </p>
               <div className="space-y-4">
                 {[
-                  'Reúnete primero en lugares seguros y públicos',
-                  'Verifica la identidad antes de reunirte',
-                  'Respeta los límites y el consentimiento',
-                  'Actúa con discreción y protege la privacidad',
-                  'Nunca compartas información personal sensible',
-                  'Confía en tu intuición',
+                  'Verificación de identidad y mayoría de edad (18+)',
+                  'Tolerancia cero a estafas, coerción o actividad ilegal',
+                  'Moderación activa y revisión manual de reportes',
+                  'Canales de contacto directos y confidenciales',
+                  'Cumplimiento de leyes y regulaciones locales',
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-[#a83d8e]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -394,41 +436,15 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Reglas de la plataforma */}
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
-              <h3 className="text-2xl text-white mb-6 flex items-center gap-3">
-                <AlertTriangle className="w-7 h-7 text-[#d4af37]" />
-                Reglas de la plataforma
-              </h3>
-              <div className="space-y-4">
-                {[
-                  'Solo adultos (18+) con control estricto',
-                  'No contenido explícito o pornográfico',
-                  'No se tolera trata ni coerción',
-                  'Reporta actividad sospechosa de inmediato',
-                  'Respeta a toda la comunidad',
-                  'Cumple las leyes y regulaciones locales',
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#d4af37]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-[#d4af37]"></div>
-                    </div>
-                    <span className="text-gray-300">{item}</span>
-                  </div>
-                ))}
+              <div className="mt-7">
+                <a
+                  href="/safety"
+                  className="inline-flex items-center justify-center border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-6 py-2.5 rounded-full transition-all"
+                >
+                  Ver guía completa de seguridad
+                </a>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 mt-12">
-            <button className="border border-[#a83d8e] text-[#a83d8e] hover:bg-[#a83d8e] hover:text-white px-8 py-3 rounded-full transition-all hover:shadow-[0_0_20px_rgba(168,61,142,0.5)]">
-              Reportar perfil
-            </button>
-            <button className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-3 rounded-full transition-all">
-              Contactar soporte
-            </button>
           </div>
         </div>
       </section>
@@ -494,10 +510,15 @@ export default function Home() {
               <Eye className="w-5 h-5" />
               Buscar perfiles
             </button>
-            <button className="border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white px-10 py-4 rounded-full text-lg transition-all flex items-center gap-3">
+            <a
+              href={CONTACT_WHATSAPP_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white px-10 py-4 rounded-full text-lg transition-all flex items-center gap-3"
+            >
               <MessageCircle className="w-5 h-5" />
               Hablar por WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </section>

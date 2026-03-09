@@ -1,8 +1,106 @@
+import { useEffect, useState } from "react";
 import { RouterProvider } from 'react-router';
 import { router } from './routes';
 
+const AGE_GATE_KEY = "dubai_age_gate_status";
+
+type AgeGateStatus = "unknown" | "accepted" | "rejected";
+
 function App() {
-  return <RouterProvider router={router} />;
+  const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>("unknown");
+  const isAdminRoute = /^\/admin(\/|$)/.test(window.location.pathname);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(AGE_GATE_KEY);
+    if (stored === "accepted" || stored === "rejected") {
+      setAgeGateStatus(stored);
+    }
+  }, []);
+
+  const acceptAgeGate = () => {
+    localStorage.setItem(AGE_GATE_KEY, "accepted");
+    setAgeGateStatus("accepted");
+  };
+
+  const rejectAgeGate = () => {
+    localStorage.setItem(AGE_GATE_KEY, "rejected");
+    setAgeGateStatus("rejected");
+  };
+
+  const exitRejectedScreen = () => {
+    localStorage.removeItem(AGE_GATE_KEY);
+    setAgeGateStatus("unknown");
+    window.location.href = "/";
+  };
+
+  if (!isAdminRoute && ageGateStatus === "rejected") {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center px-6">
+        <div className="text-center">
+          <img src="/images/logo.png" alt="Dubai logo" className="mx-auto h-28 w-auto mb-6" />
+          <h1 className="text-white text-xl sm:text-2xl">
+            Este sitio web solo esta dirigido a usuarios mayores de 18 años
+          </h1>
+          <button
+            onClick={exitRejectedScreen}
+            className="mt-6 rounded-lg border border-white/30 px-6 py-3 text-white hover:bg-white/10 transition"
+          >
+            Salir
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const showAgeGateModal = !isAdminRoute && ageGateStatus === "unknown";
+
+  return (
+    <div className="relative min-h-screen">
+      <div className={showAgeGateModal ? "pointer-events-none blur-sm select-none" : ""}>
+        <RouterProvider router={router} />
+      </div>
+
+      {showAgeGateModal ? (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-md px-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/20 bg-[#0d1320] p-6 sm:p-8">
+            <div className="mb-5 text-center">
+              <img
+                src="/images/logo.png"
+                alt="Dubai logo"
+                className="mx-auto h-24 sm:h-32 w-auto"
+              />
+              <p className="mt-3 text-sm sm:text-base text-gray-300">Dubai | Escorts Ecuador</p>
+            </div>
+            <h1 className="text-white text-2xl sm:text-3xl mb-4">
+              Este es un sitio web para adultos
+            </h1>
+            <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-6">
+              Este sitio web contiene material restringido para menores de edad, que incluyen
+              desnudez y representaciones explicitas de actividad sexual. Al entrar, afirma que
+              tiene por lo menos 18 años de edad o la mayoria de edad en la jurisdiccion desde que
+              esta accediendo al sitio web y que da consentimiento en ver contenido sexualmente
+              explicito.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={acceptAgeGate}
+                className="rounded-lg bg-[#a83d8e] hover:bg-[#922f79] text-white px-4 py-3 font-medium transition"
+              >
+                Tengo 18 años o más - Ingresar
+              </button>
+              <button
+                onClick={rejectAgeGate}
+                className="rounded-lg border border-red-400/70 text-red-300 hover:bg-red-400/10 px-4 py-3 font-medium transition"
+              >
+                Soy menor de 18 años - Salir
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export default App;

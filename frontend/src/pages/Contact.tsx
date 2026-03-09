@@ -1,5 +1,10 @@
 import Layout from '../components/Layout';
-import { Mail, MessageCircle, Phone } from 'lucide-react';
+import { MessageCircle, Phone, Send } from 'lucide-react';
+import {
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_TEL,
+  CONTACT_WHATSAPP_URL,
+} from '../constants/contact';
 
 export default function Contact() {
   return (
@@ -26,25 +31,33 @@ export default function Contact() {
               <p className="text-gray-400 mb-6 leading-relaxed">
                 Atención directa para consultas rápidas y soporte inmediato.
               </p>
-              <button className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3">
+              <a
+                href={CONTACT_WHATSAPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
+              >
                 <MessageCircle className="w-5 h-5" />
                 Abrir WhatsApp
-              </button>
+              </a>
             </div>
 
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
-              <div className="w-14 h-14 rounded-lg bg-[#a83d8e]/20 flex items-center justify-center mb-4">
-                <Mail className="w-7 h-7 text-[#a83d8e]" />
+            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#229ED9]/30">
+              <div className="w-14 h-14 rounded-lg bg-[#229ED9]/20 flex items-center justify-center mb-4">
+                <Send className="w-7 h-7 text-[#229ED9]" />
               </div>
-              <h3 className="text-2xl text-white mb-3">Correo electrónico</h3>
+              <h3 className="text-2xl text-white mb-3">Telegram</h3>
               <p className="text-gray-400 mb-4 leading-relaxed">
-                Para solicitudes detalladas y seguimiento de casos.
+                Contáctanos directamente por Telegram para soporte y postulaciones.
               </p>
+              
               <a
-                href="mailto:support@dubai-directory.com"
-                className="text-[#d4af37] hover:text-[#d4af37]/80 transition-colors break-all"
+                href="https://t.me/DBE593"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex items-center justify-center bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-5 py-2.5 rounded-lg transition-all shadow-[0_0_18px_rgba(36,161,222,0.35)]"
               >
-                support@dubai-directory.com
+                Abrir Telegram
               </a>
             </div>
 
@@ -57,39 +70,48 @@ export default function Contact() {
                 Canal recomendado para casos urgentes.
               </p>
               <a
-                href="tel:+593999999999"
+                href={`tel:${CONTACT_PHONE_TEL}`}
                 className="text-[#d4af37] hover:text-[#d4af37]/80 transition-colors"
               >
-                +593 99 999 9999
+                {CONTACT_PHONE_DISPLAY}
               </a>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border border-[#a83d8e]/20">
-              <h3 className="text-xl text-white mb-3">Tiempo de respuesta</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Respondemos normalmente en menos de 24 horas en días hábiles. Si es un tema
-                urgente de seguridad, usa WhatsApp o teléfono para atención inmediata.
-              </p>
+          <div className="rounded-2xl p-6 sm:p-8 border border-[#229ED9]/30 bg-gradient-to-r from-[#051017] via-[#0a0a0a] to-[#151008] shadow-[0_0_40px_rgba(34,158,217,0.15)]">
+            <div className="inline-flex items-center rounded-full border border-[#229ED9]/50 bg-[#229ED9]/10 px-4 py-1 mb-4">
+              <span className="text-[#7dd3fc] text-xs tracking-[0.2em]">NUEVAS VACANTES</span>
             </div>
-
-            <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border border-[#a83d8e]/20">
-              <h3 className="text-xl text-white mb-3">Horario de atención</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-gray-400">
-                  <span>Lunes - Viernes</span>
-                  <span>9:00 AM - 10:00 PM</span>
-                </div>
-                <div className="flex justify-between text-gray-400">
-                  <span>Sábado</span>
-                  <span>10:00 AM - 8:00 PM</span>
-                </div>
-                <div className="flex justify-between text-gray-400">
-                  <span>Domingo</span>
-                  <span>12:00 PM - 6:00 PM</span>
-                </div>
-              </div>
+            <h3 className="text-2xl sm:text-4xl text-white leading-tight mb-3">
+              ¿QUIERES TRABAJAR CON NOSOTROS?
+            </h3>
+            <p className="text-base sm:text-lg text-gray-200 mb-6">
+              Escanea el código QR y envíanos un mensaje por Telegram o Whatsapp. Proceso directo,
+              reservado y rápido.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 place-items-center">
+              <a
+                href="https://t.me/DBE593"
+                target="_blank"
+                rel="noreferrer"
+                className="block w-full"
+              >
+                <img
+                  src="/images/telegram.png"
+                  alt="Código QR de Telegram"
+                  className="w-full max-w-[320px] mx-auto"
+                />
+              </a>
+              <img
+                src="/images/wpp.png"
+                alt="Código QR de WhatsApp"
+                className="w-full max-w-[320px] mx-auto"
+              />
+            </div>
+            <div className="mt-5 text-center">
+              <span className="inline-flex items-center justify-center rounded-full bg-[#229ED9] text-white px-5 py-2 text-sm font-medium shadow-[0_0_24px_rgba(34,158,217,0.45)]">
+                Escanea el codigo y envianos un mensaje!
+              </span>
             </div>
           </div>
 

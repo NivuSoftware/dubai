@@ -6,3 +6,6 @@ html {
   scroll-behavior: smooth;
 }
 
+body.admin-private-page .whatsapp-fab {
+  display: none !important;
+}

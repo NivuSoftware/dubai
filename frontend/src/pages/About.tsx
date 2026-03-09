@@ -93,12 +93,6 @@ export default function About() {
               >
                 Ver perfiles VIP
               </Link>
-              <Link
-                to="/safety"
-                className="inline-flex items-center justify-center w-full sm:w-auto border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-3 rounded-lg transition-all"
-              >
-                Ver guía de seguridad
-              </Link>
             </div>
           </section>
         </div>

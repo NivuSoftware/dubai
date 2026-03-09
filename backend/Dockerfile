@@ -1,5 +1,7 @@
-# Imagen base de Python
-FROM python:3.11-slim
+# Imagen base configurable.
+# Default local para entornos sin acceso a registries (ya existe: dubai-backend:latest).
+ARG PYTHON_BASE_IMAGE=dubai-backend:latest
+FROM ${PYTHON_BASE_IMAGE}
 
 # Establecer directorio de trabajo
 WORKDIR /app
@@ -14,5 +16,5 @@ COPY . .
 # Exponer puerto Flask
 EXPOSE 5000
 
-# Comando para ejecutar la app
-CMD ["python", "app.py"]
+# Ejecutar migraciones y luego iniciar app
+CMD ["sh", "-c", "flask --app app db upgrade && python app.py"]
