@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, MessageCircle, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CONTACT_WHATSAPP_URL } from '../constants/contact';
 
 export default function Header() {
   const location = useLocation();
@@ -54,9 +53,6 @@ export default function Header() {
           <Link to="/about" className={navLinkClass('/about')}>
             Sobre nosotros
           </Link>
-          <Link to="/contact" className={navLinkClass('/contact')}>
-            Contacto
-          </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -72,15 +68,6 @@ export default function Header() {
           >
             Buscar perfiles
           </Link>
-          <a
-            href={CONTACT_WHATSAPP_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-6 py-2 rounded-full text-base font-medium transition-all flex items-center gap-2"
-          >
-            <MessageCircle className="w-4 h-4" />
-            WhatsApp
-          </a>
         </div>
 
         <button
@@ -109,10 +96,6 @@ export default function Header() {
             <Link to="/about" className={navLinkClass('/about')}>
               Sobre nosotros
             </Link>
-            <Link to="/contact" className={navLinkClass('/contact')}>
-              Contacto
-            </Link>
-
             <div className="pt-2 flex flex-col gap-3">
               <Link
                 to="/registro-anunciante"
@@ -126,15 +109,6 @@ export default function Header() {
               >
                 Buscar perfiles
               </Link>
-              <a
-                href={CONTACT_WHATSAPP_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-6 py-2 rounded-full text-base font-medium transition-all flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp
-              </a>
             </div>
           </nav>
         </div>

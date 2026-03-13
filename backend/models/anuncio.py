@@ -18,9 +18,10 @@ class Anuncio(db.Model):
     contact_number = db.Column(db.String(20), nullable=True)
     estado = db.Column(db.String(30), nullable=False, default="pending", index=True)
     pago = db.Column(db.String(30), nullable=False, default="pending", index=True)
+    is_draft = db.Column(db.Boolean, nullable=False, default=False, index=True)
     plan = db.Column(db.String(20), nullable=False)
     imagen_comprobante_pago = db.Column(db.String(500), nullable=False)
-    fecha_hasta = db.Column(db.Date, nullable=False, index=True)
+    fecha_hasta = db.Column(db.DateTime, nullable=False, index=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow

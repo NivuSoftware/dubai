@@ -351,9 +351,13 @@ export default function AdminPanel() {
   };
 
   const getPlanLabel = (plan: string) => {
-    if (plan === "quarterly") return "Trimestral";
-    if (plan === "semiannual") return "Semestral";
-    return "Mensual";
+    if (plan === "executive") return "Plan Ejecutivo (Diario) $20";
+    if (plan === "nena") return "Plan Nena (Semanal) $120";
+    if (plan === "dama") return "Plan Dama (Mensual) $560";
+    if (plan === "monthly") return "Mensual (legado)";
+    if (plan === "quarterly") return "Trimestral (legado)";
+    if (plan === "semiannual") return "Semestral (legado)";
+    return "Plan Princesa (Trimestral) $1740";
   };
 
   if (authLoading) {

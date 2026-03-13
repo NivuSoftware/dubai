@@ -18,7 +18,8 @@ export interface Anuncio {
   whatsapp_url: string;
   estado: string;
   pago: string;
-  plan: "monthly" | "quarterly" | "semiannual";
+  is_draft: boolean;
+  plan: string;
   imagen_comprobante_pago: string;
   imagen_comprobante_pago_url: string;
   fecha_hasta: string;
@@ -43,7 +44,7 @@ export interface AnuncioPayload {
   ubicacion: string;
   contact_country_code: string;
   contact_number: string;
-  plan: "monthly" | "quarterly" | "semiannual";
+  plan: "executive" | "nena" | "dama" | "princesa";
   payment_receipt_image: File;
   images: File[];
 }
@@ -58,7 +59,12 @@ export interface AnuncioUpdatePayload {
 }
 
 export interface AnuncioReactivatePayload {
-  plan: "monthly" | "quarterly" | "semiannual";
+  plan: "executive" | "nena" | "dama" | "princesa";
+  payment_receipt_image: File;
+}
+
+export interface AnuncioDraftPayload {
+  plan: "executive" | "nena" | "dama" | "princesa";
   payment_receipt_image: File;
 }
 
@@ -90,6 +96,25 @@ export async function createAdvertiserAnuncio(token: string, payload: AnuncioPay
   return response.item;
 }
 
+export async function createAdvertiserAnuncioDraft(
+  token: string,
+  payload: AnuncioDraftPayload
+): Promise<Anuncio> {
+  const formData = new FormData();
+  formData.append("plan", payload.plan);
+  formData.append("payment_receipt_image", payload.payment_receipt_image);
+
+  const response = await apiRequestWithAuth<{ message: string; item: Anuncio }>(
+    token,
+    "/api/advertiser/anuncios/draft",
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+  return response.item;
+}
+
 export function updateAdvertiserAnuncio(
   token: string,
   anuncioId: number,
@@ -100,6 +125,19 @@ export function updateAdvertiserAnuncio(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+}
+
+export function finalizeAdvertiserAnuncio(
+  token: string,
+  anuncioId: number
+): Promise<{ message: string; item: Anuncio }> {
+  return apiRequestWithAuth<{ message: string; item: Anuncio }>(
+    token,
+    `/api/advertiser/anuncios/${anuncioId}/finalize`,
+    {
+      method: "POST",
+    }
+  );
 }
 
 export function deleteAdvertiserAnuncio(

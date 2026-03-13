@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 from flask import current_app, send_from_directory, url_for
@@ -145,10 +145,10 @@ def _require_admin():
 @jwt_required()
 def list_ad_requests():
     _require_admin()
-    today = date.today()
+    now = datetime.utcnow()
     expired_requests = (
         Anuncio.query.filter(
-            Anuncio.fecha_hasta < today,
+            Anuncio.fecha_hasta < now,
             or_(Anuncio.estado != "INACTIVO", Anuncio.pago != "PENDIENTE"),
         ).all()
     )
@@ -159,7 +159,7 @@ def list_ad_requests():
         db.session.commit()
 
     requests = (
-        Anuncio.query.filter(Anuncio.estado.in_(["pending", "PENDIENTE"]))
+        Anuncio.query.filter(Anuncio.estado.in_(["pending", "PENDIENTE"]), Anuncio.is_draft.is_(False))
         .order_by(Anuncio.created_at.desc())
         .all()
     )

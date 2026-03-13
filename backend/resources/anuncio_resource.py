@@ -1,6 +1,6 @@
 import calendar
 import os
-from datetime import date
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 from uuid import uuid4
@@ -30,10 +30,11 @@ public_anuncio_bp = Blueprint(
 )
 
 MAX_IMAGES_PER_ANUNCIO = 5
-PLAN_MONTHS = {
-    "monthly": 1,
-    "quarterly": 3,
-    "semiannual": 6,
+PLAN_CONFIG = {
+    "executive": {"hours": 24},
+    "nena": {"days": 7},
+    "dama": {"months": 1},
+    "princesa": {"months": 3},
 }
 
 
@@ -66,12 +67,26 @@ def _allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
 
 
-def _add_months(current_date: date, months: int) -> date:
-    month_index = current_date.month - 1 + months
-    year = current_date.year + month_index // 12
+def _add_months(current_datetime: datetime, months: int) -> datetime:
+    month_index = current_datetime.month - 1 + months
+    year = current_datetime.year + month_index // 12
     month = month_index % 12 + 1
-    day = min(current_date.day, calendar.monthrange(year, month)[1])
-    return date(year, month, day)
+    day = min(current_datetime.day, calendar.monthrange(year, month)[1])
+    return current_datetime.replace(year=year, month=month, day=day)
+
+
+def _calculate_expiration(plan: str, now: Optional[datetime] = None) -> datetime:
+    current_time = now or datetime.utcnow()
+    config = PLAN_CONFIG[plan]
+
+    if "hours" in config:
+        return current_time + timedelta(hours=config["hours"])
+    if "days" in config:
+        return current_time + timedelta(days=config["days"])
+    if "months" in config:
+        return _add_months(current_time, config["months"])
+
+    raise ValueError(f"Plan no soportado: {plan}")
 
 
 def _save_file(file_storage, target_folder: Path, prefix: str) -> str:
@@ -115,10 +130,28 @@ def _require_owner(ad: Anuncio, advertiser_id: int):
         abort(403, message="No tienes permisos sobre este anuncio")
 
 
+def _validate_anuncio_completion(anuncio: Anuncio):
+    if not (anuncio.titulo or "").strip():
+        abort(400, message="Completa el título del anuncio.")
+    if not (anuncio.descripcion or "").strip():
+        abort(400, message="Completa la descripción del anuncio.")
+    if not (anuncio.ubicacion or "").strip():
+        abort(400, message="Completa la ubicación del anuncio.")
+    if anuncio.precio is None or float(anuncio.precio) < 0:
+        abort(400, message="Precio inválido.")
+
+    country_digits = "".join(char for char in (anuncio.contact_country_code or "") if char.isdigit())
+    phone_digits = "".join(char for char in (anuncio.contact_number or "") if char.isdigit()).lstrip("0")
+    if not country_digits or len(country_digits) < 1 or len(country_digits) > 4:
+        abort(400, message="Código de país inválido.")
+    if not phone_digits or len(phone_digits) < 6 or len(phone_digits) > 15:
+        abort(400, message="Número de contacto inválido.")
+
+
 def _expire_outdated_ads(owner_id: Optional[int] = None):
-    today = date.today()
+    now = datetime.utcnow()
     query = Anuncio.query.filter(
-        Anuncio.fecha_hasta < today,
+        Anuncio.fecha_hasta < now,
         or_(Anuncio.estado != "INACTIVO", Anuncio.pago != "PENDIENTE"),
     )
     if owner_id is not None:
@@ -189,8 +222,8 @@ def create_advertiser_anuncio():
     contact_country_code = f"+{country_digits}"
     contact_number = phone_digits
 
-    if plan not in PLAN_MONTHS:
-        abort(400, message="Plan inválido. Usa monthly, quarterly o semiannual.")
+    if plan not in PLAN_CONFIG:
+        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
 
     try:
         precio = float(precio_raw)
@@ -207,7 +240,7 @@ def create_advertiser_anuncio():
     if len(ad_images) > MAX_IMAGES_PER_ANUNCIO:
         abort(400, message=f"Máximo {MAX_IMAGES_PER_ANUNCIO} imágenes por anuncio.")
 
-    expiration_date = _add_months(date.today(), PLAN_MONTHS[plan])
+    expiration_date = _calculate_expiration(plan)
 
     anuncio = Anuncio(
         owner_id=advertiser.id,
@@ -246,6 +279,49 @@ def create_advertiser_anuncio():
     }, 201
 
 
+@advertiser_anuncio_bp.route("/draft", methods=["POST"])
+@jwt_required()
+def create_advertiser_anuncio_draft():
+    advertiser = _require_verified_advertiser()
+
+    plan = (request.form.get("plan") or "").strip().lower()
+    if plan not in PLAN_CONFIG:
+        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
+
+    payment_receipt = request.files.get("payment_receipt_image")
+    if not payment_receipt:
+        abort(400, message="Debes cargar la foto de la transferencia.")
+
+    anuncio = Anuncio(
+        owner_id=advertiser.id,
+        titulo="",
+        descripcion="",
+        precio=0,
+        ubicacion="",
+        contact_country_code="+593",
+        contact_number="",
+        plan=plan,
+        estado="PENDIENTE",
+        pago="PENDIENTE",
+        is_draft=True,
+        fecha_hasta=_calculate_expiration(plan),
+        imagen_comprobante_pago="",
+    )
+    db.session.add(anuncio)
+    db.session.flush()
+
+    upload_root = _upload_root()
+    ad_folder = upload_root / str(anuncio.id)
+    ad_folder.mkdir(parents=True, exist_ok=True)
+    anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
+
+    db.session.commit()
+    return {
+        "message": "Borrador creado correctamente.",
+        "item": _serialize_anuncio(anuncio),
+    }, 201
+
+
 @advertiser_anuncio_bp.route("/<int:anuncio_id>/reactivate", methods=["POST"])
 @jwt_required()
 def reactivate_advertiser_anuncio(anuncio_id):
@@ -260,8 +336,8 @@ def reactivate_advertiser_anuncio(anuncio_id):
         abort(400, message="Solo puedes activar anuncios inactivos y con pago pendiente.")
 
     plan = (request.form.get("plan") or "").strip().lower()
-    if plan not in PLAN_MONTHS:
-        abort(400, message="Plan inválido. Usa monthly, quarterly o semiannual.")
+    if plan not in PLAN_CONFIG:
+        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
 
     payment_receipt = request.files.get("payment_receipt_image")
     if not payment_receipt:
@@ -277,7 +353,7 @@ def reactivate_advertiser_anuncio(anuncio_id):
 
     anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
     anuncio.plan = plan
-    anuncio.fecha_hasta = _add_months(date.today(), PLAN_MONTHS[plan])
+    anuncio.fecha_hasta = _calculate_expiration(plan)
     anuncio.estado = "PENDIENTE"
     anuncio.pago = "PENDIENTE"
 
@@ -324,6 +400,31 @@ def update_advertiser_anuncio(data, anuncio_id):
 
     db.session.commit()
     return _serialize_anuncio(anuncio)
+
+
+@advertiser_anuncio_bp.route("/<int:anuncio_id>/finalize", methods=["POST"])
+@jwt_required()
+def finalize_advertiser_anuncio(anuncio_id):
+    claims = get_jwt()
+    if claims.get("role") != "advertiser":
+        abort(403, message="No tienes permisos de anunciante")
+
+    advertiser_id = int(get_jwt_identity())
+    anuncio = db.session.get(Anuncio, anuncio_id)
+    if not anuncio:
+        abort(404, message="Anuncio no encontrado")
+    _require_owner(anuncio, advertiser_id)
+
+    _validate_anuncio_completion(anuncio)
+    anuncio.is_draft = False
+    anuncio.estado = "PENDIENTE"
+    anuncio.pago = "PENDIENTE"
+
+    db.session.commit()
+    return {
+        "message": "Anuncio finalizado y enviado a revisión.",
+        "item": _serialize_anuncio(anuncio),
+    }
 
 
 @advertiser_anuncio_bp.route("/<int:anuncio_id>", methods=["DELETE"])
@@ -427,10 +528,10 @@ def get_anuncio_file(file_path):
 @public_anuncio_bp.route("", methods=["GET"])
 def list_public_anuncios():
     _expire_outdated_ads()
-    today = date.today()
+    now = datetime.utcnow()
     anuncios = (
         Anuncio.query.filter_by(estado="ACTIVO", pago="PAGADO")
-        .filter(Anuncio.fecha_hasta >= today)
+        .filter(Anuncio.fecha_hasta >= now)
         .order_by(Anuncio.created_at.desc())
         .all()
     )
@@ -440,8 +541,8 @@ def list_public_anuncios():
 @public_anuncio_bp.route("/<int:anuncio_id>", methods=["GET"])
 def get_public_anuncio(anuncio_id):
     _expire_outdated_ads()
-    today = date.today()
+    now = datetime.utcnow()
     anuncio = Anuncio.query.filter_by(id=anuncio_id, estado="ACTIVO", pago="PAGADO").first()
-    if not anuncio or anuncio.fecha_hasta < today:
+    if not anuncio or anuncio.fecha_hasta < now:
         abort(404, message="Anuncio no encontrado")
     return _serialize_anuncio(anuncio)

@@ -9,7 +9,7 @@ class AnuncioCreateSchema(Schema):
     contact_country_code = fields.String(required=True, validate=validate.Length(min=2, max=8))
     contact_number = fields.String(required=True, validate=validate.Length(min=6, max=20))
     plan = fields.String(
-        required=True, validate=validate.OneOf(["monthly", "quarterly", "semiannual"])
+        required=True, validate=validate.OneOf(["executive", "nena", "dama", "princesa"])
     )
 
 
@@ -40,10 +40,11 @@ class AnuncioSchema(Schema):
     whatsapp_url = fields.String(dump_only=True)
     estado = fields.String(dump_only=True)
     pago = fields.String(dump_only=True)
+    is_draft = fields.Boolean(dump_only=True)
     plan = fields.String(dump_only=True)
     imagen_comprobante_pago = fields.String(dump_only=True)
     imagen_comprobante_pago_url = fields.String(dump_only=True)
-    fecha_hasta = fields.Date(dump_only=True)
+    fecha_hasta = fields.DateTime(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     images = fields.List(fields.Nested(AnuncioImageSchema), dump_only=True)

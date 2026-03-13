@@ -8,10 +8,10 @@ import {
 } from "../services/authService";
 import {
   Anuncio,
-  AnuncioPayload,
-  createAdvertiserAnuncio,
+  createAdvertiserAnuncioDraft,
   deleteAdvertiserAnuncio,
   deleteAdvertiserAnuncioImage,
+  finalizeAdvertiserAnuncio,
   listAdvertiserAnuncios,
   reactivateAdvertiserAnuncio,
   updateAdvertiserAnuncio,
@@ -35,7 +35,7 @@ interface VerificationFormState {
   portrait_image: File | null;
 }
 
-type AnuncioPlan = "monthly" | "quarterly" | "semiannual";
+type AnuncioPlan = "executive" | "nena" | "dama" | "princesa";
 
 interface PaymentStepState {
   plan: AnuncioPlan;
@@ -54,6 +54,7 @@ interface AnuncioFormState {
 }
 
 const MAX_IMAGES_PER_ANUNCIO = 5;
+const DRAFT_STORAGE_PREFIX = "advertiser_anuncio_draft_form";
 
 function normalizePhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "");
@@ -77,9 +78,34 @@ function isAdult(birthDate: string): boolean {
 }
 
 function planLabel(plan: AnuncioPlan): string {
-  if (plan === "quarterly") return "Trimestral";
-  if (plan === "semiannual") return "Semestral";
-  return "Mensual";
+  if (plan === "executive") return "Plan Ejecutivo (Diario) $20";
+  if (plan === "nena") return "Plan Nena (Semanal) $120";
+  if (plan === "dama") return "Plan Dama (Mensual) $560";
+  return "Plan Princesa (Trimestral) $1740";
+}
+
+function planLabelFromValue(plan: string): string {
+  if (plan === "executive" || plan === "nena" || plan === "dama" || plan === "princesa") {
+    return planLabel(plan);
+  }
+  if (plan === "monthly") return "Mensual (legado)";
+  if (plan === "quarterly") return "Trimestral (legado)";
+  if (plan === "semiannual") return "Semestral (legado)";
+  return plan;
+}
+
+function normalizeSelectablePlan(plan: string): AnuncioPlan {
+  if (plan === "executive" || plan === "nena" || plan === "dama" || plan === "princesa") {
+    return plan;
+  }
+  return "executive";
+}
+
+function formatDateTime(value: string): string {
+  return new Date(value).toLocaleString("es-EC", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }
 
 function statusLabel(value: string): string {
@@ -105,9 +131,14 @@ function estadoTextClass(value: string): string {
 
 function canReactivateAnuncio(anuncio: Anuncio): boolean {
   return (
+    !anuncio.is_draft &&
     anuncio.estado?.toUpperCase() === "INACTIVO" &&
     anuncio.pago?.toUpperCase() === "PENDIENTE"
   );
+}
+
+function getDraftStorageKey(anuncioId: number): string {
+  return `${DRAFT_STORAGE_PREFIX}_${anuncioId}`;
 }
 
 export default function AdvertiserPanel() {
@@ -127,7 +158,7 @@ export default function AdvertiserPanel() {
   const [anuncioFiles, setAnuncioFiles] = useState<File[]>([]);
   const [anuncioPreviewUrls, setAnuncioPreviewUrls] = useState<string[]>([]);
   const [paymentStep, setPaymentStep] = useState<PaymentStepState>({
-    plan: "monthly",
+    plan: "executive",
     payment_receipt_image: null,
   });
   const [paymentFlowMode, setPaymentFlowMode] = useState<PaymentFlowMode>("create");
@@ -152,6 +183,24 @@ export default function AdvertiserPanel() {
     portrait_image: null,
   });
   const [showAnuncioCreatedModal, setShowAnuncioCreatedModal] = useState(false);
+
+  const persistDraftForm = (anuncioId: number, form: AnuncioFormState) => {
+    localStorage.setItem(getDraftStorageKey(anuncioId), JSON.stringify(form));
+  };
+
+  const restoreDraftForm = (anuncioId: number): AnuncioFormState | null => {
+    const raw = localStorage.getItem(getDraftStorageKey(anuncioId));
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as AnuncioFormState;
+    } catch {
+      return null;
+    }
+  };
+
+  const clearDraftForm = (anuncioId: number) => {
+    localStorage.removeItem(getDraftStorageKey(anuncioId));
+  };
 
   useEffect(() => {
     const urls = anuncioFiles.map((file) => URL.createObjectURL(file));
@@ -262,7 +311,7 @@ export default function AdvertiserPanel() {
   };
 
   const resetAnuncioFlow = () => {
-    setPaymentStep({ plan: "monthly", payment_receipt_image: null });
+    setPaymentStep({ plan: "executive", payment_receipt_image: null });
     setPaymentFlowMode("create");
     setAnuncioToReactivate(null);
     setAnuncioForm({
@@ -280,6 +329,26 @@ export default function AdvertiserPanel() {
     setAnuncioSaving(false);
   };
 
+  const closeAnuncioModal = () => {
+    if (anuncioEditing?.is_draft) {
+      persistDraftForm(anuncioEditing.id, anuncioForm);
+      setSuccess("Borrador guardado. Puedes continuarlo después.");
+    }
+
+    setShowAnuncioModal(false);
+    setAnuncioFiles([]);
+    setAnuncioEditing(null);
+    setAnuncioSaving(false);
+    setAnuncioForm({
+      titulo: "",
+      descripcion: "",
+      precio: 0,
+      ubicacion: "",
+      contact_country_code: "+593",
+      contact_number: "",
+    });
+  };
+
   const openCreateAnuncio = () => {
     if (!data?.is_verified) {
       setError("Solo los anunciantes verificados pueden crear anuncios.");
@@ -289,7 +358,7 @@ export default function AdvertiserPanel() {
     setSuccess("");
     setPaymentFlowMode("create");
     setAnuncioToReactivate(null);
-    setPaymentStep({ plan: "monthly", payment_receipt_image: null });
+    setPaymentStep({ plan: "executive", payment_receipt_image: null });
     setAnuncioForm({
       titulo: "",
       descripcion: "",
@@ -313,22 +382,25 @@ export default function AdvertiserPanel() {
     setPaymentFlowMode("reactivate");
     setAnuncioToReactivate(anuncio);
     setPaymentStep({
-      plan: anuncio.plan ?? "monthly",
+      plan: normalizeSelectablePlan(anuncio.plan),
       payment_receipt_image: null,
     });
     setShowPaymentModal(true);
   };
 
   const openEditAnuncio = (anuncio: Anuncio) => {
+    const restoredDraft = anuncio.is_draft ? restoreDraftForm(anuncio.id) : null;
     setAnuncioEditing(anuncio);
-    setAnuncioForm({
-      titulo: anuncio.titulo,
-      descripcion: anuncio.descripcion,
-      precio: Number(anuncio.precio),
-      ubicacion: anuncio.ubicacion,
-      contact_country_code: anuncio.contact_country_code || "+593",
-      contact_number: anuncio.contact_number || "",
-    });
+    setAnuncioForm(
+      restoredDraft ?? {
+        titulo: anuncio.titulo,
+        descripcion: anuncio.descripcion,
+        precio: Number(anuncio.precio),
+        ubicacion: anuncio.ubicacion,
+        contact_country_code: anuncio.contact_country_code || "+593",
+        contact_number: anuncio.contact_number || "",
+      }
+    );
     setAnuncioFiles([]);
     setError("");
     setSuccess("");
@@ -360,7 +432,7 @@ export default function AdvertiserPanel() {
         setShowPaymentModal(false);
         setPaymentFlowMode("create");
         setAnuncioToReactivate(null);
-        setPaymentStep({ plan: "monthly", payment_receipt_image: null });
+        setPaymentStep({ plan: "executive", payment_receipt_image: null });
         setSuccess("Solicitud enviada. Tu anuncio quedó en pendiente para aprobación.");
       } catch {
         setError("No se pudo activar el anuncio.");
@@ -371,8 +443,22 @@ export default function AdvertiserPanel() {
     }
 
     setError("");
-    setShowPaymentModal(false);
-    setShowAnuncioModal(true);
+    setAnuncioSaving(true);
+    try {
+      const draft = await createAdvertiserAnuncioDraft(token, {
+        plan: paymentStep.plan,
+        payment_receipt_image: paymentStep.payment_receipt_image,
+      });
+      persistDraftForm(draft.id, anuncioForm);
+      await loadAnuncios();
+      setAnuncioEditing(draft);
+      setShowPaymentModal(false);
+      setShowAnuncioModal(true);
+    } catch {
+      setError("No se pudo guardar el borrador del anuncio.");
+    } finally {
+      setAnuncioSaving(false);
+    }
   };
 
   const handleAnuncioFilesChange = (files: File[]) => {
@@ -404,26 +490,7 @@ export default function AdvertiserPanel() {
     setSuccess("");
 
     try {
-      if (!anuncioEditing) {
-        if (!paymentStep.payment_receipt_image) {
-          setError("Falta el comprobante de pago.");
-          setAnuncioSaving(false);
-          return;
-        }
-
-        const payload: AnuncioPayload = {
-          ...anuncioForm,
-          precio: Number(anuncioForm.precio),
-          plan: paymentStep.plan,
-          payment_receipt_image: paymentStep.payment_receipt_image,
-          images: anuncioFiles,
-        };
-
-        await createAdvertiserAnuncio(token, payload);
-        await loadAnuncios();
-        resetAnuncioFlow();
-        setShowAnuncioCreatedModal(true);
-      } else {
+      if (anuncioEditing) {
         await updateAdvertiserAnuncio(token, anuncioEditing.id, {
           titulo: anuncioForm.titulo,
           descripcion: anuncioForm.descripcion,
@@ -437,11 +504,23 @@ export default function AdvertiserPanel() {
           await uploadAdvertiserAnuncioImages(token, anuncioEditing.id, anuncioFiles);
         }
 
+        if (anuncioEditing.is_draft) {
+          await finalizeAdvertiserAnuncio(token, anuncioEditing.id);
+          clearDraftForm(anuncioEditing.id);
+        }
+
         await loadAnuncios();
         setShowAnuncioModal(false);
         setAnuncioFiles([]);
         setAnuncioEditing(null);
-        setSuccess("Anuncio actualizado correctamente");
+        setSuccess(
+          anuncioEditing.is_draft
+            ? "Anuncio enviado correctamente a revisión."
+            : "Anuncio actualizado correctamente"
+        );
+        if (anuncioEditing.is_draft) {
+          setShowAnuncioCreatedModal(true);
+        }
       }
     } catch {
       setError("No se pudo guardar el anuncio.");
@@ -459,6 +538,7 @@ export default function AdvertiserPanel() {
     setSuccess("");
     try {
       await deleteAdvertiserAnuncio(token, anuncioId);
+      clearDraftForm(anuncioId);
       await loadAnuncios();
       if (anuncioEditing?.id === anuncioId) {
         setAnuncioEditing(null);
@@ -468,6 +548,11 @@ export default function AdvertiserPanel() {
       setError("No se pudo eliminar el anuncio.");
     }
   };
+
+  useEffect(() => {
+    if (!anuncioEditing?.is_draft || !showAnuncioModal) return;
+    persistDraftForm(anuncioEditing.id, anuncioForm);
+  }, [anuncioEditing, anuncioForm, showAnuncioModal]);
 
   const handleDeleteAnuncioImage = async (imageId: number) => {
     if (!token || !anuncioEditing) return;
@@ -557,9 +642,11 @@ export default function AdvertiserPanel() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h4 className="text-sm font-semibold text-white">{anuncio.titulo}</h4>
-                      <p className="text-xs text-gray-400">{planLabel(anuncio.plan)}</p>
-                      <p className="text-xs text-gray-400">Hasta: {new Date(anuncio.fecha_hasta).toLocaleDateString()}</p>
+                      <h4 className="text-sm font-semibold text-white">
+                        {anuncio.titulo?.trim() || "Anuncio en proceso"}
+                      </h4>
+                      <p className="text-xs text-gray-400">{planLabelFromValue(anuncio.plan)}</p>
+                      <p className="text-xs text-gray-400">Hasta: {formatDateTime(anuncio.fecha_hasta)}</p>
                     </div>
                     <span className={`rounded-full border border-[#1f7fd8]/40 px-2 py-1 text-[11px] ${estadoTextClass(anuncio.estado)}`}>
                       {statusLabel(anuncio.estado)}
@@ -576,7 +663,14 @@ export default function AdvertiserPanel() {
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2">
-                    {canReactivateAnuncio(anuncio) ? (
+                    {anuncio.is_draft ? (
+                      <button
+                        onClick={() => openEditAnuncio(anuncio)}
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d4af37]/60 px-3 py-2 text-xs text-[#f7d97b]"
+                      >
+                        Continuar
+                      </button>
+                    ) : canReactivateAnuncio(anuncio) ? (
                       <button
                         onClick={() => openReactivateAnuncio(anuncio)}
                         className="inline-flex items-center justify-center gap-2 rounded-md border border-emerald-400/60 px-3 py-2 text-xs text-emerald-300"
@@ -584,13 +678,15 @@ export default function AdvertiserPanel() {
                         Activarlo
                       </button>
                     ) : null}
-                    <button
-                      onClick={() => openEditAnuncio(anuncio)}
-                      className="inline-flex items-center justify-center gap-2 rounded-md border border-[#1f7fd8]/60 px-3 py-2 text-xs text-[#7eb8f2]"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Editar
-                    </button>
+                    {!anuncio.is_draft ? (
+                      <button
+                        onClick={() => openEditAnuncio(anuncio)}
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-[#1f7fd8]/60 px-3 py-2 text-xs text-[#7eb8f2]"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Editar
+                      </button>
+                    ) : null}
                     <button
                       onClick={() => handleDeleteAnuncio(anuncio.id)}
                       className="inline-flex items-center justify-center gap-2 rounded-md border border-red-400/60 px-3 py-2 text-xs text-red-300"
@@ -618,14 +714,23 @@ export default function AdvertiserPanel() {
                 <tbody className="divide-y divide-white/10 bg-[#0d1320]">
                   {anuncios.map((anuncio) => (
                     <tr key={anuncio.id}>
-                      <td className="px-4 py-3 text-sm text-white">{anuncio.titulo}</td>
-                      <td className="px-4 py-3 text-sm text-gray-300">{planLabel(anuncio.plan)}</td>
+                      <td className="px-4 py-3 text-sm text-white">
+                        {anuncio.titulo?.trim() || "Anuncio en proceso"}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-300">{planLabelFromValue(anuncio.plan)}</td>
                       <td className={`px-4 py-3 text-sm ${pagoTextClass(anuncio.pago)}`}>{statusLabel(anuncio.pago)}</td>
                       <td className={`px-4 py-3 text-sm ${estadoTextClass(anuncio.estado)}`}>{statusLabel(anuncio.estado)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-300">{new Date(anuncio.fecha_hasta).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-sm text-gray-300">{formatDateTime(anuncio.fecha_hasta)}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-2">
-                          {canReactivateAnuncio(anuncio) ? (
+                          {anuncio.is_draft ? (
+                            <button
+                              onClick={() => openEditAnuncio(anuncio)}
+                              className="inline-flex items-center gap-1 rounded-md border border-[#d4af37]/60 px-3 py-1.5 text-xs text-[#f7d97b] transition hover:bg-[#d4af37]/15"
+                            >
+                              Continuar
+                            </button>
+                          ) : canReactivateAnuncio(anuncio) ? (
                             <button
                               onClick={() => openReactivateAnuncio(anuncio)}
                               className="inline-flex items-center gap-1 rounded-md border border-emerald-400/60 px-3 py-1.5 text-xs text-emerald-300 transition hover:bg-emerald-500/15"
@@ -633,13 +738,15 @@ export default function AdvertiserPanel() {
                               Activarlo
                             </button>
                           ) : null}
-                          <button
-                            onClick={() => openEditAnuncio(anuncio)}
-                            className="inline-flex items-center gap-1 rounded-md border border-[#1f7fd8]/60 px-3 py-1.5 text-xs text-[#7eb8f2] transition hover:bg-[#1f7fd8]/15"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            Editar
-                          </button>
+                          {!anuncio.is_draft ? (
+                            <button
+                              onClick={() => openEditAnuncio(anuncio)}
+                              className="inline-flex items-center gap-1 rounded-md border border-[#1f7fd8]/60 px-3 py-1.5 text-xs text-[#7eb8f2] transition hover:bg-[#1f7fd8]/15"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              Editar
+                            </button>
+                          ) : null}
                           <button
                             onClick={() => handleDeleteAnuncio(anuncio.id)}
                             className="inline-flex items-center gap-1 rounded-md border border-red-400/60 px-3 py-1.5 text-xs text-red-300 transition hover:bg-red-400/15"
@@ -677,28 +784,41 @@ export default function AdvertiserPanel() {
             </div>
 
             <form onSubmit={handlePaymentStepSubmit} className="space-y-3">
+              <p className="text-sm font-medium text-[#93c5fd]">1. Selecciona tu plan</p>
               <label className="mb-1 block text-xs text-gray-300">Plan de anuncio</label>
               <select
                 value={paymentStep.plan}
                 onChange={(e) =>
                   setPaymentStep((prev) => ({ ...prev, plan: e.target.value as AnuncioPlan }))
                 }
-                className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
+                className="w-full rounded-lg border-2 border-[#1f7fd8]/70 bg-[#16233a] px-4 py-3 text-base font-semibold text-white shadow-[0_0_0_1px_rgba(31,127,216,0.18)] outline-none transition focus:border-[#4ea3ff] focus:bg-[#1a2944] focus:shadow-[0_0_0_4px_rgba(31,127,216,0.18)]"
               >
-                <option value="monthly">Mensual - $10</option>
-                <option value="quarterly">Trimestral - $25</option>
-                <option value="semiannual">Semestral - $40</option>
+                <option value="executive">Plan Ejecutivo (Diario) $20</option>
+                <option value="nena">Plan Nena (Semanal) $120</option>
+                <option value="dama">Plan Dama (Mensual) $560</option>
+                <option value="princesa">Plan Princesa (Trimestral) $1740</option>
               </select>
 
-              <div className="rounded-lg border border-[#1f7fd8]/30 bg-[#121a2a] p-3 text-sm text-gray-300">
-                <p className="font-semibold text-white">Datos bancarios (demo)</p>
-                <p>Banco: Banco Demo Ecuador</p>
-                <p>Cuenta: 1234567890</p>
-                <p>Tipo: Ahorros</p>
-                <p>Titular: Dubai Publicidad S.A.</p>
+              <p className="pt-1 text-sm font-medium text-[#93c5fd]">
+                2. Realiza la transferencia bancaria
+              </p>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-lg border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
+                  <p className="font-semibold text-white">Banco del Guayaquil</p>
+                  <p>Tipo: Cuenta de ahorros</p>
+                  <p>Cuenta: 21417526</p>
+                  <p>Ci: 1719906578</p>
+                </div>
+                <div className="rounded-lg border border-emerald-500/50 bg-[linear-gradient(180deg,rgba(16,185,129,0.18),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
+                  <p className="font-semibold text-white">Banco Produbanco</p>
+                  <p>Tipo: Cuenta Ahorros</p>
+                  <p>Cuenta: 12008169115</p>
+                  <p>Ci: 1719906578</p>
+                </div>
               </div>
 
               <div>
+                <p className="mb-2 pt-1 text-sm font-medium text-[#93c5fd]">3. Crea tu anuncio</p>
                 <label className="mb-1 block text-xs text-gray-300">Cargue la foto de la transferencia</label>
                 <input
                   type="file"
@@ -744,10 +864,10 @@ export default function AdvertiserPanel() {
           <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-xl border border-white/20 bg-[#0d1320] p-3 sm:max-w-2xl sm:rounded-2xl sm:p-8">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg text-white sm:text-xl">
-                {anuncioEditing ? "Editar anuncio" : "Completa los datos del anuncio"}
+                {anuncioEditing?.is_draft ? "Completa los datos del anuncio" : "Editar anuncio"}
               </h2>
               <button
-                onClick={resetAnuncioFlow}
+                onClick={closeAnuncioModal}
                 className="rounded-md border border-white/20 p-2 text-gray-300 transition hover:bg-white/10 hover:text-white"
                 aria-label="Cerrar modal"
               >
@@ -911,7 +1031,7 @@ export default function AdvertiserPanel() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={resetAnuncioFlow}
+                  onClick={closeAnuncioModal}
                   className="rounded-lg border border-white/20 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10"
                 >
                   Cancelar
@@ -921,7 +1041,11 @@ export default function AdvertiserPanel() {
                   disabled={anuncioSaving}
                   className="rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1a6ab4] disabled:opacity-60"
                 >
-                  {anuncioSaving ? "Guardando..." : anuncioEditing ? "Actualizar" : "Crear anuncio"}
+                  {anuncioSaving
+                    ? "Guardando..."
+                    : anuncioEditing?.is_draft
+                      ? "Enviar anuncio"
+                      : "Actualizar"}
                 </button>
               </div>
             </form>

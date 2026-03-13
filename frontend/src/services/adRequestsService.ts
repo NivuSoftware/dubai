@@ -14,7 +14,7 @@ export interface AdRequestItem {
   descripcion: string;
   precio: number;
   ubicacion: string;
-  plan: "monthly" | "quarterly" | "semiannual";
+  plan: string;
   estado: string;
   pago: string;
   fecha_hasta: string;
