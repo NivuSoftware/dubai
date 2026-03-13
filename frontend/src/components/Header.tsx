@@ -61,6 +61,12 @@ export default function Header() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link
+            to="/registro-anunciante"
+            className="border border-[#1f7fd8] text-[#93c5fd] hover:bg-[#1f7fd8] hover:text-white px-6 py-2 rounded-full text-base font-medium transition-all"
+          >
+            Registrarse
+          </Link>
+          <Link
             to="/profiles"
             className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-6 py-2 rounded-full text-base font-medium transition-all hover:shadow-[0_0_20px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50"
           >
@@ -108,6 +114,12 @@ export default function Header() {
             </Link>
 
             <div className="pt-2 flex flex-col gap-3">
+              <Link
+                to="/registro-anunciante"
+                className="border border-[#1f7fd8] text-[#93c5fd] hover:bg-[#1f7fd8] hover:text-white px-6 py-2 rounded-full text-base font-medium transition-all text-center"
+              >
+                Registrarse
+              </Link>
               <Link
                 to="/profiles"
                 className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-6 py-2 rounded-full text-base font-medium transition-all text-center border border-[#a83d8e]/50"

@@ -1,6 +1,6 @@
 import { Navigate } from "react-router";
 import { ReactElement } from "react";
-import { ADMIN_TOKEN_KEY } from "../lib/auth";
+import { ADMIN_TOKEN_KEY } from "../services/authService";
 
 interface AdminRouteProps {
   children: ReactElement;
@@ -9,7 +9,7 @@ interface AdminRouteProps {
 export default function AdminRoute({ children }: AdminRouteProps) {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

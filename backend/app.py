@@ -10,9 +10,11 @@ from dotenv import load_dotenv
 from extensions import db, migrate
 import models  # noqa: F401
 from resources.admin_resource import admin_bp
+from resources.advertiser_resource import advertiser_bp
+from resources.anuncio_resource import advertiser_anuncio_bp, public_anuncio_bp
 from resources.auth_resource import auth_bp
 from resources.mail_resource import mail_bp
-from resources.modelo_resource import modelo_bp, public_modelo_bp
+from resources.modelo_resource import advertiser_modelo_bp, modelo_bp, public_modelo_bp
 from seed import seed_admin_user
 
 load_dotenv()
@@ -36,6 +38,10 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "change-this-in-production")
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", "86400"))
     app.config["MODEL_UPLOAD_DIR"] = os.getenv("MODEL_UPLOAD_DIR", "modelos")
+    app.config["VERIFICATION_UPLOAD_DIR"] = os.getenv(
+        "VERIFICATION_UPLOAD_DIR", "verification_requests"
+    )
+    app.config["ANUNCIO_UPLOAD_DIR"] = os.getenv("ANUNCIO_UPLOAD_DIR", "anuncios")
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -45,7 +51,11 @@ def create_app():
     api.register_blueprint(mail_bp)
     api.register_blueprint(auth_bp)
     api.register_blueprint(admin_bp)
+    api.register_blueprint(advertiser_bp)
+    api.register_blueprint(advertiser_anuncio_bp)
+    api.register_blueprint(public_anuncio_bp)
     api.register_blueprint(modelo_bp)
+    api.register_blueprint(advertiser_modelo_bp)
     api.register_blueprint(public_modelo_bp)
 
     with app.app_context():

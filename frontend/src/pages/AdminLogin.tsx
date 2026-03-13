@@ -1,11 +1,11 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Eye, EyeOff, Lock, Mail, Shield } from "lucide-react";
-import { ADMIN_TOKEN_KEY, login } from "../lib/auth";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { ADMIN_TOKEN_KEY, login } from "../services/authService";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@dubai.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,13 @@ export default function AdminLogin() {
     try {
       const data = await login({ email, password });
       localStorage.setItem(ADMIN_TOKEN_KEY, data.access_token);
-      navigate("/admin/panel");
+      if (data.user.role === "admin") {
+        navigate("/admin/panel");
+      } else if (data.user.role === "advertiser") {
+        navigate("/advertiser/panel");
+      } else {
+        setError("Rol de usuario no válido.");
+      }
     } catch {
       setError("Credenciales inválidas. Verifica email y contraseña.");
     } finally {
@@ -45,17 +51,15 @@ export default function AdminLogin() {
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-14">
         <div className="w-full max-w-md rounded-3xl border border-white/15 bg-white/5 p-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-10">
           <div className="mb-7 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#a83d8e] to-[#1f7fd8] text-white shadow-[0_8px_24px_rgba(31,127,216,0.45)]">
-              <Shield className="h-5 w-5" />
-            </div>
+            <img src="/images/logo.png" alt="Dubai logo" className="h-14 w-auto" />
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#d4af37]">Acceso privado</p>
-              <h1 className="text-2xl font-semibold text-white">Admin Login</h1>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#d4af37]">Acceso</p>
+              <h1 className="text-2xl font-semibold text-white">Iniciar sesión</h1>
             </div>
           </div>
 
           <p className="mb-7 text-sm leading-relaxed text-gray-300">
-            Ingresa tus credenciales para acceder al panel administrativo.
+            Ingresa tus credenciales para continuar.
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
@@ -70,7 +74,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
-                placeholder="Correo admin"
+                placeholder="Correo electrónico"
                 required
               />
             </label>
@@ -106,7 +110,7 @@ export default function AdminLogin() {
               className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#a83d8e] via-[#9f58c9] to-[#1f7fd8] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
               disabled={loading}
             >
-              {loading ? "Validando..." : "Entrar al panel"}
+              {loading ? "Validando..." : "Entrar"}
             </button>
           </form>
         </div>

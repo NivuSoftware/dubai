@@ -12,6 +12,9 @@ export interface ProfileCardProps {
   category?: string;
   priceValue?: number;
   imageUrl?: string;
+  whatsappUrl?: string;
+  className?: string;
+  imageClassName?: string;
 }
 
 export default function ProfileCard({
@@ -24,7 +27,30 @@ export default function ProfileCard({
   category,
   priceValue,
   imageUrl,
+  whatsappUrl,
+  className,
+  imageClassName,
 }: ProfileCardProps) {
+  const withPrefilledMessage = (baseUrl: string, message: string) => {
+    try {
+      const url = new URL(baseUrl);
+      url.searchParams.set("text", message);
+      return url.toString();
+    } catch {
+      return baseUrl;
+    }
+  };
+
+  const profileUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/profile/${id}`
+      : `/profile/${id}`;
+  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, y quisiera preguntarte .. `;
+  const whatsappHref = withPrefilledMessage(
+    whatsappUrl || CONTACT_WHATSAPP_URL,
+    prefilledMessage
+  );
+
   const normalizedCategory = (category || "").toLowerCase();
   const categoryClasses = normalizedCategory.includes("bronce")
     ? "bg-[#CD7F32]/30 border-[#CD7F32]/80 text-[#ffd2a3] shadow-[0_0_18px_rgba(205,127,50,0.45)]"
@@ -37,8 +63,12 @@ export default function ProfileCard({
           : "bg-[#d4af37]/30 border-[#d4af37]/80 text-[#ffe69c] shadow-[0_0_18px_rgba(212,175,55,0.5)]";
 
   return (
-    <div className="bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] rounded-xl overflow-hidden border border-[#a83d8e]/20 hover:border-[#a83d8e]/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,61,142,0.3)] group">
-      <div className="relative h-[420px] sm:h-64 bg-gradient-to-br from-[#a83d8e]/20 to-black overflow-hidden">
+    <div
+      className={`bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] rounded-xl overflow-hidden border border-[#a83d8e]/20 hover:border-[#a83d8e]/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,61,142,0.3)] group ${className ?? ""}`}
+    >
+      <div
+        className={`relative bg-gradient-to-br from-[#a83d8e]/20 to-black overflow-hidden ${imageClassName ?? "h-[420px] sm:h-64"}`}
+      >
         {imageUrl ? (
           <>
             <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
@@ -97,7 +127,7 @@ export default function ProfileCard({
             Ver perfil
           </Link>
           <a
-            href={CONTACT_WHATSAPP_URL}
+            href={whatsappHref}
             target="_blank"
             rel="noreferrer"
             className="bg-[#25D366] hover:bg-[#25D366]/90 text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-2 sm:whitespace-nowrap"

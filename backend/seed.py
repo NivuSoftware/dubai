@@ -17,6 +17,7 @@ def seed_admin_user():
         email=ADMIN_EMAIL,
         password_hash=generate_password_hash(ADMIN_PASSWORD),
         role="admin",
+        is_verified=True,
     )
     db.session.add(user)
     db.session.commit()

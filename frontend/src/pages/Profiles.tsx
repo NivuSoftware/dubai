@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { DollarSign, Filter, MapPin } from "lucide-react";
 import Layout from "../components/Layout";
 import ProfileCard from "../components/ProfileCard";
-import { Modelo, listPublicModelos } from "../lib/auth";
+import { Modelo, listPublicModelos } from "../services/modelosService";
+import { Anuncio, listPublicAnuncios } from "../services/anunciosService";
 
 export default function Profiles() {
   const [modelos, setModelos] = useState<Modelo[]>([]);
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCiudad, setSelectedCiudad] = useState("all");
@@ -15,8 +17,12 @@ export default function Profiles() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await listPublicModelos();
-        setModelos(data);
+        const [modelosData, anunciosData] = await Promise.all([
+          listPublicModelos(),
+          listPublicAnuncios(),
+        ]);
+        setModelos(modelosData);
+        setAnuncios(anunciosData);
       } catch {
         setError("No se pudieron cargar los perfiles.");
       } finally {
@@ -28,26 +34,89 @@ export default function Profiles() {
   }, []);
 
   const ciudades = useMemo(() => {
-    const unique = Array.from(new Set(modelos.map((m) => m.ubicacion))).filter(Boolean);
+    const unique = Array.from(
+      new Set([...modelos.map((m) => m.ubicacion), ...anuncios.map((a) => a.ubicacion)])
+    ).filter(Boolean);
     return ["all", ...unique];
-  }, [modelos]);
+  }, [anuncios, modelos]);
 
-  const filteredModelos = useMemo(() => {
-    const base =
+  const mixedProfiles = useMemo(() => {
+    const modelosBase =
       selectedCiudad === "all"
         ? modelos
         : modelos.filter((item) => item.ubicacion.toLowerCase() === selectedCiudad.toLowerCase());
+    const anunciosBase =
+      selectedCiudad === "all"
+        ? anuncios
+        : anuncios.filter((item) => item.ubicacion.toLowerCase() === selectedCiudad.toLowerCase());
 
+    let sortedModelos = [...modelosBase];
+    let sortedAnuncios = [...anunciosBase];
     if (sortBy === "name") {
-      return [...base].sort((a, b) => a.nombre.localeCompare(b.nombre));
+      sortedModelos = sortedModelos.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      sortedAnuncios = sortedAnuncios.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (sortBy === "age") {
+      sortedModelos = sortedModelos.sort((a, b) => a.edad - b.edad);
+      sortedAnuncios = sortedAnuncios.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    } else {
+      sortedModelos = sortedModelos.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      sortedAnuncios = sortedAnuncios.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     }
-    if (sortBy === "age") {
-      return [...base].sort((a, b) => a.edad - b.edad);
+
+    const mixed: Array<{
+      key: string;
+      id: string;
+      name: string;
+      age: number;
+      city: string;
+      tagline: string;
+      category?: string;
+      priceValue?: number;
+      imageUrl?: string;
+      whatsappUrl?: string;
+    }> = [];
+    const maxLength = Math.max(sortedModelos.length, sortedAnuncios.length);
+
+    for (let i = 0; i < maxLength; i += 1) {
+      const anuncio = sortedAnuncios[i];
+      if (anuncio) {
+        mixed.push({
+          key: `a-${anuncio.id}`,
+          id: `a-${anuncio.id}`,
+          name: anuncio.titulo,
+          age: 18,
+          city: anuncio.ubicacion,
+          tagline: anuncio.descripcion,
+          priceValue: anuncio.precio,
+          imageUrl: anuncio.images?.[0]?.url,
+          whatsappUrl: anuncio.whatsapp_url,
+        });
+      }
+
+      const modelo = sortedModelos[i];
+      if (modelo) {
+        mixed.push({
+          key: `m-${modelo.id}`,
+          id: `m-${modelo.id}`,
+          name: modelo.nombre,
+          age: modelo.edad,
+          city: modelo.ubicacion,
+          tagline: modelo.descripcion,
+          category: modelo.categoria,
+          priceValue: modelo.precio,
+          imageUrl: modelo.images?.[0]?.url,
+        });
+      }
     }
-    return [...base].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-  }, [modelos, selectedCiudad, sortBy]);
+
+    return mixed;
+  }, [anuncios, modelos, selectedCiudad, sortBy]);
 
   return (
     <Layout>
@@ -58,7 +127,7 @@ export default function Profiles() {
               Explorar perfiles
             </h1>
             <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
-              {loading ? "Cargando perfiles..." : `${filteredModelos.length} modelos disponibles`}
+              {loading ? "Cargando perfiles..." : `${mixedProfiles.length} perfiles disponibles`}
             </p>
           </div>
         </div>
@@ -129,18 +198,19 @@ export default function Profiles() {
               {error ? <p className="mb-4 text-red-400">{error}</p> : null}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6">
-                {filteredModelos.map((modelo) => (
+                {mixedProfiles.map((profile) => (
                   <ProfileCard
-                    key={String(modelo.id)}
-                    id={String(modelo.id)}
-                    name={modelo.nombre}
-                    age={modelo.edad}
-                    city={modelo.ubicacion}
+                    key={profile.key}
+                    id={profile.id}
+                    name={profile.name}
+                    age={profile.age}
+                    city={profile.city}
                     verified={true}
-                    tagline={modelo.descripcion}
-                    category={modelo.categoria}
-                    priceValue={modelo.precio}
-                    imageUrl={modelo.images?.[0]?.url}
+                    tagline={profile.tagline}
+                    category={profile.category}
+                    priceValue={profile.priceValue}
+                    imageUrl={profile.imageUrl}
+                    whatsappUrl={profile.whatsappUrl}
                   />
                 ))}
               </div>

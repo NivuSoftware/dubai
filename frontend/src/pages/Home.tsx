@@ -3,100 +3,29 @@ import {
   BadgeCheck, 
   Shield, 
   ChevronDown,
-  Search,
-  MapPin,
-  Calendar,
-  DollarSign,
+  ChevronLeft,
+  ChevronRight,
   MessageCircle,
   Lock,
-  UserCheck,
   Eye
 } from 'lucide-react';
 import ProfileCard from '../components/ProfileCard';
 import FeatureCard from '../components/FeatureCard';
-import CityCard from '../components/CityCard';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import * as Accordion from '@radix-ui/react-accordion';
 import { CONTACT_WHATSAPP_URL } from '../constants/contact';
+import { listPublicModelos, Modelo } from '../services/modelosService';
+import { Anuncio, listPublicAnuncios } from '../services/anunciosService';
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from '../components/ui/carousel';
 
 const HERO_IMAGE = 'https://images.unsplash.com/photo-1760008218224-f8614778fec4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxEdWJhaSUyMHNreWxpbmUlMjBuaWdodCUyMG5lb24lMjBsaWdodHN8ZW58MXx8fHwxNzcyNTgyMjkzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
-
-const FEATURED_PROFILES = [
-  {
-    id: '1',
-    name: 'Sofia',
-    age: 24,
-    city: 'Quito',
-    verified: true,
-    tagline: 'Acompañante elegante para ocasiones sofisticadas',
-    price: '$120 / 1 hora',
-    tags: ['Nuevo', 'Mejor valorado'],
-  },
-  {
-    id: '2',
-    name: 'Isabella',
-    age: 26,
-    city: 'Guayaquil',
-    verified: true,
-    tagline: 'Compañía profesional y discreta',
-    price: '$120 / 1 hora',
-    tags: ['Mejor valorado'],
-  },
-  {
-    id: '3',
-    name: 'Valentina',
-    age: 23,
-    city: 'Cuenca',
-    verified: true,
-    tagline: 'Presencia sofisticada y encantadora',
-    price: '$120 / 1 hora',
-    tags: ['Nuevo'],
-  },
-  {
-    id: '4',
-    name: 'Camila',
-    age: 25,
-    city: 'Quito',
-    verified: true,
-    tagline: 'Acompañante refinada para eventos exclusivos',
-    price: '$120 / 1 hora',
-  },
-  {
-    id: '5',
-    name: 'Lucia',
-    age: 27,
-    city: 'Guayaquil',
-    verified: true,
-    tagline: 'Compañía elegante y profesional',
-    tags: ['Mejor valorado'],
-  },
-  {
-    id: '6',
-    name: 'Martina',
-    age: 24,
-    city: 'Manta',
-    verified: true,
-    tagline: 'Servicio de acompañamiento discreto y sofisticado',
-  },
-  {
-    id: '7',
-    name: 'Daniela',
-    age: 26,
-    city: 'Cuenca',
-    verified: true,
-    tagline: 'Experiencia premium de acompañamiento',
-    tags: ['Nuevo'],
-  },
-  {
-    id: '8',
-    name: 'Ana',
-    age: 25,
-    city: 'Quito',
-    verified: true,
-    tagline: 'Acompañante exclusiva para clientes exigentes',
-  },
-];
 
 const FAQ_ITEMS = [
   {
@@ -134,9 +63,116 @@ const FAQ_ITEMS = [
 ];
 
 export default function Home() {
-  const [selectedCity, setSelectedCity] = useState('all');
-  const [availability, setAvailability] = useState('all');
-  const [budget, setBudget] = useState([0, 500]);
+  const [modelos, setModelos] = useState<Modelo[]>([]);
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [featuredError, setFeaturedError] = useState('');
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+
+  useEffect(() => {
+    const loadFeaturedProfiles = async () => {
+      try {
+        const [modelosData, anunciosData] = await Promise.all([
+          listPublicModelos(),
+          listPublicAnuncios(),
+        ]);
+        setModelos(modelosData);
+        setAnuncios(anunciosData);
+      } catch {
+        setFeaturedError('No se pudieron cargar los perfiles destacados.');
+      } finally {
+        setLoadingFeatured(false);
+      }
+    };
+
+    loadFeaturedProfiles();
+  }, []);
+
+  const featuredProfiles = useMemo<
+    Array<{
+      key: string;
+      id: string;
+      name: string;
+      age: number;
+      city: string;
+      tagline: string;
+      category?: string;
+      priceValue?: number;
+      imageUrl?: string;
+      whatsappUrl?: string;
+    }>
+  >(() => {
+    const sortedModelos = [...modelos].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    const sortedAnuncios = [...anuncios].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    const interleaved: Array<{
+      key: string;
+      id: string;
+      name: string;
+      age: number;
+      city: string;
+      tagline: string;
+      category?: string;
+      priceValue?: number;
+      imageUrl?: string;
+      whatsappUrl?: string;
+    }> = [];
+    const maxLength = Math.max(sortedModelos.length, sortedAnuncios.length);
+
+    for (let i = 0; i < maxLength; i += 1) {
+      const anuncio = sortedAnuncios[i];
+      if (anuncio) {
+        interleaved.push({
+          key: `anuncio-${anuncio.id}`,
+          id: `a-${anuncio.id}`,
+          name: anuncio.titulo,
+          age: 18,
+          city: anuncio.ubicacion,
+          tagline: anuncio.descripcion,
+          priceValue: anuncio.precio,
+          imageUrl: anuncio.images?.[0]?.url,
+          whatsappUrl: anuncio.whatsapp_url,
+        });
+      }
+
+      const modelo = sortedModelos[i];
+      if (modelo) {
+        interleaved.push({
+          key: `modelo-${modelo.id}`,
+          id: `m-${modelo.id}`,
+          name: modelo.nombre,
+          age: modelo.edad,
+          city: modelo.ubicacion,
+          tagline: modelo.descripcion,
+          category: modelo.categoria,
+          priceValue: modelo.precio,
+          imageUrl: modelo.images?.[0]?.url,
+        });
+      }
+    }
+
+    return interleaved;
+  }, [anuncios, modelos]);
+
+  useEffect(() => {
+    if (!carouselApi || featuredProfiles.length <= 1) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      carouselApi.scrollNext();
+    }, 4500);
+
+    return () => window.clearInterval(timer);
+  }, [carouselApi, featuredProfiles.length]);
+
+  const goToFeaturedProfiles = () => {
+    document.getElementById('featured-profiles')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <Layout>
@@ -178,7 +214,11 @@ export default function Home() {
             </p>
 
             <div className="flex items-center justify-center gap-4">
-              <button className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-8 py-4 rounded-full transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50">
+              <button
+                type="button"
+                onClick={goToFeaturedProfiles}
+                className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-8 py-4 rounded-full transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50"
+              >
                 Busca Perfiles
               </button>
               <button className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all">
@@ -210,114 +250,86 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Barra de búsqueda y filtros */}
-      <section className="py-12 px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/30 backdrop-blur-xl shadow-[0_0_40px_rgba(168,61,142,0.2)]">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {/* Ciudad */}
-              <div>
-                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Ciudad
-                </label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-white focus:border-[#a83d8e] focus:outline-none transition-colors"
-                >
-                  <option value="all">Todas las ciudades</option>
-                  <option value="quito">Quito</option>
-                  <option value="guayaquil">Guayaquil</option>
-                  <option value="cuenca">Cuenca</option>
-                  <option value="manta">Manta</option>
-                  <option value="loja">Loja</option>
-                </select>
-              </div>
-
-              {/* Disponibilidad */}
-              <div>
-                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Disponibilidad
-                </label>
-                <select
-                  value={availability}
-                  onChange={(e) => setAvailability(e.target.value)}
-                  className="w-full bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-white focus:border-[#a83d8e] focus:outline-none transition-colors"
-                >
-                  <option value="all">Todo</option>
-                  <option value="today">Hoy</option>
-                  <option value="week">Esta semana</option>
-                  <option value="weekend">Fines de semana</option>
-                </select>
-              </div>
-
-              {/* Preferencias */}
-              <div>
-                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <UserCheck className="w-4 h-4" />
-                  Preferencias
-                </label>
-                <select className="w-full bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-white focus:border-[#a83d8e] focus:outline-none transition-colors">
-                  <option>Todo</option>
-                  <option>Elegante</option>
-                  <option>Profesional</option>
-                  <option>Sofisticada</option>
-                </select>
-              </div>
-
-              {/* Presupuesto */}
-              <div>
-                <label className="block text-sm text-gray-400 mb-2 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
-                  Rango de presupuesto
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="500"
-                  value={budget[1]}
-                  onChange={(e) => setBudget([0, parseInt(e.target.value)])}
-                  className="w-full h-10 accent-[#a83d8e]"
-                />
-                <div className="text-xs text-gray-500 mt-1">${budget[0]} - ${budget[1]}</div>
-              </div>
-
-              {/* Botón de búsqueda */}
-              <div className="flex items-end">
-                <button className="w-full bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(168,61,142,0.5)]">
-                  <Search className="w-5 h-5" />
-                  Buscar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Perfiles destacados */}
-      <section className="py-20 px-8 bg-[#0a0a0a]">
+      <section id="featured-profiles" className="py-20 px-8 bg-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Perfiles destacados
             </h2>
             <p className="text-gray-400 text-lg">
-              Explora nuestra selección de escorts verificadas y profesionales
+              Carrusel automático intercalado: 1 anunciante y 1 modelo
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {FEATURED_PROFILES.map((profile) => (
-              <ProfileCard key={profile.id} {...profile} />
-            ))}
-          </div>
+          {loadingFeatured ? (
+            <p className="text-center text-gray-400">Cargando perfiles destacados...</p>
+          ) : featuredError ? (
+            <p className="text-center text-red-400">{featuredError}</p>
+          ) : featuredProfiles.length === 0 ? (
+            <p className="text-center text-gray-400">
+              No hay perfiles destacados disponibles en este momento.
+            </p>
+          ) : (
+            <div className="relative">
+              <Carousel
+                setApi={setCarouselApi}
+                opts={{ align: 'start', loop: true }}
+                className="w-full"
+              >
+                <CarouselContent>
+                  {featuredProfiles.map((profile) => (
+                    <CarouselItem
+                      key={profile.key}
+                      className="basis-full sm:basis-1/2 xl:basis-1/3 2xl:basis-1/4"
+                    >
+                      <ProfileCard
+                        id={profile.id}
+                        name={profile.name}
+                        age={profile.age}
+                        city={profile.city}
+                        verified={true}
+                        tagline={profile.tagline}
+                        category={profile.category}
+                        priceValue={profile.priceValue}
+                        imageUrl={profile.imageUrl}
+                        whatsappUrl={profile.whatsappUrl}
+                        className="h-full w-full"
+                        imageClassName="h-[440px] sm:h-[340px]"
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollPrev()}
+                className="absolute -left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#a83d8e]/60 bg-black/70 p-2 text-white transition-all hover:bg-[#a83d8e]/20 disabled:opacity-40 sm:-left-4"
+                disabled={featuredProfiles.length <= 1}
+                aria-label="Card anterior"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => carouselApi?.scrollNext()}
+                className="absolute -right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-[#a83d8e]/60 bg-black/70 p-2 text-white transition-all hover:bg-[#a83d8e]/20 disabled:opacity-40 sm:-right-4"
+                disabled={featuredProfiles.length <= 1}
+                aria-label="Card siguiente"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
 
           <div className="text-center mt-12">
-            <button className="border border-[#a83d8e] text-[#a83d8e] hover:bg-[#a83d8e] hover:text-white px-8 py-3 rounded-full transition-all hover:shadow-[0_0_20px_rgba(168,61,142,0.5)]">
+            <Link
+              to="/profiles"
+              className="inline-flex border border-[#a83d8e] text-[#a83d8e] hover:bg-[#a83d8e] hover:text-white px-8 py-3 rounded-full transition-all hover:shadow-[0_0_20px_rgba(168,61,142,0.5)]"
+            >
               Ver todos los perfiles
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -506,10 +518,13 @@ export default function Home() {
           </p>
 
           <div className="flex items-center justify-center gap-4">
-            <button className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-10 py-4 rounded-full text-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50 flex items-center gap-3">
+            <Link
+              to="/profiles"
+              className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-10 py-4 rounded-full text-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50 flex items-center gap-3"
+            >
               <Eye className="w-5 h-5" />
               Buscar perfiles
-            </button>
+            </Link>
             <a
               href={CONTACT_WHATSAPP_URL}
               target="_blank"

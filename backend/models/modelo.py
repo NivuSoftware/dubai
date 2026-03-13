@@ -14,6 +14,9 @@ class Modelo(db.Model):
     ubicacion = db.Column(db.String(150), nullable=False)
     categoria = db.Column(db.String(120), nullable=False)
     precio = db.Column(db.Numeric(10, 2, asdecimal=False), nullable=False, default=0)
+    owner_id = db.Column(
+        db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
@@ -25,6 +28,7 @@ class Modelo(db.Model):
         cascade="all, delete-orphan",
         order_by="ModeloImage.id",
     )
+    owner = db.relationship("User", back_populates="modelos")
 
 
 class ModeloImage(db.Model):

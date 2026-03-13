@@ -19,6 +19,7 @@ class ModeloImageSchema(Schema):
 
 class ModeloSchema(Schema):
     id = fields.Integer(dump_only=True)
+    owner_id = fields.Integer(dump_only=True, allow_none=True)
     nombre = fields.String(required=True)
     edad = fields.Integer(required=True)
     descripcion = fields.String(required=True)

@@ -13,12 +13,13 @@ import {
   Send,
 } from "lucide-react";
 import Layout from "../components/Layout";
-import { getPublicModelo, Modelo } from "../lib/auth";
+import { getPublicModelo, Modelo } from "../services/modelosService";
 import {
   CONTACT_TELEGRAM_URL,
   CONTACT_WHATSAPP_NUMBER,
   CONTACT_WHATSAPP_URL,
 } from "../constants/contact";
+import { getPublicAnuncio } from "../services/anunciosService";
 
 function categoryClasses(category: string) {
   const normalized = category.toLowerCase();
@@ -40,6 +41,8 @@ function categoryClasses(category: string) {
 export default function ProfileDetail() {
   const { id } = useParams();
   const [modelo, setModelo] = useState<Modelo | null>(null);
+  const [isAdvertiserProfile, setIsAdvertiserProfile] = useState(false);
+  const [advertiserWhatsAppUrl, setAdvertiserWhatsAppUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeImage, setActiveImage] = useState(0);
@@ -52,9 +55,37 @@ export default function ProfileDetail() {
         return;
       }
 
+      setActiveImage(0);
+      setError("");
+
       try {
-        const data = await getPublicModelo(id);
-        setModelo(data);
+        const isAdvertiserAd = id.startsWith("a-");
+        const profileId =
+          id.startsWith("a-") || id.startsWith("m-") ? id.slice(2) : id;
+
+        if (isAdvertiserAd) {
+          setIsAdvertiserProfile(true);
+          const ad = await getPublicAnuncio(profileId);
+          setAdvertiserWhatsAppUrl(ad.whatsapp_url || "");
+          setModelo({
+            id: ad.id,
+            nombre: ad.titulo,
+            edad: 18,
+            descripcion: ad.descripcion,
+            disponibilidad: "",
+            ubicacion: ad.ubicacion,
+            categoria: "",
+            precio: ad.precio,
+            created_at: ad.created_at,
+            updated_at: ad.updated_at,
+            images: ad.images ?? [],
+          });
+        } else {
+          setIsAdvertiserProfile(false);
+          setAdvertiserWhatsAppUrl("");
+          const data = await getPublicModelo(profileId);
+          setModelo(data);
+        }
       } catch {
         setError("No se pudo cargar el perfil.");
       } finally {
@@ -95,6 +126,23 @@ export default function ProfileDetail() {
 
   const reportMessage = encodeURIComponent(`Hola quiero reportar el perfil de ${modelo.nombre}`);
   const reportWhatsAppUrl = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${reportMessage}`;
+  const detailWhatsAppUrlRaw =
+    isAdvertiserProfile && advertiserWhatsAppUrl ? advertiserWhatsAppUrl : CONTACT_WHATSAPP_URL;
+  const withPrefilledMessage = (baseUrl: string, message: string) => {
+    try {
+      const url = new URL(baseUrl);
+      url.searchParams.set("text", message);
+      return url.toString();
+    } catch {
+      return baseUrl;
+    }
+  };
+  const profileUrl =
+    typeof window !== "undefined"
+      ? window.location.href
+      : `/profile/${id ?? ""}`;
+  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, y quisiera preguntarte .. `;
+  const detailWhatsAppUrl = withPrefilledMessage(detailWhatsAppUrlRaw, prefilledMessage);
   const availability = modelo.disponibilidad
     .split(",")
     .map((item) => item.trim())
@@ -191,13 +239,15 @@ export default function ProfileDetail() {
                           {modelo.ubicacion}
                         </div>
                       </div>
-                      <span
-                        className={`mt-3 inline-flex rounded-full border px-4 py-1.5 text-sm font-bold tracking-wide ${categoryClasses(
-                          modelo.categoria
-                        )}`}
-                      >
-                        {modelo.categoria}
-                      </span>
+                      {!isAdvertiserProfile ? (
+                        <span
+                          className={`mt-3 inline-flex rounded-full border px-4 py-1.5 text-sm font-bold tracking-wide ${categoryClasses(
+                            modelo.categoria
+                          )}`}
+                        >
+                          {modelo.categoria}
+                        </span>
+                      ) : null}
                       <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#22c55e]/50 bg-[#22c55e]/15 px-4 py-2 text-[#86efac] shadow-[0_0_24px_rgba(34,197,94,0.45)]">
                         <DollarSign className="h-5 w-5" />
                         <span className="text-lg font-bold">Desde ${Number(modelo.precio || 0).toFixed(2)}</span>
@@ -209,34 +259,36 @@ export default function ProfileDetail() {
                       <p className="text-gray-300 leading-relaxed">{modelo.descripcion}</p>
                     </div>
 
-                    <div className="mb-8">
-                      <h2 className="text-2xl text-white mb-4 flex items-center gap-2">
-                        <Calendar className="w-6 h-6 text-[#a83d8e]" />
-                        Disponibilidad
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {availability.length ? (
-                          availability.map((time, index) => (
-                            <div
-                              key={index}
-                              className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 flex items-center gap-2"
-                            >
-                              <Clock className="w-4 h-4 text-[#a83d8e]" />
-                              <span className="text-gray-300">{time}</span>
+                    {!isAdvertiserProfile ? (
+                      <div className="mb-8">
+                        <h2 className="text-2xl text-white mb-4 flex items-center gap-2">
+                          <Calendar className="w-6 h-6 text-[#a83d8e]" />
+                          Disponibilidad
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {availability.length ? (
+                            availability.map((time, index) => (
+                              <div
+                                key={index}
+                                className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 flex items-center gap-2"
+                              >
+                                <Clock className="w-4 h-4 text-[#a83d8e]" />
+                                <span className="text-gray-300">{time}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-gray-300">
+                              {modelo.disponibilidad}
                             </div>
-                          ))
-                        ) : (
-                          <div className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-gray-300">
-                            {modelo.disponibilidad}
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ) : null}
 
                     <div className="space-y-3">
                       <h3 className="text-xl text-white">Contacto</h3>
                       <a
-                        href={CONTACT_WHATSAPP_URL}
+                        href={detailWhatsAppUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
@@ -244,15 +296,17 @@ export default function ProfileDetail() {
                         <MessageCircle className="w-5 h-5" />
                         WhatsApp
                       </a>
-                      <a
-                        href={CONTACT_TELEGRAM_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
-                      >
-                        <Send className="w-5 h-5" />
-                        Telegram
-                      </a>
+                      {!isAdvertiserProfile ? (
+                        <a
+                          href={CONTACT_TELEGRAM_URL}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
+                        >
+                          <Send className="w-5 h-5" />
+                          Telegram
+                        </a>
+                      ) : null}
                       <a
                         href={reportWhatsAppUrl}
                         target="_blank"
@@ -342,13 +396,15 @@ export default function ProfileDetail() {
                           {modelo.ubicacion}
                         </div>
                       </div>
-                      <span
-                        className={`mt-3 inline-flex rounded-full border px-4 py-1.5 text-sm font-bold tracking-wide ${categoryClasses(
-                          modelo.categoria
-                        )}`}
-                      >
-                        {modelo.categoria}
-                      </span>
+                      {!isAdvertiserProfile ? (
+                        <span
+                          className={`mt-3 inline-flex rounded-full border px-4 py-1.5 text-sm font-bold tracking-wide ${categoryClasses(
+                            modelo.categoria
+                          )}`}
+                        >
+                          {modelo.categoria}
+                        </span>
+                      ) : null}
                       <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#22c55e]/50 bg-[#22c55e]/15 px-4 py-2 text-[#86efac] shadow-[0_0_24px_rgba(34,197,94,0.45)]">
                         <DollarSign className="h-5 w-5" />
                         <span className="text-lg font-bold">Desde ${Number(modelo.precio || 0).toFixed(2)}</span>
@@ -360,35 +416,37 @@ export default function ProfileDetail() {
                       <p className="text-gray-300 leading-relaxed">{modelo.descripcion}</p>
                     </div>
 
-                    <div className="mb-8">
-                      <h2 className="text-2xl text-white mb-4 flex items-center gap-2">
-                        <Calendar className="w-6 h-6 text-[#a83d8e]" />
-                        Disponibilidad
-                      </h2>
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                        {availability.length ? (
-                          availability.map((time, index) => (
-                            <div
-                              key={index}
-                              className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 flex items-center gap-2"
-                            >
-                              <Clock className="w-4 h-4 text-[#a83d8e]" />
-                              <span className="text-gray-300">{time}</span>
+                    {!isAdvertiserProfile ? (
+                      <div className="mb-8">
+                        <h2 className="text-2xl text-white mb-4 flex items-center gap-2">
+                          <Calendar className="w-6 h-6 text-[#a83d8e]" />
+                          Disponibilidad
+                        </h2>
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                          {availability.length ? (
+                            availability.map((time, index) => (
+                              <div
+                                key={index}
+                                className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 flex items-center gap-2"
+                              >
+                                <Clock className="w-4 h-4 text-[#a83d8e]" />
+                                <span className="text-gray-300">{time}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-gray-300">
+                              {modelo.disponibilidad}
                             </div>
-                          ))
-                        ) : (
-                          <div className="bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-4 py-3 text-gray-300">
-                            {modelo.disponibilidad}
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ) : null}
 
                     <div className="space-y-3">
                       <h3 className="text-xl text-white">Contacto</h3>
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                         <a
-                          href={CONTACT_WHATSAPP_URL}
+                          href={detailWhatsAppUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
@@ -396,15 +454,17 @@ export default function ProfileDetail() {
                           <MessageCircle className="w-5 h-5" />
                           WhatsApp
                         </a>
-                        <a
-                          href={CONTACT_TELEGRAM_URL}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
-                        >
-                          <Send className="w-5 h-5" />
-                          Telegram
-                        </a>
+                        {!isAdvertiserProfile ? (
+                          <a
+                            href={CONTACT_TELEGRAM_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"
+                          >
+                            <Send className="w-5 h-5" />
+                            Telegram
+                          </a>
+                        ) : null}
                       </div>
                       <a
                         href={reportWhatsAppUrl}
