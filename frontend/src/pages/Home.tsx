@@ -25,8 +25,6 @@ import {
   CarouselItem,
 } from '../components/ui/carousel';
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1760008218224-f8614778fec4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxEdWJhaSUyMHNreWxpbmUlMjBuaWdodCUyMG5lb24lMjBsaWdodHN8ZW58MXx8fHwxNzcyNTgyMjkzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
-
 const FAQ_ITEMS = [
   {
     question: '¿Cómo funciona la verificación?',
@@ -180,12 +178,18 @@ export default function Home() {
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Fondo */}
         <div className="absolute inset-0">
-          <img
-            src={HERO_IMAGE}
-            alt="panorámica de Dubai"
+          <video
+            src="/video/hero.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/80 to-black"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.15),rgba(0,0,0,0.72))]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/75 to-black"></div>
         </div>
 
         {/* Contenido */}
@@ -501,9 +505,14 @@ export default function Home() {
       <section className="py-20 px-8 bg-gradient-to-b from-[#0a0a0a] to-black relative overflow-hidden">
         {/* Fondo */}
         <div className="absolute inset-0 opacity-20">
-          <img
-            src={HERO_IMAGE}
-            alt="Fondo"
+          <video
+            src="/video/hero.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black"></div>

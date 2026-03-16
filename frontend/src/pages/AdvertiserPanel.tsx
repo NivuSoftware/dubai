@@ -802,6 +802,15 @@ export default function AdvertiserPanel() {
               <p className="pt-1 text-sm font-medium text-[#93c5fd]">
                 2. Realiza la transferencia bancaria
               </p>
+              <div className="rounded-lg border border-[#1f7fd8]/40 bg-[linear-gradient(180deg,rgba(31,127,216,0.16),rgba(18,26,42,0.96))] p-4 text-sm text-gray-200 shadow-[0_0_24px_rgba(31,127,216,0.12)]">
+                <p className="mb-3 font-semibold text-white">Pago por QR</p>
+                <img
+                  src="/images/qr.jpeg"
+                  alt="Código QR para transferencia"
+                  className="mx-auto max-h-64 w-auto rounded-lg border border-white/10 object-contain"
+                />
+              </div>
+
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-lg border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
                   <p className="font-semibold text-white">Banco del Guayaquil</p>
