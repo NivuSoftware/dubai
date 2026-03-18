@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { ADMIN_TOKEN_KEY, login } from "../services/authService";
 
 export default function AdminLogin() {
@@ -50,6 +50,14 @@ export default function AdminLogin() {
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-14">
         <div className="w-full max-w-md rounded-3xl border border-white/15 bg-white/5 p-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-10">
+          <Link
+            to="/"
+            className="mb-6 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[#d4af37] transition hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            VOLVER
+          </Link>
+
           <div className="mb-7 flex items-center gap-3">
             <img src="/images/logo.png" alt="Dubai logo" className="h-14 w-auto" />
             <div>

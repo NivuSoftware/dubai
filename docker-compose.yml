@@ -20,11 +20,12 @@ services:
       - dubai-network
 
   backend:
+    image: dubai-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
       args:
-        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-dubai-backend:latest}
+        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-python:3.11-slim}
     container_name: dubai-backend
     env_file:
       - ./backend/.env

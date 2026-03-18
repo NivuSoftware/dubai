@@ -40,32 +40,30 @@ export function getPublicAnuncio(id: string): Promise<Anuncio> {
 export interface AnuncioPayload {
   titulo: string;
   descripcion: string;
-  precio: number;
   ubicacion: string;
   contact_country_code: string;
   contact_number: string;
-  plan: "executive" | "nena" | "dama" | "princesa";
-  payment_receipt_image: File;
+  plan: "daily" | "weekly" | "monthly";
+  payment_receipt_image: File | null;
   images: File[];
 }
 
 export interface AnuncioUpdatePayload {
   titulo: string;
   descripcion: string;
-  precio: number;
   ubicacion: string;
   contact_country_code: string;
   contact_number: string;
 }
 
 export interface AnuncioReactivatePayload {
-  plan: "executive" | "nena" | "dama" | "princesa";
-  payment_receipt_image: File;
+  plan: "daily" | "weekly" | "monthly";
+  payment_receipt_image: File | null;
 }
 
 export interface AnuncioDraftPayload {
-  plan: "executive" | "nena" | "dama" | "princesa";
-  payment_receipt_image: File;
+  plan: "daily" | "weekly" | "monthly";
+  payment_receipt_image: File | null;
 }
 
 export async function listAdvertiserAnuncios(token: string): Promise<Anuncio[]> {
@@ -77,12 +75,13 @@ export async function createAdvertiserAnuncio(token: string, payload: AnuncioPay
   const formData = new FormData();
   formData.append("titulo", payload.titulo);
   formData.append("descripcion", payload.descripcion);
-  formData.append("precio", String(payload.precio));
   formData.append("ubicacion", payload.ubicacion);
   formData.append("contact_country_code", payload.contact_country_code);
   formData.append("contact_number", payload.contact_number);
   formData.append("plan", payload.plan);
-  formData.append("payment_receipt_image", payload.payment_receipt_image);
+  if (payload.payment_receipt_image) {
+    formData.append("payment_receipt_image", payload.payment_receipt_image);
+  }
   payload.images.forEach((file) => formData.append("images", file));
 
   const response = await apiRequestWithAuth<{ message: string; item: Anuncio }>(
@@ -102,7 +101,9 @@ export async function createAdvertiserAnuncioDraft(
 ): Promise<Anuncio> {
   const formData = new FormData();
   formData.append("plan", payload.plan);
-  formData.append("payment_receipt_image", payload.payment_receipt_image);
+  if (payload.payment_receipt_image) {
+    formData.append("payment_receipt_image", payload.payment_receipt_image);
+  }
 
   const response = await apiRequestWithAuth<{ message: string; item: Anuncio }>(
     token,
@@ -156,7 +157,9 @@ export async function reactivateAdvertiserAnuncio(
 ): Promise<Anuncio> {
   const formData = new FormData();
   formData.append("plan", payload.plan);
-  formData.append("payment_receipt_image", payload.payment_receipt_image);
+  if (payload.payment_receipt_image) {
+    formData.append("payment_receipt_image", payload.payment_receipt_image);
+  }
 
   const response = await apiRequestWithAuth<{ message: string; item: Anuncio }>(
     token,

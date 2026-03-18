@@ -77,7 +77,6 @@ export default function Profiles() {
       city: string;
       tagline: string;
       category?: string;
-      priceValue?: number;
       imageUrl?: string;
       whatsappUrl?: string;
     }> = [];
@@ -93,7 +92,6 @@ export default function Profiles() {
           age: 18,
           city: anuncio.ubicacion,
           tagline: anuncio.descripcion,
-          priceValue: anuncio.precio,
           imageUrl: anuncio.images?.[0]?.url,
           whatsappUrl: anuncio.whatsapp_url,
         });
@@ -109,7 +107,6 @@ export default function Profiles() {
           city: modelo.ubicacion,
           tagline: modelo.descripcion,
           category: modelo.categoria,
-          priceValue: modelo.precio,
           imageUrl: modelo.images?.[0]?.url,
         });
       }
@@ -208,7 +205,6 @@ export default function Profiles() {
                     verified={true}
                     tagline={profile.tagline}
                     category={profile.category}
-                    priceValue={profile.priceValue}
                     imageUrl={profile.imageUrl}
                     whatsappUrl={profile.whatsappUrl}
                   />

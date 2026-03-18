@@ -1,6 +1,19 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { BadgeCheck, CheckCircle2, Clock3, LogOut, Pencil, Plus, Trash2, X, XCircle } from "lucide-react";
+import {
+  BadgeCheck,
+  CheckCircle2,
+  Clock3,
+  LogOut,
+  Pencil,
+  Plus,
+  Shield,
+  Sparkles,
+  Ticket,
+  Trash2,
+  X,
+  XCircle,
+} from "lucide-react";
 import {
   ADMIN_TOKEN_KEY,
   fetchAdvertiserMe,
@@ -24,6 +37,7 @@ interface AdvertiserState {
   is_verified: boolean;
   is_verification_requested: boolean;
   is_verification_rejected: boolean;
+  has_used_free_trial: boolean;
   created_at: string;
 }
 
@@ -35,7 +49,7 @@ interface VerificationFormState {
   portrait_image: File | null;
 }
 
-type AnuncioPlan = "executive" | "nena" | "dama" | "princesa";
+type AnuncioPlan = "daily" | "weekly" | "monthly";
 
 interface PaymentStepState {
   plan: AnuncioPlan;
@@ -43,11 +57,11 @@ interface PaymentStepState {
 }
 
 type PaymentFlowMode = "create" | "reactivate";
+type AdvertiserView = "pricing" | "ads";
 
 interface AnuncioFormState {
   titulo: string;
   descripcion: string;
-  precio: number;
   ubicacion: string;
   contact_country_code: string;
   contact_number: string;
@@ -55,6 +69,62 @@ interface AnuncioFormState {
 
 const MAX_IMAGES_PER_ANUNCIO = 5;
 const DRAFT_STORAGE_PREFIX = "advertiser_anuncio_draft_form";
+const PRICING_PLANS: Array<{
+  plan: AnuncioPlan;
+  name: string;
+  price: string;
+  priceValue: number;
+  duration: string;
+  savingsLabel: string;
+  features: string[];
+  accentClass: string;
+}> = [
+  {
+    plan: "daily",
+    name: "Diario Lanzamiento",
+    price: "$7.99",
+    priceValue: 7.99,
+    duration: "24h",
+    savingsLabel: "Tiempo limitado",
+    features: [
+      "Top prioridad 24 horas",
+      "Verificación manual estricta",
+      "Solo por tiempo limitado",
+      "Primeras 100 personas verificadas",
+    ],
+    accentClass:
+      "border-[#f5c08d]/35 bg-[linear-gradient(180deg,rgba(245,192,141,0.22),rgba(70,39,20,0.96))] shadow-[0_0_32px_rgba(245,192,141,0.16)]",
+  },
+  {
+    plan: "weekly",
+    name: "Semanal Premium",
+    price: "$34.99",
+    priceValue: 34.99,
+    duration: "7 días",
+    savingsLabel: "Ahorro +30%",
+    features: [
+      "Visibilidad top 7 días completos",
+      "Ahorro +30% vs. diario",
+    ],
+    accentClass:
+      "border-[#f3a7a0]/35 bg-[linear-gradient(180deg,rgba(243,167,160,0.22),rgba(65,24,28,0.96))] shadow-[0_0_32px_rgba(243,167,160,0.16)]",
+  },
+  {
+    plan: "monthly",
+    name: "Mensual Elite",
+    price: "$129.99",
+    priceValue: 129.99,
+    duration: "30 días",
+    savingsLabel: "Ahorro ~50%",
+    features: [
+      "Prioridad máxima permanente 30 días",
+      "Ahorro ~50% vs. diario",
+      "Soporte prioritario directo",
+    ],
+    accentClass:
+      "border-[#f08bb7]/35 bg-[linear-gradient(180deg,rgba(240,139,183,0.24),rgba(54,18,41,0.96))] shadow-[0_0_32px_rgba(240,139,183,0.18)]",
+  },
+];
 
 function normalizePhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, "");
@@ -78,27 +148,39 @@ function isAdult(birthDate: string): boolean {
 }
 
 function planLabel(plan: AnuncioPlan): string {
-  if (plan === "executive") return "Plan Ejecutivo (Diario) $20";
-  if (plan === "nena") return "Plan Nena (Semanal) $120";
-  if (plan === "dama") return "Plan Dama (Mensual) $560";
-  return "Plan Princesa (Trimestral) $1740";
+  if (plan === "daily") return "Diario Lanzamiento · $7.99 · 24h";
+  if (plan === "weekly") return "Semanal Premium · $34.99 · 7 días";
+  return "Mensual Elite · $129.99 · 30 días";
 }
 
 function planLabelFromValue(plan: string): string {
-  if (plan === "executive" || plan === "nena" || plan === "dama" || plan === "princesa") {
+  if (plan === "daily" || plan === "weekly" || plan === "monthly") {
     return planLabel(plan);
   }
-  if (plan === "monthly") return "Mensual (legado)";
-  if (plan === "quarterly") return "Trimestral (legado)";
-  if (plan === "semiannual") return "Semestral (legado)";
+  if (plan === "trial") return "Trial (legado) · 48h";
+  if (plan === "quarterly") return "Trimestral (legado) · 90 días";
+  if (plan === "semiannual") return "Semestral (legado) · 180 días";
+  if (plan === "executive") return "Plan Ejecutivo (legado)";
+  if (plan === "nena") return "Plan Nena (legado)";
+  if (plan === "dama") return "Plan Dama (legado)";
+  if (plan === "princesa") return "Plan Princesa (legado)";
   return plan;
 }
 
 function normalizeSelectablePlan(plan: string): AnuncioPlan {
-  if (plan === "executive" || plan === "nena" || plan === "dama" || plan === "princesa") {
+  if (plan === "daily" || plan === "weekly" || plan === "monthly") {
     return plan;
   }
-  return "executive";
+  if (plan === "trial" || plan === "executive") return "daily";
+  if (plan === "nena") return "weekly";
+  if (plan === "quarterly" || plan === "semiannual" || plan === "dama" || plan === "princesa") {
+    return "monthly";
+  }
+  return "monthly";
+}
+
+function isSupportedPlan(plan: string): plan is AnuncioPlan {
+  return plan === "daily" || plan === "weekly" || plan === "monthly";
 }
 
 function formatDateTime(value: string): string {
@@ -146,6 +228,7 @@ export default function AdvertiserPanel() {
   const token = useMemo(() => localStorage.getItem(ADMIN_TOKEN_KEY), []);
 
   const [data, setData] = useState<AdvertiserState | null>(null);
+  const [activeView, setActiveView] = useState<AdvertiserView>("pricing");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -158,7 +241,7 @@ export default function AdvertiserPanel() {
   const [anuncioFiles, setAnuncioFiles] = useState<File[]>([]);
   const [anuncioPreviewUrls, setAnuncioPreviewUrls] = useState<string[]>([]);
   const [paymentStep, setPaymentStep] = useState<PaymentStepState>({
-    plan: "executive",
+    plan: "monthly",
     payment_receipt_image: null,
   });
   const [paymentFlowMode, setPaymentFlowMode] = useState<PaymentFlowMode>("create");
@@ -166,7 +249,6 @@ export default function AdvertiserPanel() {
   const [anuncioForm, setAnuncioForm] = useState<AnuncioFormState>({
     titulo: "",
     descripcion: "",
-    precio: 0,
     ubicacion: "",
     contact_country_code: "+593",
     contact_number: "",
@@ -183,6 +265,7 @@ export default function AdvertiserPanel() {
     portrait_image: null,
   });
   const [showAnuncioCreatedModal, setShowAnuncioCreatedModal] = useState(false);
+  const visiblePricingPlans = PRICING_PLANS;
 
   const persistDraftForm = (anuncioId: number, form: AnuncioFormState) => {
     localStorage.setItem(getDraftStorageKey(anuncioId), JSON.stringify(form));
@@ -311,13 +394,12 @@ export default function AdvertiserPanel() {
   };
 
   const resetAnuncioFlow = () => {
-    setPaymentStep({ plan: "executive", payment_receipt_image: null });
+    setPaymentStep({ plan: "monthly", payment_receipt_image: null });
     setPaymentFlowMode("create");
     setAnuncioToReactivate(null);
     setAnuncioForm({
       titulo: "",
       descripcion: "",
-      precio: 0,
       ubicacion: "",
       contact_country_code: "+593",
       contact_number: "",
@@ -342,27 +424,26 @@ export default function AdvertiserPanel() {
     setAnuncioForm({
       titulo: "",
       descripcion: "",
-      precio: 0,
       ubicacion: "",
       contact_country_code: "+593",
       contact_number: "",
     });
   };
 
-  const openCreateAnuncio = () => {
+  const openCreateAnuncio = (initialPlan: AnuncioPlan = "monthly") => {
     if (!data?.is_verified) {
       setError("Solo los anunciantes verificados pueden crear anuncios.");
       return;
     }
     setError("");
     setSuccess("");
+    setActiveView("ads");
     setPaymentFlowMode("create");
     setAnuncioToReactivate(null);
-    setPaymentStep({ plan: "executive", payment_receipt_image: null });
+    setPaymentStep({ plan: initialPlan, payment_receipt_image: null });
     setAnuncioForm({
       titulo: "",
       descripcion: "",
-      precio: 0,
       ubicacion: "",
       contact_country_code: "+593",
       contact_number: "",
@@ -395,7 +476,6 @@ export default function AdvertiserPanel() {
       restoredDraft ?? {
         titulo: anuncio.titulo,
         descripcion: anuncio.descripcion,
-        precio: Number(anuncio.precio),
         ubicacion: anuncio.ubicacion,
         contact_country_code: anuncio.contact_country_code || "+593",
         contact_number: anuncio.contact_number || "",
@@ -410,6 +490,9 @@ export default function AdvertiserPanel() {
   const handlePaymentStepSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!token) return;
+    const normalizedPlan = isSupportedPlan(paymentStep.plan)
+      ? paymentStep.plan
+      : normalizeSelectablePlan(paymentStep.plan);
     if (!paymentStep.payment_receipt_image) {
       setError("Debes cargar la foto de la transferencia.");
       return;
@@ -425,17 +508,17 @@ export default function AdvertiserPanel() {
       setError("");
       try {
         await reactivateAdvertiserAnuncio(token, anuncioToReactivate.id, {
-          plan: paymentStep.plan,
+          plan: normalizedPlan,
           payment_receipt_image: paymentStep.payment_receipt_image,
         });
         await loadAnuncios();
         setShowPaymentModal(false);
         setPaymentFlowMode("create");
         setAnuncioToReactivate(null);
-        setPaymentStep({ plan: "executive", payment_receipt_image: null });
+        setPaymentStep({ plan: "monthly", payment_receipt_image: null });
         setSuccess("Solicitud enviada. Tu anuncio quedó en pendiente para aprobación.");
-      } catch {
-        setError("No se pudo activar el anuncio.");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "No se pudo activar el anuncio.");
       } finally {
         setAnuncioSaving(false);
       }
@@ -446,7 +529,7 @@ export default function AdvertiserPanel() {
     setAnuncioSaving(true);
     try {
       const draft = await createAdvertiserAnuncioDraft(token, {
-        plan: paymentStep.plan,
+        plan: normalizedPlan,
         payment_receipt_image: paymentStep.payment_receipt_image,
       });
       persistDraftForm(draft.id, anuncioForm);
@@ -454,8 +537,8 @@ export default function AdvertiserPanel() {
       setAnuncioEditing(draft);
       setShowPaymentModal(false);
       setShowAnuncioModal(true);
-    } catch {
-      setError("No se pudo guardar el borrador del anuncio.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo guardar el borrador del anuncio.");
     } finally {
       setAnuncioSaving(false);
     }
@@ -494,7 +577,6 @@ export default function AdvertiserPanel() {
         await updateAdvertiserAnuncio(token, anuncioEditing.id, {
           titulo: anuncioForm.titulo,
           descripcion: anuncioForm.descripcion,
-          precio: Number(anuncioForm.precio),
           ubicacion: anuncioForm.ubicacion,
           contact_country_code: anuncioForm.contact_country_code,
           contact_number: anuncioForm.contact_number,
@@ -522,8 +604,8 @@ export default function AdvertiserPanel() {
           setShowAnuncioCreatedModal(true);
         }
       }
-    } catch {
-      setError("No se pudo guardar el anuncio.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo guardar el anuncio.");
     } finally {
       setAnuncioSaving(false);
     }
@@ -565,6 +647,8 @@ export default function AdvertiserPanel() {
       setError("No se pudo eliminar la imagen del anuncio.");
     }
   };
+
+  const selectedPlanDetails = visiblePricingPlans.find((plan) => plan.plan === paymentStep.plan);
 
   return (
     <section className="min-h-screen bg-[#06090f]">
@@ -618,158 +702,257 @@ export default function AdvertiserPanel() {
           {error ? <p className="mb-3 text-red-400">{error}</p> : null}
           {success ? <p className="mb-3 text-emerald-400">{success}</p> : null}
 
-          <div className="rounded-2xl border border-[#1f7fd8]/30 bg-[#121a2a] p-4 sm:p-6">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-lg text-white">Mis anuncios</h3>
-              <button
-                onClick={openCreateAnuncio}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1a6ab4]"
-              >
-                <Plus className="h-4 w-4" />
-                Crear anuncio
-              </button>
-            </div>
-
-            {anuncios.length === 0 ? (
-              <p className="text-sm text-gray-400">Aún no has creado solicitudes de anuncio.</p>
-            ) : null}
-
-            <div className="space-y-3 md:hidden">
-              {anuncios.map((anuncio) => (
-                <article
-                  key={anuncio.id}
-                  className="rounded-xl border border-white/10 bg-[#0d1320] p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="text-sm font-semibold text-white">
-                        {anuncio.titulo?.trim() || "Anuncio en proceso"}
-                      </h4>
-                      <p className="text-xs text-gray-400">{planLabelFromValue(anuncio.plan)}</p>
-                      <p className="text-xs text-gray-400">Hasta: {formatDateTime(anuncio.fecha_hasta)}</p>
-                    </div>
-                    <span className={`rounded-full border border-[#1f7fd8]/40 px-2 py-1 text-[11px] ${estadoTextClass(anuncio.estado)}`}>
-                      {statusLabel(anuncio.estado)}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                    <p className="text-gray-400">
-                      Pago: <span className={pagoTextClass(anuncio.pago)}>{statusLabel(anuncio.pago)}</span>
-                    </p>
-                    <p className="text-gray-400">
-                      Precio: <span className="text-[#d4af37]">${Number(anuncio.precio).toFixed(2)}</span>
-                    </p>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {anuncio.is_draft ? (
-                      <button
-                        onClick={() => openEditAnuncio(anuncio)}
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d4af37]/60 px-3 py-2 text-xs text-[#f7d97b]"
-                      >
-                        Continuar
-                      </button>
-                    ) : canReactivateAnuncio(anuncio) ? (
-                      <button
-                        onClick={() => openReactivateAnuncio(anuncio)}
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-emerald-400/60 px-3 py-2 text-xs text-emerald-300"
-                      >
-                        Activarlo
-                      </button>
-                    ) : null}
-                    {!anuncio.is_draft ? (
-                      <button
-                        onClick={() => openEditAnuncio(anuncio)}
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-[#1f7fd8]/60 px-3 py-2 text-xs text-[#7eb8f2]"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                        Editar
-                      </button>
-                    ) : null}
-                    <button
-                      onClick={() => handleDeleteAnuncio(anuncio.id)}
-                      className="inline-flex items-center justify-center gap-2 rounded-md border border-red-400/60 px-3 py-2 text-xs text-red-300"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Eliminar
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="hidden overflow-x-auto rounded-xl border border-white/10 md:block">
-              <table className="min-w-full divide-y divide-white/10">
-                <thead className="bg-[#0f1728]">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Título</th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Plan</th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Pago</th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Estado</th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Fecha hasta</th>
-                    <th className="px-4 py-3 text-right text-xs uppercase tracking-wide text-gray-400">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10 bg-[#0d1320]">
-                  {anuncios.map((anuncio) => (
-                    <tr key={anuncio.id}>
-                      <td className="px-4 py-3 text-sm text-white">
-                        {anuncio.titulo?.trim() || "Anuncio en proceso"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-300">{planLabelFromValue(anuncio.plan)}</td>
-                      <td className={`px-4 py-3 text-sm ${pagoTextClass(anuncio.pago)}`}>{statusLabel(anuncio.pago)}</td>
-                      <td className={`px-4 py-3 text-sm ${estadoTextClass(anuncio.estado)}`}>{statusLabel(anuncio.estado)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-300">{formatDateTime(anuncio.fecha_hasta)}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-2">
-                          {anuncio.is_draft ? (
-                            <button
-                              onClick={() => openEditAnuncio(anuncio)}
-                              className="inline-flex items-center gap-1 rounded-md border border-[#d4af37]/60 px-3 py-1.5 text-xs text-[#f7d97b] transition hover:bg-[#d4af37]/15"
-                            >
-                              Continuar
-                            </button>
-                          ) : canReactivateAnuncio(anuncio) ? (
-                            <button
-                              onClick={() => openReactivateAnuncio(anuncio)}
-                              className="inline-flex items-center gap-1 rounded-md border border-emerald-400/60 px-3 py-1.5 text-xs text-emerald-300 transition hover:bg-emerald-500/15"
-                            >
-                              Activarlo
-                            </button>
-                          ) : null}
-                          {!anuncio.is_draft ? (
-                            <button
-                              onClick={() => openEditAnuncio(anuncio)}
-                              className="inline-flex items-center gap-1 rounded-md border border-[#1f7fd8]/60 px-3 py-1.5 text-xs text-[#7eb8f2] transition hover:bg-[#1f7fd8]/15"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                              Editar
-                            </button>
-                          ) : null}
-                          <button
-                            onClick={() => handleDeleteAnuncio(anuncio.id)}
-                            className="inline-flex items-center gap-1 rounded-md border border-red-400/60 px-3 py-1.5 text-xs text-red-300 transition hover:bg-red-400/15"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="mb-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveView("pricing")}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+                activeView === "pricing"
+                  ? "border-[#f5a7c9]/70 bg-[#f5a7c9]/15 text-[#ffd6ea]"
+                  : "border-white/10 bg-[#120d18] text-gray-300 hover:border-[#f08bb7]/40 hover:text-white"
+              }`}
+            >
+              <Ticket className="h-4 w-4" />
+              Precios
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView("ads")}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+                activeView === "ads"
+                  ? "border-[#d9a4ff]/70 bg-[#d9a4ff]/15 text-[#eedbff]"
+                  : "border-white/10 bg-[#120d18] text-gray-300 hover:border-[#d9a4ff]/40 hover:text-white"
+              }`}
+            >
+              <Shield className="h-4 w-4" />
+              Mis anuncios
+            </button>
           </div>
+
+          {activeView === "pricing" ? (
+            <div className="space-y-8">
+              <div className="relative px-2 py-6 sm:px-6 sm:py-10">
+                <div className="absolute -left-6 top-0 h-40 w-40 rounded-full bg-[#f5a7c9]/12 blur-3xl" />
+                <div className="absolute right-0 top-2 h-56 w-56 rounded-full bg-[#d9a4ff]/10 blur-3xl" />
+                <div className="absolute bottom-0 left-1/3 h-44 w-44 rounded-full bg-[#f6d58c]/10 blur-3xl" />
+                <div className="relative mx-auto max-w-5xl text-center">
+                  <blockquote className="font-[Georgia] text-4xl italic leading-tight text-white sm:text-5xl lg:text-6xl">
+                    "Una mujer debe ser dos cosas: quien ella quiera y lo que ella quiera."
+                  </blockquote>
+                  <p className="mt-5 text-sm uppercase tracking-[0.32em] text-[#ffd6ea]">
+                    Coco Chanel
+                  </p>
+                  <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#f6ddeb] sm:text-base">
+                    Diseñado para una presencia elegante, constante y segura dentro de la plataforma.
+                    Elige el tiempo de visibilidad que mejor se adapte a tu ritmo.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <p className="inline-flex items-center gap-2 rounded-full border border-[#f5a7c9]/30 bg-[#f5a7c9]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-[#ffd6ea]">
+                  <Sparkles className="h-4 w-4" />
+                  Precio
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {visiblePricingPlans.map((plan) => (
+                  <article
+                    key={plan.plan}
+                    className={`relative flex min-h-[440px] flex-col overflow-hidden rounded-[28px] border p-5 ${plan.accentClass}`}
+                  >
+                    <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-white/8 blur-2xl" />
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-serif text-2xl text-white">{plan.name}</h3>
+                        <p className="mt-1 text-sm text-white/70">{plan.duration}</p>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-2">
+                        <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-white">
+                          {plan.price}
+                        </span>
+                        <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80">
+                          {plan.savingsLabel}
+                        </span>
+                      </div>
+                    </div>
+                    <ul className="mt-4 flex-1 space-y-3 text-sm leading-6 text-gray-100">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2">
+                          <span className="mt-1 h-2 w-2 rounded-full bg-white/80" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openCreateAnuncio(plan.plan);
+                      }}
+                      className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Crear anuncio
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-[#1f7fd8]/30 bg-[#121a2a] p-4 sm:p-6">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-lg text-white">Mis anuncios</h3>
+                <button
+                  onClick={openCreateAnuncio}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1a6ab4]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Crear anuncio
+                </button>
+              </div>
+
+              {anuncios.length === 0 ? (
+                <p className="text-sm text-gray-400">Aún no has creado solicitudes de anuncio.</p>
+              ) : null}
+
+              <div className="space-y-3 md:hidden">
+                {anuncios.map((anuncio) => (
+                  <article
+                    key={anuncio.id}
+                    className="rounded-xl border border-white/10 bg-[#0d1320] p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="text-sm font-semibold text-white">
+                          {anuncio.titulo?.trim() || "Anuncio en proceso"}
+                        </h4>
+                        <p className="text-xs text-gray-400">{planLabelFromValue(anuncio.plan)}</p>
+                        <p className="text-xs text-gray-400">Hasta: {formatDateTime(anuncio.fecha_hasta)}</p>
+                      </div>
+                      <span className={`rounded-full border border-[#1f7fd8]/40 px-2 py-1 text-[11px] ${estadoTextClass(anuncio.estado)}`}>
+                        {statusLabel(anuncio.estado)}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <p className="text-gray-400">
+                        Pago: <span className={pagoTextClass(anuncio.pago)}>{statusLabel(anuncio.pago)}</span>
+                      </p>
+                      <p className="text-gray-400">
+                        Precio: <span className="text-[#d4af37]">${Number(anuncio.precio).toFixed(2)}</span>
+                      </p>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {anuncio.is_draft ? (
+                        <button
+                          onClick={() => openEditAnuncio(anuncio)}
+                          className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d4af37]/60 px-3 py-2 text-xs text-[#f7d97b]"
+                        >
+                          Continuar
+                        </button>
+                      ) : canReactivateAnuncio(anuncio) ? (
+                        <button
+                          onClick={() => openReactivateAnuncio(anuncio)}
+                          className="inline-flex items-center justify-center gap-2 rounded-md border border-emerald-400/60 px-3 py-2 text-xs text-emerald-300"
+                        >
+                          Activarlo
+                        </button>
+                      ) : null}
+                      {!anuncio.is_draft ? (
+                        <button
+                          onClick={() => openEditAnuncio(anuncio)}
+                          className="inline-flex items-center justify-center gap-2 rounded-md border border-[#1f7fd8]/60 px-3 py-2 text-xs text-[#7eb8f2]"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Editar
+                        </button>
+                      ) : null}
+                      <button
+                        onClick={() => handleDeleteAnuncio(anuncio.id)}
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-red-400/60 px-3 py-2 text-xs text-red-300"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Eliminar
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="hidden overflow-x-auto rounded-xl border border-white/10 md:block">
+                <table className="min-w-full divide-y divide-white/10">
+                  <thead className="bg-[#0f1728]">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Título</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Plan</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Pago</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Estado</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">Fecha hasta</th>
+                      <th className="px-4 py-3 text-right text-xs uppercase tracking-wide text-gray-400">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10 bg-[#0d1320]">
+                    {anuncios.map((anuncio) => (
+                      <tr key={anuncio.id}>
+                        <td className="px-4 py-3 text-sm text-white">
+                          {anuncio.titulo?.trim() || "Anuncio en proceso"}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{planLabelFromValue(anuncio.plan)}</td>
+                        <td className={`px-4 py-3 text-sm ${pagoTextClass(anuncio.pago)}`}>{statusLabel(anuncio.pago)}</td>
+                        <td className={`px-4 py-3 text-sm ${estadoTextClass(anuncio.estado)}`}>{statusLabel(anuncio.estado)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{formatDateTime(anuncio.fecha_hasta)}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            {anuncio.is_draft ? (
+                              <button
+                                onClick={() => openEditAnuncio(anuncio)}
+                                className="inline-flex items-center gap-1 rounded-md border border-[#d4af37]/60 px-3 py-1.5 text-xs text-[#f7d97b] transition hover:bg-[#d4af37]/15"
+                              >
+                                Continuar
+                              </button>
+                            ) : canReactivateAnuncio(anuncio) ? (
+                              <button
+                                onClick={() => openReactivateAnuncio(anuncio)}
+                                className="inline-flex items-center gap-1 rounded-md border border-emerald-400/60 px-3 py-1.5 text-xs text-emerald-300 transition hover:bg-emerald-500/15"
+                              >
+                                Activarlo
+                              </button>
+                            ) : null}
+                            {!anuncio.is_draft ? (
+                              <button
+                                onClick={() => openEditAnuncio(anuncio)}
+                                className="inline-flex items-center gap-1 rounded-md border border-[#1f7fd8]/60 px-3 py-1.5 text-xs text-[#7eb8f2] transition hover:bg-[#1f7fd8]/15"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Editar
+                              </button>
+                            ) : null}
+                            <button
+                              onClick={() => handleDeleteAnuncio(anuncio.id)}
+                              className="inline-flex items-center gap-1 rounded-md border border-red-400/60 px-3 py-1.5 text-xs text-red-300 transition hover:bg-red-400/15"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {showPaymentModal ? (
-        <div className="fixed inset-0 z-[85] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-[#1f7fd8]/40 bg-[#0d1320] p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-[85] flex items-start justify-center bg-black/70 px-2 py-2 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6">
+          <div className="max-h-[94vh] w-full max-w-xl overflow-y-auto rounded-xl border border-[#1f7fd8]/40 bg-[#0d1320] p-3 sm:rounded-2xl sm:p-6">
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <h2 className="pr-2 text-lg font-semibold text-white sm:text-xl">
                 {paymentFlowMode === "reactivate"
                   ? "Activar anuncio: selecciona plan"
                   : "Seleccione su plan de anuncio"}
@@ -784,20 +967,37 @@ export default function AdvertiserPanel() {
             </div>
 
             <form onSubmit={handlePaymentStepSubmit} className="space-y-3">
+              {error ? (
+                <p className="rounded-lg border border-red-400/35 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                  {error}
+                </p>
+              ) : null}
               <p className="text-sm font-medium text-[#93c5fd]">1. Selecciona tu plan</p>
               <label className="mb-1 block text-xs text-gray-300">Plan de anuncio</label>
               <select
                 value={paymentStep.plan}
                 onChange={(e) =>
-                  setPaymentStep((prev) => ({ ...prev, plan: e.target.value as AnuncioPlan }))
+                  setPaymentStep((prev) => ({
+                    ...prev,
+                    plan: normalizeSelectablePlan(e.target.value),
+                    payment_receipt_image: null,
+                  }))
                 }
                 className="w-full rounded-lg border-2 border-[#1f7fd8]/70 bg-[#16233a] px-4 py-3 text-base font-semibold text-white shadow-[0_0_0_1px_rgba(31,127,216,0.18)] outline-none transition focus:border-[#4ea3ff] focus:bg-[#1a2944] focus:shadow-[0_0_0_4px_rgba(31,127,216,0.18)]"
               >
-                <option value="executive">Plan Ejecutivo (Diario) $20</option>
-                <option value="nena">Plan Nena (Semanal) $120</option>
-                <option value="dama">Plan Dama (Mensual) $560</option>
-                <option value="princesa">Plan Princesa (Trimestral) $1740</option>
+                <option value="daily">Diario Lanzamiento · $7.99 · 24h</option>
+                <option value="weekly">Semanal Premium · $34.99 · 7 días</option>
+                <option value="monthly">Mensual Elite · $129.99 · 30 días</option>
               </select>
+
+              <div className="rounded-xl border border-[#d4af37]/35 bg-[#d4af37]/10 p-4 text-sm text-[#f6e7a8]">
+                <p className="font-semibold text-white">
+                  Plan seleccionado: {selectedPlanDetails?.name}
+                </p>
+                <p className="mt-1">
+                  Valor a pagar: <span className="font-semibold">{selectedPlanDetails?.price}</span>
+                </p>
+              </div>
 
               <p className="pt-1 text-sm font-medium text-[#93c5fd]">
                 2. Realiza la transferencia bancaria
@@ -811,7 +1011,7 @@ export default function AdvertiserPanel() {
                 />
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="rounded-lg border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
                   <p className="font-semibold text-white">Banco del Guayaquil</p>
                   <p>Tipo: Cuenta de ahorros</p>
@@ -824,11 +1024,16 @@ export default function AdvertiserPanel() {
                   <p>Cuenta: 12008169115</p>
                   <p>Ci: 1719906578</p>
                 </div>
+                <div className="rounded-lg border border-[#d4af37]/55 bg-[linear-gradient(180deg,rgba(212,175,55,0.24),rgba(59,44,12,0.96))] p-3 text-sm text-[#f5e8b2] shadow-[0_0_24px_rgba(212,175,55,0.14)]">
+                  <p className="font-semibold text-white">Banco Pichincha</p>
+                  <p>Tipo: Cuenta Ahorros</p>
+                  <p>Cuenta: 2215589147</p>
+                </div>
               </div>
 
               <div>
-                <p className="mb-2 pt-1 text-sm font-medium text-[#93c5fd]">3. Crea tu anuncio</p>
-                <label className="mb-1 block text-xs text-gray-300">Cargue la foto de la transferencia</label>
+                <p className="mb-2 pt-1 text-sm font-medium text-[#93c5fd]">3. Adjunta tu comprobante</p>
+                <label className="mb-1 block text-xs text-gray-300">Carga la foto de la transferencia</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -843,18 +1048,18 @@ export default function AdvertiserPanel() {
                 />
               </div>
 
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(false)}
-                  className="rounded-lg border border-white/20 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10"
+                  className="rounded-lg border border-white/20 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10 sm:min-w-[120px]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={anuncioSaving}
-                  className="rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm text-white transition hover:bg-[#1a6ab4] disabled:opacity-60"
+                  className="rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm text-white transition hover:bg-[#1a6ab4] disabled:opacity-60 sm:min-w-[220px]"
                 >
                   {anuncioSaving
                     ? "Enviando..."
@@ -870,8 +1075,8 @@ export default function AdvertiserPanel() {
 
       {showAnuncioModal ? (
         <div className="fixed inset-0 z-[86] flex items-start justify-center bg-black/70 px-2 py-2 backdrop-blur-sm sm:items-center sm:px-4 sm:py-8">
-          <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-xl border border-white/20 bg-[#0d1320] p-3 sm:max-w-2xl sm:rounded-2xl sm:p-8">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="max-h-[94vh] w-full max-w-md overflow-y-auto rounded-xl border border-white/20 bg-[#0d1320] p-3 sm:max-w-3xl sm:rounded-2xl sm:p-6 lg:p-8">
+            <div className="mb-4 flex items-start justify-between gap-3">
               <h2 className="text-lg text-white sm:text-xl">
                 {anuncioEditing?.is_draft ? "Completa los datos del anuncio" : "Editar anuncio"}
               </h2>
@@ -884,13 +1089,25 @@ export default function AdvertiserPanel() {
               </button>
             </div>
 
-            {!anuncioEditing ? (
-              <p className="mb-3 text-sm text-[#93c5fd]">
-                Plan seleccionado: <span className="font-semibold">{planLabel(paymentStep.plan)}</span>
-              </p>
-            ) : null}
+            <div className="mb-3 rounded-lg border border-[#d4af37]/25 bg-[#d4af37]/10 px-3 py-2 text-sm text-[#f5e9b4]">
+              <span className="font-medium">Plan seleccionado:</span>{" "}
+              <span className="font-semibold">
+                {anuncioEditing ? planLabelFromValue(anuncioEditing.plan) : planLabel(paymentStep.plan)}
+              </span>
+              {" · "}
+              <span className="font-semibold">
+                {anuncioEditing
+                  ? `$${Number(anuncioEditing.precio).toFixed(2)}`
+                  : selectedPlanDetails?.price}
+              </span>
+            </div>
 
-            <form onSubmit={handleSubmitAnuncio} className="space-y-3">
+            <form onSubmit={handleSubmitAnuncio} className="space-y-3 sm:space-y-4">
+              {error ? (
+                <p className="rounded-lg border border-red-400/35 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                  {error}
+                </p>
+              ) : null}
               <div>
                 <label className="mb-1 block text-xs text-gray-300">Titulo</label>
                 <input
@@ -915,42 +1132,30 @@ export default function AdvertiserPanel() {
                 />
               </div>
 
-              <div>
-                <label className="mb-1 block text-xs text-gray-300">Precio</label>
-                <input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
-                  placeholder="Precio (USD)"
-                  value={anuncioForm.precio}
-                  onChange={(e) => setAnuncioForm((prev) => ({ ...prev, precio: Number(e.target.value) }))}
-                  required
-                />
-              </div>
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+                <div>
+                  <label className="mb-1 block text-xs text-gray-300">Ubicacion</label>
+                  <input
+                    className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
+                    placeholder="Ubicación"
+                    value={anuncioForm.ubicacion}
+                    onChange={(e) => setAnuncioForm((prev) => ({ ...prev, ubicacion: e.target.value }))}
+                    required
+                  />
+                </div>
 
-              <div>
-                <label className="mb-1 block text-xs text-gray-300">Ubicacion</label>
-                <input
-                  className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
-                  placeholder="Ubicación"
-                  value={anuncioForm.ubicacion}
-                  onChange={(e) => setAnuncioForm((prev) => ({ ...prev, ubicacion: e.target.value }))}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-gray-300">Código de país</label>
-                <input
-                  className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
-                  placeholder="+593"
-                  value={anuncioForm.contact_country_code}
-                  onChange={(e) =>
-                    setAnuncioForm((prev) => ({ ...prev, contact_country_code: e.target.value }))
-                  }
-                  required
-                />
+                <div>
+                  <label className="mb-1 block text-xs text-gray-300">Código de país</label>
+                  <input
+                    className="w-full rounded-lg border border-white/15 bg-[#121a2a] px-3 py-2 text-sm text-white outline-none focus:border-[#1f7fd8]"
+                    placeholder="+593"
+                    value={anuncioForm.contact_country_code}
+                    onChange={(e) =>
+                      setAnuncioForm((prev) => ({ ...prev, contact_country_code: e.target.value }))
+                    }
+                    required
+                  />
+                </div>
               </div>
 
               <div>
@@ -982,7 +1187,7 @@ export default function AdvertiserPanel() {
                 </div>
               ) : null}
 
-              {anuncioEditing ? (
+              {anuncioEditing?.imagen_comprobante_pago_url ? (
                 <a
                   href={anuncioEditing.imagen_comprobante_pago_url}
                   target="_blank"
@@ -994,7 +1199,7 @@ export default function AdvertiserPanel() {
               ) : null}
 
               {anuncioEditing?.images?.length ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
                   {anuncioEditing.images.map((image) => (
                     <div key={image.id} className="relative">
                       <img
@@ -1016,7 +1221,7 @@ export default function AdvertiserPanel() {
               ) : null}
 
               {anuncioPreviewUrls.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
                   {anuncioPreviewUrls.map((url, index) => (
                     <div key={`${url}-${index}`} className="relative">
                       <img
@@ -1037,18 +1242,18 @@ export default function AdvertiserPanel() {
                 </div>
               ) : null}
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeAnuncioModal}
-                  className="rounded-lg border border-white/20 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10"
+                  className="rounded-lg border border-white/20 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/10 sm:min-w-[120px]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={anuncioSaving}
-                  className="rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1a6ab4] disabled:opacity-60"
+                  className="rounded-lg bg-[#1f7fd8] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#1a6ab4] disabled:opacity-60 sm:min-w-[180px]"
                 >
                   {anuncioSaving
                     ? "Guardando..."

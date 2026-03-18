@@ -351,13 +351,17 @@ export default function AdminPanel() {
   };
 
   const getPlanLabel = (plan: string) => {
-    if (plan === "executive") return "Plan Ejecutivo (Diario) $20";
-    if (plan === "nena") return "Plan Nena (Semanal) $120";
-    if (plan === "dama") return "Plan Dama (Mensual) $560";
-    if (plan === "monthly") return "Mensual (legado)";
-    if (plan === "quarterly") return "Trimestral (legado)";
-    if (plan === "semiannual") return "Semestral (legado)";
-    return "Plan Princesa (Trimestral) $1740";
+    if (plan === "daily") return "Diario Lanzamiento · $7.99 · 24h";
+    if (plan === "weekly") return "Semanal Premium · $34.99 · 7 días";
+    if (plan === "monthly") return "Mensual Elite · $129.99 · 30 días";
+    if (plan === "trial") return "Trial (legado) · 48h";
+    if (plan === "quarterly") return "Trimestral (legado) · 90 días";
+    if (plan === "semiannual") return "Semestral (legado) · 180 días";
+    if (plan === "executive") return "Plan Ejecutivo (legado)";
+    if (plan === "nena") return "Plan Nena (legado)";
+    if (plan === "dama") return "Plan Dama (legado)";
+    if (plan === "princesa") return "Plan Princesa (legado)";
+    return plan;
   };
 
   if (authLoading) {

@@ -10,7 +10,6 @@ export interface ProfileCardProps {
   verified: boolean;
   tagline: string;
   category?: string;
-  priceValue?: number;
   imageUrl?: string;
   whatsappUrl?: string;
   className?: string;
@@ -25,7 +24,6 @@ export default function ProfileCard({
   verified,
   tagline,
   category,
-  priceValue,
   imageUrl,
   whatsappUrl,
   className,
@@ -101,13 +99,8 @@ export default function ProfileCard({
         </div>
 
         <p className="text-sm text-gray-300 mb-4 line-clamp-2">{tagline}</p>
-        {(category || typeof priceValue === "number") && (
+        {category && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            {typeof priceValue === "number" ? (
-              <span className="inline-flex items-center rounded-full border border-[#22c55e]/60 bg-[#22c55e]/15 px-3.5 py-1.5 text-sm font-bold text-[#86efac] shadow-[0_0_18px_rgba(34,197,94,0.45)]">
-                Desde ${priceValue.toFixed(2)}
-              </span>
-            ) : null}
             {category ? (
               <span
                 className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold tracking-wide ${categoryClasses}`}

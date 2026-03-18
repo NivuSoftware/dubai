@@ -13,6 +13,7 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, nullable=False, default=False)
     is_verification_requested = db.Column(db.Boolean, nullable=False, default=False)
     is_verification_rejected = db.Column(db.Boolean, nullable=False, default=False)
+    has_used_free_trial = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modelos = db.relationship("Modelo", back_populates="owner")
     anuncios = db.relationship(
@@ -36,5 +37,6 @@ class User(db.Model):
             "is_verified": self.is_verified,
             "is_verification_requested": self.is_verification_requested,
             "is_verification_rejected": self.is_verification_rejected,
+            "has_used_free_trial": self.has_used_free_trial,
             "created_at": self.created_at.isoformat(),
         }

@@ -1,6 +1,7 @@
 # Imagen base configurable.
-# Default local para entornos sin acceso a registries (ya existe: dubai-backend:latest).
-ARG PYTHON_BASE_IMAGE=dubai-backend:latest
+# Por defecto usa una imagen oficial de Python para evitar depender
+# de una etiqueta local inexistente.
+ARG PYTHON_BASE_IMAGE=python:3.11-slim
 FROM ${PYTHON_BASE_IMAGE}
 
 # Establecer directorio de trabajo

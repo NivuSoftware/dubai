@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  DollarSign,
   Flag,
   MapPin,
   MessageCircle,
@@ -248,10 +247,6 @@ export default function ProfileDetail() {
                           {modelo.categoria}
                         </span>
                       ) : null}
-                      <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#22c55e]/50 bg-[#22c55e]/15 px-4 py-2 text-[#86efac] shadow-[0_0_24px_rgba(34,197,94,0.45)]">
-                        <DollarSign className="h-5 w-5" />
-                        <span className="text-lg font-bold">Desde ${Number(modelo.precio || 0).toFixed(2)}</span>
-                      </div>
                     </div>
 
                     <div className="mb-8">
@@ -405,10 +400,6 @@ export default function ProfileDetail() {
                           {modelo.categoria}
                         </span>
                       ) : null}
-                      <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#22c55e]/50 bg-[#22c55e]/15 px-4 py-2 text-[#86efac] shadow-[0_0_24px_rgba(34,197,94,0.45)]">
-                        <DollarSign className="h-5 w-5" />
-                        <span className="text-lg font-bold">Desde ${Number(modelo.precio || 0).toFixed(2)}</span>
-                      </div>
                     </div>
 
                     <div className="mb-8">

@@ -42,6 +42,7 @@ def register_advertiser(data):
             "is_verified": user.is_verified,
             "is_verification_requested": user.is_verification_requested,
             "is_verification_rejected": user.is_verification_rejected,
+            "has_used_free_trial": user.has_used_free_trial,
         },
     }, 201
 
@@ -70,5 +71,6 @@ def login(data):
             "is_verified": user.is_verified,
             "is_verification_requested": user.is_verification_requested,
             "is_verification_rejected": user.is_verification_rejected,
+            "has_used_free_trial": user.has_used_free_trial,
         },
     }

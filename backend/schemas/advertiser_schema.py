@@ -24,4 +24,5 @@ class AdvertiserSchema(Schema):
     is_verified = fields.Boolean(dump_only=True)
     is_verification_requested = fields.Boolean(dump_only=True)
     is_verification_rejected = fields.Boolean(dump_only=True)
+    has_used_free_trial = fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)

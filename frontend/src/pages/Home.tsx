@@ -32,31 +32,31 @@ const FAQ_ITEMS = [
   },
   {
     question: '¿Esta es una plataforma de reservas?',
-    answer: 'No, DUBAI es solo un directorio. Proporcionamos información de contacto de adultos verificados. Todos los acuerdos se realizan directamente entre las partes.',
+    answer: 'Proporcionamos información de contacto de perfiles verificados. Todos los acuerdos se realizan directamente entre las partes.',
   },
   {
     question: '¿Cómo contacto a los perfiles?',
     answer: 'Cada perfil tiene opciones de contacto por WhatsApp y teléfono. Puedes comunicarte directamente por esos canales para acordar encuentros.',
   },
   {
-    question: '¿Qué contenido está permitido?',
-    answer: 'Mantenemos estándares estrictos. No se permite contenido explícito, desnudos ni material pornográfico. Todos los perfiles deben ser discretos y profesionales.',
+    question: '¿Es legal?',
+    answer: 'Si!, Dubai Escorts esta constituida y respaldada legalmente en Ecuador, ademas contamos con cumplimiento estricto de la ley de proteccion de datos.',
   },
   {
     question: '¿Cómo puedo reportar un perfil?',
     answer: 'Cada perfil tiene un botón de "Reportar perfil". También puedes contactar a nuestro equipo de soporte desde la página de contacto.',
   },
   {
-    question: 'Privacidad y protección de datos',
+    question: 'Privacidad y protescción de datos',
     answer: 'Nos tomamos la privacidad muy en serio. Todos los datos están cifrados y nunca compartimos información personal sin consentimiento. Lee nuestra Política de privacidad para más detalles.',
   },
   {
     question: '¿Hay costos por publicar o navegar?',
-    answer: 'Los perfiles son publicados por personas verificadas. No hay costo por navegar. Contacta a los perfiles directamente para cualquier acuerdo.',
+    answer: 'Los perfiles son publicados por personas verificadas. No hay costo por navegar. Contacta a los perfiles directamente para cualquier acuerdo. Si deseas publicar, puedes registrarte y publicar tu anuncion facilmente.',
   },
   {
     question: '¿Qué prácticas de seguridad debo seguir?',
-    answer: 'Siempre reúnete primero en lugares públicos, verifica identidad, respeta límites, actúa con discreción y nunca compartas información personal sensible.',
+    answer: 'Dubai Escorts, no pide dinero por adelantado no llámanos ni escribimos a nadie EVITA ESTAFAS o EXTORSIONES y repporta los perfiles inmediatamente!',
   },
 ];
 
@@ -95,7 +95,6 @@ export default function Home() {
       city: string;
       tagline: string;
       category?: string;
-      priceValue?: number;
       imageUrl?: string;
       whatsappUrl?: string;
     }>
@@ -115,7 +114,6 @@ export default function Home() {
       city: string;
       tagline: string;
       category?: string;
-      priceValue?: number;
       imageUrl?: string;
       whatsappUrl?: string;
     }> = [];
@@ -131,7 +129,6 @@ export default function Home() {
           age: 18,
           city: anuncio.ubicacion,
           tagline: anuncio.descripcion,
-          priceValue: anuncio.precio,
           imageUrl: anuncio.images?.[0]?.url,
           whatsappUrl: anuncio.whatsapp_url,
         });
@@ -147,7 +144,6 @@ export default function Home() {
           city: modelo.ubicacion,
           tagline: modelo.descripcion,
           category: modelo.categoria,
-          priceValue: modelo.precio,
           imageUrl: modelo.images?.[0]?.url,
         });
       }
@@ -179,7 +175,7 @@ export default function Home() {
         {/* Fondo */}
         <div className="absolute inset-0">
           <video
-            src="/video/hero.mp4"
+            src="/video/hero1.mp4"
             autoPlay
             loop
             muted
@@ -188,8 +184,8 @@ export default function Home() {
             aria-hidden="true"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.15),rgba(0,0,0,0.72))]"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/75 to-black"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.06),rgba(0,0,0,0.46))]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/42 to-black/72"></div>
         </div>
 
         {/* Contenido */}
@@ -295,11 +291,10 @@ export default function Home() {
                         verified={true}
                         tagline={profile.tagline}
                         category={profile.category}
-                        priceValue={profile.priceValue}
                         imageUrl={profile.imageUrl}
                         whatsappUrl={profile.whatsappUrl}
-                        className="h-full w-full"
-                        imageClassName="h-[440px] sm:h-[340px]"
+                        className="mx-auto h-full w-full max-w-[380px]"
+                        imageClassName="h-[400px] sm:h-[300px]"
                       />
                     </CarouselItem>
                   ))}

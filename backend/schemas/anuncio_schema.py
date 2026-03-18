@@ -4,12 +4,13 @@ from marshmallow import Schema, fields, validate
 class AnuncioCreateSchema(Schema):
     titulo = fields.String(required=True, validate=validate.Length(min=3, max=180))
     descripcion = fields.String(required=True, validate=validate.Length(min=10))
-    precio = fields.Float(required=True, validate=validate.Range(min=0))
+    precio = fields.Float(required=False, validate=validate.Range(min=0))
     ubicacion = fields.String(required=True, validate=validate.Length(min=2, max=150))
     contact_country_code = fields.String(required=True, validate=validate.Length(min=2, max=8))
     contact_number = fields.String(required=True, validate=validate.Length(min=6, max=20))
     plan = fields.String(
-        required=True, validate=validate.OneOf(["executive", "nena", "dama", "princesa"])
+        required=True,
+        validate=validate.OneOf(["daily", "weekly", "monthly"]),
     )
 
 

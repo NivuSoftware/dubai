@@ -16,6 +16,7 @@ export interface LoginResponse {
     is_verified: boolean;
     is_verification_requested: boolean;
     is_verification_rejected: boolean;
+    has_used_free_trial: boolean;
   };
 }
 
@@ -34,6 +35,7 @@ export interface RegisterAdvertiserResponse {
     is_verified: boolean;
     is_verification_requested: boolean;
     is_verification_rejected: boolean;
+    has_used_free_trial: boolean;
   };
 }
 
@@ -46,6 +48,7 @@ export interface AdminMeResponse {
     is_verified: boolean;
     is_verification_requested: boolean;
     is_verification_rejected: boolean;
+    has_used_free_trial: boolean;
     created_at: string;
   };
 }
@@ -59,6 +62,7 @@ export interface AdvertiserMeResponse {
     is_verified: boolean;
     is_verification_requested: boolean;
     is_verification_rejected: boolean;
+    has_used_free_trial: boolean;
     created_at: string;
   };
 }

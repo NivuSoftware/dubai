@@ -8,7 +8,19 @@ export const API_BASE_URL = apiBaseUrl.replace(/\/$/, "");
 
 async function parseError(response: Response, fallbackMessage: string): Promise<never> {
   const errorText = await response.text();
-  throw new Error(errorText || fallbackMessage);
+  if (!errorText) {
+    throw new Error(fallbackMessage);
+  }
+
+  let parsedMessage = "";
+  try {
+    const parsed = JSON.parse(errorText) as { message?: string };
+    parsedMessage = parsed.message || "";
+  } catch {
+    // Ignore JSON parse failures and fall back to raw text below.
+  }
+
+  throw new Error(parsedMessage || errorText || fallbackMessage);
 }
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
