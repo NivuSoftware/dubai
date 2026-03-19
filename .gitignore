@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+
+# Backend generated uploads
+backend/anuncios/
+backend/modelos/
+backend/verification_requests/
+
+# Keep placeholder files if needed
+!backend/anuncios/.gitkeep
+!backend/modelos/.gitkeep
+!backend/verification_requests/.gitkeep

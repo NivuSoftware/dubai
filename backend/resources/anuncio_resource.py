@@ -1,4 +1,3 @@
-import calendar
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -31,11 +30,11 @@ public_anuncio_bp = Blueprint(
 
 MAX_IMAGES_PER_ANUNCIO = 5
 PLAN_CONFIG = {
-    "executive": {"hours": 24},
-    "nena": {"days": 7},
-    "dama": {"months": 1},
-    "princesa": {"months": 3},
+    "daily": {"hours": 24, "price": 7.99},
+    "weekly": {"days": 7, "price": 34.99},
+    "monthly": {"days": 30, "price": 129.99},
 }
+VALID_PLAN_MESSAGE = "Plan inválido. Usa daily, weekly o monthly."
 
 
 def _require_verified_advertiser() -> User:
@@ -66,15 +65,6 @@ def _allowed_file(filename: str) -> bool:
     )
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
 
-
-def _add_months(current_datetime: datetime, months: int) -> datetime:
-    month_index = current_datetime.month - 1 + months
-    year = current_datetime.year + month_index // 12
-    month = month_index % 12 + 1
-    day = min(current_datetime.day, calendar.monthrange(year, month)[1])
-    return current_datetime.replace(year=year, month=month, day=day)
-
-
 def _calculate_expiration(plan: str, now: Optional[datetime] = None) -> datetime:
     current_time = now or datetime.utcnow()
     config = PLAN_CONFIG[plan]
@@ -83,10 +73,12 @@ def _calculate_expiration(plan: str, now: Optional[datetime] = None) -> datetime
         return current_time + timedelta(hours=config["hours"])
     if "days" in config:
         return current_time + timedelta(days=config["days"])
-    if "months" in config:
-        return _add_months(current_time, config["months"])
 
     raise ValueError(f"Plan no soportado: {plan}")
+
+
+def _plan_price(plan: str) -> float:
+    return float(PLAN_CONFIG[plan]["price"])
 
 
 def _save_file(file_storage, target_folder: Path, prefix: str) -> str:
@@ -109,10 +101,14 @@ def _serialize_anuncio(anuncio: Anuncio):
     contact_raw = f"{anuncio.contact_country_code or ''}{anuncio.contact_number or ''}"
     whatsapp_digits = "".join(char for char in contact_raw if char.isdigit())
     payload["whatsapp_url"] = f"https://wa.me/{whatsapp_digits}" if whatsapp_digits else ""
-    payload["imagen_comprobante_pago_url"] = url_for(
-        "advertiser_anuncios.get_anuncio_file",
-        file_path=anuncio.imagen_comprobante_pago,
-        _external=True,
+    payload["imagen_comprobante_pago_url"] = (
+        url_for(
+            "advertiser_anuncios.get_anuncio_file",
+            file_path=anuncio.imagen_comprobante_pago,
+            _external=True,
+        )
+        if anuncio.imagen_comprobante_pago
+        else ""
     )
     payload["images"] = [
         {
@@ -193,7 +189,6 @@ def create_advertiser_anuncio():
     descripcion = (request.form.get("descripcion") or "").strip()
     ubicacion = (request.form.get("ubicacion") or "").strip()
     plan = (request.form.get("plan") or "").strip().lower()
-    precio_raw = (request.form.get("precio") or "").strip()
     contact_country_code = (request.form.get("contact_country_code") or "").strip()
     contact_number = (request.form.get("contact_number") or "").strip()
 
@@ -202,7 +197,6 @@ def create_advertiser_anuncio():
         or not descripcion
         or not ubicacion
         or not plan
-        or not precio_raw
         or not contact_country_code
         or not contact_number
     ):
@@ -223,14 +217,7 @@ def create_advertiser_anuncio():
     contact_number = phone_digits
 
     if plan not in PLAN_CONFIG:
-        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
-
-    try:
-        precio = float(precio_raw)
-    except ValueError:
-        abort(400, message="Precio inválido.")
-    if precio < 0:
-        abort(400, message="Precio inválido.")
+        abort(400, message=VALID_PLAN_MESSAGE)
 
     payment_receipt = request.files.get("payment_receipt_image")
     if not payment_receipt:
@@ -246,7 +233,7 @@ def create_advertiser_anuncio():
         owner_id=advertiser.id,
         titulo=titulo,
         descripcion=descripcion,
-        precio=precio,
+        precio=_plan_price(plan),
         ubicacion=ubicacion,
         contact_country_code=contact_country_code,
         contact_number=contact_number,
@@ -263,7 +250,8 @@ def create_advertiser_anuncio():
     ad_folder = upload_root / str(anuncio.id)
     ad_folder.mkdir(parents=True, exist_ok=True)
 
-    anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
+    if payment_receipt:
+        anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
 
     for file in ad_images:
         image_path = _save_file(file, ad_folder, "ad")
@@ -286,7 +274,7 @@ def create_advertiser_anuncio_draft():
 
     plan = (request.form.get("plan") or "").strip().lower()
     if plan not in PLAN_CONFIG:
-        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
+        abort(400, message=VALID_PLAN_MESSAGE)
 
     payment_receipt = request.files.get("payment_receipt_image")
     if not payment_receipt:
@@ -296,7 +284,7 @@ def create_advertiser_anuncio_draft():
         owner_id=advertiser.id,
         titulo="",
         descripcion="",
-        precio=0,
+        precio=_plan_price(plan),
         ubicacion="",
         contact_country_code="+593",
         contact_number="",
@@ -313,7 +301,8 @@ def create_advertiser_anuncio_draft():
     upload_root = _upload_root()
     ad_folder = upload_root / str(anuncio.id)
     ad_folder.mkdir(parents=True, exist_ok=True)
-    anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
+    if payment_receipt:
+        anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
 
     db.session.commit()
     return {
@@ -337,7 +326,7 @@ def reactivate_advertiser_anuncio(anuncio_id):
 
     plan = (request.form.get("plan") or "").strip().lower()
     if plan not in PLAN_CONFIG:
-        abort(400, message="Plan inválido. Usa executive, nena, dama o princesa.")
+        abort(400, message=VALID_PLAN_MESSAGE)
 
     payment_receipt = request.files.get("payment_receipt_image")
     if not payment_receipt:
@@ -353,6 +342,7 @@ def reactivate_advertiser_anuncio(anuncio_id):
 
     anuncio.imagen_comprobante_pago = _save_file(payment_receipt, ad_folder, "payment")
     anuncio.plan = plan
+    anuncio.precio = _plan_price(plan)
     anuncio.fecha_hasta = _calculate_expiration(plan)
     anuncio.estado = "PENDIENTE"
     anuncio.pago = "PENDIENTE"
@@ -394,6 +384,8 @@ def update_advertiser_anuncio(data, anuncio_id):
         if not phone_digits or len(phone_digits) < 6 or len(phone_digits) > 15:
             abort(400, message="Número de contacto inválido.")
         data["contact_number"] = phone_digits
+
+    data.pop("precio", None)
 
     for key, value in data.items():
         setattr(anuncio, key, value)

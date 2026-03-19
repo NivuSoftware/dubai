@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { DollarSign, Filter, MapPin } from "lucide-react";
+import { Filter, MapPin } from "lucide-react";
 import Layout from "../components/Layout";
 import ProfileCard from "../components/ProfileCard";
 import { Modelo, listPublicModelos } from "../services/modelosService";
@@ -11,7 +11,6 @@ export default function Profiles() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCiudad, setSelectedCiudad] = useState("all");
-  const [sortBy, setSortBy] = useState("newest");
   const [showFiltros, setShowFiltros] = useState(true);
 
   useEffect(() => {
@@ -52,22 +51,12 @@ export default function Profiles() {
 
     let sortedModelos = [...modelosBase];
     let sortedAnuncios = [...anunciosBase];
-    if (sortBy === "name") {
-      sortedModelos = sortedModelos.sort((a, b) => a.nombre.localeCompare(b.nombre));
-      sortedAnuncios = sortedAnuncios.sort((a, b) => a.titulo.localeCompare(b.titulo));
-    } else if (sortBy === "age") {
-      sortedModelos = sortedModelos.sort((a, b) => a.edad - b.edad);
-      sortedAnuncios = sortedAnuncios.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-    } else {
-      sortedModelos = sortedModelos.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      sortedAnuncios = sortedAnuncios.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-    }
+    sortedModelos = sortedModelos.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    sortedAnuncios = sortedAnuncios.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
     const mixed: Array<{
       key: string;
@@ -113,7 +102,7 @@ export default function Profiles() {
     }
 
     return mixed;
-  }, [anuncios, modelos, selectedCiudad, sortBy]);
+  }, [anuncios, modelos, selectedCiudad]);
 
   return (
     <Layout>
@@ -159,22 +148,6 @@ export default function Profiles() {
                           </label>
                         ))}
                       </div>
-                    </div>
-
-                    <div className="border-t border-[#a83d8e]/20 pt-6">
-                      <label className="block text-sm text-gray-400 mb-3 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        Orden
-                      </label>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="w-full bg-[#0a0a0a] border border-[#a83d8e]/30 rounded-lg px-3 py-2 text-white focus:border-[#a83d8e] focus:outline-none"
-                      >
-                        <option value="newest">Más recientes</option>
-                        <option value="name">Nombre (A-Z)</option>
-                        <option value="age">Edad (menor a mayor)</option>
-                      </select>
                     </div>
                   </div>
                 </div>

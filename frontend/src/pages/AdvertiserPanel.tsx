@@ -770,7 +770,7 @@ export default function AdvertiserPanel() {
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-2">
                         <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-white">
-                          {plan.price}
+                          {plan.price} <span className="text-[11px] font-medium text-white/75">(incluye IVA)</span>
                         </span>
                         <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/80">
                           {plan.savingsLabel}
@@ -991,11 +991,11 @@ export default function AdvertiserPanel() {
               </select>
 
               <div className="rounded-xl border border-[#d4af37]/35 bg-[#d4af37]/10 p-4 text-sm text-[#f6e7a8]">
-                <p className="font-semibold text-white">
-                  Plan seleccionado: {selectedPlanDetails?.name}
-                </p>
-                <p className="mt-1">
-                  Valor a pagar: <span className="font-semibold">{selectedPlanDetails?.price}</span>
+                <p>
+                  Valor a pagar:{" "}
+                  <span className="font-semibold">
+                    {selectedPlanDetails?.price} (incluye IVA)
+                  </span>
                 </p>
               </div>
 
@@ -1011,23 +1011,17 @@ export default function AdvertiserPanel() {
                 />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-lg border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
-                  <p className="font-semibold text-white">Banco del Guayaquil</p>
+                  <p className="font-semibold text-white">Cuenta Banco Guayaquil</p>
                   <p>Tipo: Cuenta de ahorros</p>
                   <p>Cuenta: 21417526</p>
                   <p>Ci: 1719906578</p>
                 </div>
                 <div className="rounded-lg border border-emerald-500/50 bg-[linear-gradient(180deg,rgba(16,185,129,0.18),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
-                  <p className="font-semibold text-white">Banco Produbanco</p>
-                  <p>Tipo: Cuenta Ahorros</p>
-                  <p>Cuenta: 12008169115</p>
-                  <p>Ci: 1719906578</p>
-                </div>
-                <div className="rounded-lg border border-[#d4af37]/55 bg-[linear-gradient(180deg,rgba(212,175,55,0.24),rgba(59,44,12,0.96))] p-3 text-sm text-[#f5e8b2] shadow-[0_0_24px_rgba(212,175,55,0.14)]">
-                  <p className="font-semibold text-white">Banco Pichincha</p>
-                  <p>Tipo: Cuenta Ahorros</p>
-                  <p>Cuenta: 2215589147</p>
+                  <p className="font-semibold text-white">Cuenta Produbanco</p>
+                  <p>Tipo: Cuenta Corriente</p>
+                  <p>Cuenta: 27059155332</p>
                 </div>
               </div>
 

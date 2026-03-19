@@ -43,7 +43,7 @@ export default function ProfileCard({
     typeof window !== "undefined"
       ? `${window.location.origin}/profile/${id}`
       : `/profile/${id}`;
-  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, y quisiera preguntarte .. `;
+  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, quiero preguntarte por el servicio ... `;
   const whatsappHref = withPrefilledMessage(
     whatsappUrl || CONTACT_WHATSAPP_URL,
     prefilledMessage

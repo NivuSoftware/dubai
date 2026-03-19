@@ -57,14 +57,21 @@ export default function Footer() {
               <Link to="/safety" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
                 Guías de seguridad
               </Link>
-              <a href="#" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
-                Términos del servicio
+              <a
+                href="/archives/TERMINOSYCONDICIONES.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors"
+              >
+                Términos y condiciones
               </a>
-              <a href="#" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
+              <a
+                href="/archives/POLITICAPROTECCIONDATOS.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors"
+              >
                 Política de privacidad
-              </a>
-              <a href="#" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
-                Reportar abuso
               </a>
             </div>
           </div>

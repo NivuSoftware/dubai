@@ -140,7 +140,7 @@ export default function ProfileDetail() {
     typeof window !== "undefined"
       ? window.location.href
       : `/profile/${id ?? ""}`;
-  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, y quisiera preguntarte .. `;
+  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, quiero preguntarte por el servicio ... `;
   const detailWhatsAppUrl = withPrefilledMessage(detailWhatsAppUrlRaw, prefilledMessage);
   const availability = modelo.disponibilidad
     .split(",")
