@@ -194,7 +194,7 @@ export default function Home() {
     <Layout>
       <Seo
         title="Escorts verificadas en Ecuador | Dubai - VIP"
-        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas con contacto directo y seguro. lsitas para proporcionarte servicios eroticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
+        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas con contacto directo y seguro. listas para proporcionarte servicios eroticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
         path="/"
         image="/images/logo.png"
         jsonLd={homeSchema}
