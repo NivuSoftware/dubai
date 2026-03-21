@@ -15,7 +15,9 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import * as Accordion from '@radix-ui/react-accordion';
+import Seo from '../components/Seo';
 import { CONTACT_WHATSAPP_URL } from '../constants/contact';
+import { absoluteUrl } from '../lib/seo';
 import { listPublicModelos, Modelo } from '../services/modelosService';
 import { Anuncio, listPublicAnuncios } from '../services/anunciosService';
 import {
@@ -168,8 +170,35 @@ export default function Home() {
     document.getElementById('featured-profiles')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const homeSchema = useMemo(
+    () => [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Dubai Ecuador',
+        url: absoluteUrl('/'),
+        inLanguage: 'es-EC',
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Dubai Ecuador',
+        url: absoluteUrl('/'),
+        logo: absoluteUrl('/images/logo.png'),
+      },
+    ],
+    []
+  );
+
   return (
     <Layout>
+      <Seo
+        title="Escorts verificadas en Ecuador | Dubai - VIP"
+        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas con contacto directo y seguro. lsitas para proporcionarte servicios eroticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
+        path="/"
+        image="/images/logo.png"
+        jsonLd={homeSchema}
+      />
       {/* Sección principal */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Fondo */}
@@ -257,9 +286,6 @@ export default function Home() {
             <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Perfiles destacados
             </h2>
-            <p className="text-gray-400 text-lg">
-              Carrusel automático intercalado: 1 anunciante y 1 modelo
-            </p>
           </div>
 
           {loadingFeatured ? (

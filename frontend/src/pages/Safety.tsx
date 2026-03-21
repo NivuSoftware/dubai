@@ -1,5 +1,6 @@
 import Layout from '../components/Layout';
 import { Link } from 'react-router';
+import Seo from '../components/Seo';
 import {
   AlertTriangle,
   Flag,
@@ -12,6 +13,12 @@ import {
 export default function Safety() {
   return (
     <Layout>
+      <Seo
+        title="Seguridad y verificación"
+        description="Revisa las pautas de seguridad, verificación y reporte para navegar la plataforma con mayor confianza."
+        path="/safety"
+        image="/images/logo.png"
+      />
       <div className="min-h-screen bg-black">
         <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">

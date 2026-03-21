@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, Mail } from "lucide-react";
+import Seo from "../components/Seo";
 import { requestPasswordReset } from "../services/authService";
 
 export default function ForgotPassword() {
@@ -38,6 +39,7 @@ export default function ForgotPassword() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#07080d]">
+      <Seo title="Recuperar contraseña" path="/olvide-mi-contrasena" robots="noindex, nofollow" />
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[#a83d8e]/25 blur-3xl" />
         <div className="absolute -right-20 bottom-14 h-72 w-72 rounded-full bg-[#d4af37]/20 blur-3xl" />

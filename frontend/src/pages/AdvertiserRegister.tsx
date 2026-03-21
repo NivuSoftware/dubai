@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
 import Layout from "../components/Layout";
+import Seo from "../components/Seo";
 import { registerAdvertiser } from "../services/authService";
 
 export default function AdvertiserRegister() {
@@ -54,6 +55,7 @@ export default function AdvertiserRegister() {
 
   return (
     <Layout>
+      <Seo title="Registro de anunciante" path="/registro-anunciante" robots="noindex, nofollow" />
       <section className="min-h-screen bg-[#06090f] px-4 py-10 sm:px-6">
         <div className="mx-auto w-full max-w-lg rounded-2xl border border-[#1f7fd8]/30 bg-[#121a2a] p-6 sm:p-8">
           <p className="inline-flex rounded-full border border-[#d4af37]/50 bg-[#d4af37]/10 px-3 py-1 text-xs font-semibold tracking-wide text-[#f7d97b]">

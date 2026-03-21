@@ -1,10 +1,12 @@
 import Layout from '../components/Layout';
 import { Link } from 'react-router';
 import { Home } from 'lucide-react';
+import Seo from '../components/Seo';
 
 export default function NotFound() {
   return (
     <Layout>
+      <Seo title="Página no encontrada" path="/404" robots="noindex, nofollow" />
       <div className="min-h-screen bg-black flex items-center justify-center px-8">
         <div className="text-center">
           <h1 className="text-9xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">

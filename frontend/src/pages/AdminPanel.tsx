@@ -12,6 +12,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Seo from "../components/Seo";
 import { ADMIN_TOKEN_KEY, fetchAdminMe } from "../services/authService";
 import {
   Modelo,
@@ -374,6 +375,7 @@ export default function AdminPanel() {
 
   return (
     <section className="min-h-screen bg-[#06090f]">
+      <Seo title="Panel administrativo" path="/admin/panel" robots="noindex, nofollow" />
       <header className="sticky top-0 z-50 border-b border-[#1f7fd8]/30 bg-[#090d16]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-24 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-4">

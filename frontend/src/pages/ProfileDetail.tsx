@@ -12,12 +12,14 @@ import {
   Send,
 } from "lucide-react";
 import Layout from "../components/Layout";
+import Seo from "../components/Seo";
 import { getPublicModelo, Modelo } from "../services/modelosService";
 import {
   CONTACT_TELEGRAM_URL,
   CONTACT_WHATSAPP_NUMBER,
   CONTACT_WHATSAPP_URL,
 } from "../constants/contact";
+import { absoluteUrl } from "../lib/seo";
 import { getPublicAnuncio } from "../services/anunciosService";
 
 function categoryClasses(category: string) {
@@ -140,15 +142,71 @@ export default function ProfileDetail() {
     typeof window !== "undefined"
       ? window.location.href
       : `/profile/${id ?? ""}`;
-  const prefilledMessage = `Hola! he visto tu perfil ${profileUrl}, quiero preguntarte por el servicio ... `;
+  const prefilledMessage = `Hola! he visto tu perfil en ${profileUrl}, quiero preguntarte por el servicio ... `;
   const detailWhatsAppUrl = withPrefilledMessage(detailWhatsAppUrlRaw, prefilledMessage);
   const availability = modelo.disponibilidad
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+  const seoDescription = [
+    `Escort, prepago, puta, verificada en ${modelo.ubicacion}.`,
+    modelo.descripcion,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const profilePath = `/profile/${id ?? ""}`;
+  const profileSchema = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: `${modelo.nombre} en ${modelo.ubicacion}`,
+    description: seoDescription,
+    url: absoluteUrl(profilePath),
+    mainEntity: {
+      "@type": "Person",
+      name: modelo.nombre,
+      description: seoDescription,
+      image: images[0]?.url,
+      homeLocation: {
+        "@type": "Place",
+        name: modelo.ubicacion,
+      },
+      identifier: id,
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Inicio",
+          item: absoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Perfiles",
+          item: absoluteUrl("/profiles"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: modelo.nombre,
+          item: absoluteUrl(profilePath),
+        },
+      ],
+    },
+  };
 
   return (
     <Layout>
+      <Seo
+        title={`${modelo.nombre} en ${modelo.ubicacion}`}
+        description={seoDescription}
+        path={profilePath}
+        image={images[0]?.url || "/images/logo.png"}
+        type="profile"
+        jsonLd={profileSchema}
+      />
       <div className="min-h-screen bg-black">
         <div className="bg-[#0a0a0a] border-b border-[#a83d8e]/20 py-4 px-8">
           <div className="max-w-[1440px] mx-auto">

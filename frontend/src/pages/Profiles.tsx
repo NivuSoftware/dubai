@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Filter, MapPin } from "lucide-react";
 import Layout from "../components/Layout";
 import ProfileCard from "../components/ProfileCard";
+import Seo from "../components/Seo";
+import { absoluteUrl } from "../lib/seo";
 import { Modelo, listPublicModelos } from "../services/modelosService";
 import { Anuncio, listPublicAnuncios } from "../services/anunciosService";
 
@@ -104,8 +106,37 @@ export default function Profiles() {
     return mixed;
   }, [anuncios, modelos, selectedCiudad]);
 
+  const listingSchema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Perfiles verificados en Ecuador",
+      description:
+        "Listado de perfiles, putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas",
+      url: absoluteUrl("/profiles"),
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: mixedProfiles.length,
+        itemListElement: mixedProfiles.slice(0, 12).map((profile, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: absoluteUrl(`/profile/${profile.id}`),
+          name: `${profile.name} en ${profile.city}`,
+        })),
+      },
+    }),
+    [mixedProfiles]
+  );
+
   return (
     <Layout>
+      <Seo
+        title="Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañia verificadas"
+        description="Revisa perfiles verificados y anuncios activos, filtra por ciudad y encuentra publicaciones recientes en Ecuador."
+        path="/profiles"
+        image="/images/logo.png"
+        jsonLd={listingSchema}
+      />
       <div className="min-h-screen bg-black">
         <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-8 px-4 sm:px-6 lg:px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1440px] mx-auto">

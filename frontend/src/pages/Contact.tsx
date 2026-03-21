@@ -1,5 +1,6 @@
 import Layout from '../components/Layout';
 import { MessageCircle, Phone, Send } from 'lucide-react';
+import Seo from '../components/Seo';
 import {
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_TEL,
@@ -9,6 +10,12 @@ import {
 export default function Contact() {
   return (
     <Layout>
+      <Seo
+        title="Contacto y soporte"
+        description="Canales oficiales de contacto, soporte y postulaciones de Dubai Ecuador por WhatsApp, Telegram y teléfono."
+        path="/contact"
+        image="/images/logo.png"
+      />
       <div className="min-h-screen bg-black">
         <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-6 lg:px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">

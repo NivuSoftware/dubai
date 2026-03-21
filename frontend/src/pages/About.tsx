@@ -1,10 +1,17 @@
 import Layout from '../components/Layout';
 import { Link } from 'react-router';
 import { Shield, Lock, UserCheck, Eye } from 'lucide-react';
+import Seo from '../components/Seo';
 
 export default function About() {
   return (
     <Layout>
+      <Seo
+        title="Sobre la plataforma"
+        description="Conoce cómo funciona Dubai Escorts, el proceso de verificación de perfiles y el enfoque de seguridad de la plataforma para que disfrutes de la experiencia VIP con seguridad."
+        path="/about"
+        image="/images/logo.png"
+      />
       <div className="min-h-screen bg-black">
         <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">
