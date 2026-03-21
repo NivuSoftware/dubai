@@ -8,7 +8,13 @@ type AgeGateStatus = "unknown" | "accepted" | "rejected";
 
 function App() {
   const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>("unknown");
-  const isAdminRoute = /^\/admin(\/|$)/.test(window.location.pathname);
+  const pathname = window.location.pathname;
+  const skipAgeGate =
+    /^\/admin(\/|$)/.test(pathname) ||
+    pathname === "/login" ||
+    pathname === "/registro-anunciante" ||
+    pathname === "/olvide-mi-contrasena" ||
+    pathname === "/restablecer-contrasena";
 
   useEffect(() => {
     const stored = localStorage.getItem(AGE_GATE_KEY);
@@ -33,7 +39,7 @@ function App() {
     window.location.href = "/";
   };
 
-  if (!isAdminRoute && ageGateStatus === "rejected") {
+  if (!skipAgeGate && ageGateStatus === "rejected") {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-6">
         <div className="text-center">
@@ -52,7 +58,7 @@ function App() {
     );
   }
 
-  const showAgeGateModal = !isAdminRoute && ageGateStatus === "unknown";
+  const showAgeGateModal = !skipAgeGate && ageGateStatus === "unknown";
 
   return (
     <div className="relative min-h-screen">

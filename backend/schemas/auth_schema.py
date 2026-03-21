@@ -9,3 +9,16 @@ class LoginSchema(Schema):
 class AdvertiserRegisterSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True, load_only=True, validate=validate.Length(min=8))
+
+
+class ForgotPasswordSchema(Schema):
+    email = fields.Email(required=True)
+
+
+class ResetPasswordTokenQuerySchema(Schema):
+    token = fields.String(required=True)
+
+
+class ResetPasswordSchema(Schema):
+    token = fields.String(required=True)
+    password = fields.String(required=True, load_only=True, validate=validate.Length(min=8))

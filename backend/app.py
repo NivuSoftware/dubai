@@ -7,6 +7,8 @@ from flask_jwt_extended import JWTManager
 from flask_smorest import Api
 from dotenv import load_dotenv
 
+load_dotenv()
+
 from extensions import db, migrate
 import models  # noqa: F401
 from resources.admin_resource import admin_bp
@@ -16,8 +18,6 @@ from resources.auth_resource import auth_bp
 from resources.mail_resource import mail_bp
 from resources.modelo_resource import advertiser_modelo_bp, modelo_bp, public_modelo_bp
 from seed import seed_admin_user
-
-load_dotenv()
 
 
 def create_app():

@@ -11,6 +11,8 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
 import AdvertiserPanel from "./pages/AdvertiserPanel";
 import AdvertiserRegister from "./pages/AdvertiserRegister";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import AdminRoute from "./components/AdminRoute";
 import AdvertiserRoute from "./components/AdvertiserRoute";
 
@@ -64,6 +66,14 @@ export const router = createBrowserRouter([
   {
     path: "/registro-anunciante",
     Component: AdvertiserRegister,
+  },
+  {
+    path: "/olvide-mi-contrasena",
+    Component: ForgotPassword,
+  },
+  {
+    path: "/restablecer-contrasena",
+    Component: ResetPassword,
   },
   {
     path: "/admin/panel",

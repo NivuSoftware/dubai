@@ -1,15 +1,13 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { ADMIN_TOKEN_KEY, login } from "../services/authService";
+import { Link } from "react-router";
+import { ArrowLeft, Mail } from "lucide-react";
+import { requestPasswordReset } from "../services/authService";
 
-export default function AdminLogin() {
-  const navigate = useNavigate();
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     document.body.classList.add("admin-private-page");
@@ -22,19 +20,17 @@ export default function AdminLogin() {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
-      const data = await login({ email, password });
-      localStorage.setItem(ADMIN_TOKEN_KEY, data.access_token);
-      if (data.user.role === "admin") {
-        navigate("/admin/panel");
-      } else if (data.user.role === "advertiser") {
-        navigate("/advertiser/panel");
-      } else {
-        setError("Rol de usuario no válido.");
-      }
-    } catch {
-      setError("Credenciales inválidas. Verifica email y contraseña.");
+      const response = await requestPasswordReset({ email });
+      setSuccess(response.message);
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "No se pudo procesar la solicitud en este momento."
+      );
     } finally {
       setLoading(false);
     }
@@ -51,33 +47,34 @@ export default function AdminLogin() {
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-14">
         <div className="w-full max-w-md rounded-3xl border border-white/15 bg-white/5 p-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-10">
           <Link
-            to="/"
+            to="/login"
             className="mb-6 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[#d4af37] transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            VOLVER
+            VOLVER AL LOGIN
           </Link>
 
           <div className="mb-7 flex items-center gap-3">
             <img src="/images/logo.png" alt="Dubai logo" className="h-14 w-auto" />
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[#d4af37]">Acceso</p>
-              <h1 className="text-2xl font-semibold text-white">Iniciar sesión</h1>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#d4af37]">Recuperación</p>
+              <h1 className="text-2xl font-semibold text-white">Olvidé mi contraseña</h1>
             </div>
           </div>
 
           <p className="mb-7 text-sm leading-relaxed text-gray-300">
-            Ingresa tus credenciales para continuar.
+            Ingresa el correo de tu cuenta de anunciante. Si existe en la base de datos, enviaremos
+            un enlace seguro para cambiar la contraseña.
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <label
-              htmlFor="email"
+              htmlFor="forgot-email"
               className="group flex items-center gap-3 rounded-xl border border-white/15 bg-black/25 px-4 py-3 transition focus-within:border-[#1f7fd8]"
             >
               <Mail className="h-4 w-4 text-gray-300" />
               <input
-                id="email"
+                id="forgot-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -87,47 +84,15 @@ export default function AdminLogin() {
               />
             </label>
 
-            <label
-              htmlFor="password"
-              className="group flex items-center gap-3 rounded-xl border border-white/15 bg-black/25 px-4 py-3 transition focus-within:border-[#a83d8e]"
-            >
-              <Lock className="h-4 w-4 text-gray-300" />
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
-                placeholder="Contraseña"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="text-gray-300 transition hover:text-white"
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </label>
-
-            <div className="flex justify-end">
-              <Link
-                to="/olvide-mi-contrasena"
-                className="text-xs font-medium text-[#93c5fd] transition hover:text-white"
-              >
-                Olvidé mi contraseña
-              </Link>
-            </div>
-
             {error ? <p className="text-sm text-red-300">{error}</p> : null}
+            {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
 
             <button
               type="submit"
               className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#a83d8e] via-[#9f58c9] to-[#1f7fd8] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
               disabled={loading}
             >
-              {loading ? "Validando..." : "Entrar"}
+              {loading ? "Enviando enlace..." : "Enviar enlace de recuperación"}
             </button>
           </form>
         </div>

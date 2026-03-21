@@ -4,7 +4,14 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from extensions import db
 from models.user import User
-from schemas.auth_schema import AdvertiserRegisterSchema, LoginSchema
+from schemas.auth_schema import (
+    AdvertiserRegisterSchema,
+    ForgotPasswordSchema,
+    LoginSchema,
+    ResetPasswordSchema,
+    ResetPasswordTokenQuerySchema,
+)
+from services.password_reset_service import send_password_reset_email, validate_password_reset_token
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth", description="Autenticacion")
 
@@ -74,3 +81,75 @@ def login(data):
             "has_used_free_trial": user.has_used_free_trial,
         },
     }
+
+
+@auth_bp.route("/forgot-password", methods=["POST"])
+@auth_bp.arguments(ForgotPasswordSchema)
+def forgot_password(data):
+    email = data["email"].strip().lower()
+
+    user = User.query.filter_by(email=email, role="advertiser").first()
+    if user:
+        try:
+            send_password_reset_email(user)
+        except Exception as exc:
+            print("Error al enviar correo de recuperacion:", repr(exc))
+            abort(500, message="No se pudo enviar el correo de recuperacion")
+
+    return {
+        "message": (
+            "Si el correo pertenece a una cuenta de anunciante, recibiras un enlace para "
+            "restablecer tu contraseña."
+        )
+    }
+
+
+@auth_bp.route("/reset-password/validate", methods=["GET"])
+@auth_bp.arguments(ResetPasswordTokenQuerySchema, location="query")
+def validate_reset_password_token(args):
+    token = args["token"]
+
+    try:
+        payload = validate_password_reset_token(token)
+    except ValueError:
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    user = db.session.get(User, payload["user_id"])
+    if not user or user.role != "advertiser":
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    try:
+        validate_password_reset_token(token, user=user)
+    except ValueError:
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    return {
+        "message": "Token valido",
+        "email": user.email,
+    }
+
+
+@auth_bp.route("/reset-password", methods=["POST"])
+@auth_bp.arguments(ResetPasswordSchema)
+def reset_password(data):
+    token = data["token"]
+    password = data["password"]
+
+    try:
+        payload = validate_password_reset_token(token)
+    except ValueError:
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    user = db.session.get(User, payload["user_id"])
+    if not user or user.role != "advertiser":
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    try:
+        validate_password_reset_token(token, user=user)
+    except ValueError:
+        abort(400, message="El enlace ya no es valido o ha expirado")
+
+    user.password_hash = generate_password_hash(password)
+    db.session.commit()
+
+    return {"message": "Tu contraseña fue actualizada correctamente"}

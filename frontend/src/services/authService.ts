@@ -73,6 +73,28 @@ export interface RequestVerificationResponse {
   request_id?: number;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ValidateResetPasswordTokenResponse {
+  message: string;
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
 export function login(payload: LoginPayload): Promise<LoginResponse> {
   return apiRequest<LoginResponse>("/api/auth/login", {
     method: "POST",
@@ -85,6 +107,37 @@ export function registerAdvertiser(
   payload: RegisterAdvertiserPayload
 ): Promise<RegisterAdvertiserResponse> {
   return apiRequest<RegisterAdvertiserResponse>("/api/auth/register-advertiser", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function requestPasswordReset(
+  payload: ForgotPasswordPayload
+): Promise<ForgotPasswordResponse> {
+  return apiRequest<ForgotPasswordResponse>("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function validateResetPasswordToken(
+  token: string
+): Promise<ValidateResetPasswordTokenResponse> {
+  return apiRequest<ValidateResetPasswordTokenResponse>(
+    `/api/auth/reset-password/validate?token=${encodeURIComponent(token)}`,
+    {
+      method: "GET",
+    }
+  );
+}
+
+export function resetPassword(
+  payload: ResetPasswordPayload
+): Promise<ResetPasswordResponse> {
+  return apiRequest<ResetPasswordResponse>("/api/auth/reset-password", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

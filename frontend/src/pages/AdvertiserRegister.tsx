@@ -9,6 +9,7 @@ export default function AdvertiserRegister() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,13 +31,22 @@ export default function AdvertiserRegister() {
       return;
     }
 
+    if (!acceptedTerms) {
+      setError("Debes leer y aceptar los términos y condiciones.");
+      return;
+    }
+
     setLoading(true);
     try {
       await registerAdvertiser({ email, password });
       setSuccess("Cuenta creada correctamente. Ya puedes iniciar sesión.");
       setTimeout(() => navigate("/login"), 900);
-    } catch {
-      setError("No se pudo registrar la cuenta. Verifica los datos.");
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "No se pudo registrar la cuenta. Verifica los datos."
+      );
     } finally {
       setLoading(false);
     }
@@ -128,6 +138,33 @@ export default function AdvertiserRegister() {
                   )}
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="register-terms"
+                className="flex items-start gap-3 rounded-lg border border-white/10 bg-[#0d1320] px-3 py-3 text-sm text-gray-300"
+              >
+                <input
+                  id="register-terms"
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                  className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-[#06090f] accent-[#1f7fd8]"
+                />
+                <span>
+                  He leido y acepto los{" "}
+                  <a
+                    href="/archives/TERMINOSYCONDICIONES.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#93c5fd] underline underline-offset-4 hover:text-white"
+                  >
+                    terminos y condiciones
+                  </a>
+                </span>
+              </label>
             </div>
 
             {error ? <p className="text-sm text-red-400">{error}</p> : null}
