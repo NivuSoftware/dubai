@@ -13,10 +13,11 @@ import ProfileCard from '../components/ProfileCard';
 import FeatureCard from '../components/FeatureCard';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import * as Accordion from '@radix-ui/react-accordion';
 import Seo from '../components/Seo';
-import { CONTACT_WHATSAPP_URL } from '../constants/contact';
+import { getContactWhatsAppUrl } from '../constants/contact';
 import { absoluteUrl } from '../lib/seo';
 import { listPublicModelos, Modelo } from '../services/modelosService';
 import { Anuncio, listPublicAnuncios } from '../services/anunciosService';
@@ -63,6 +64,7 @@ const FAQ_ITEMS = [
 ];
 
 export default function Home() {
+  useTranslation();
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
@@ -690,7 +692,7 @@ export default function Home() {
               Buscar perfiles
             </Link>
             <a
-              href={CONTACT_WHATSAPP_URL}
+              href={getContactWhatsAppUrl()}
               target="_blank"
               rel="noreferrer"
               className="border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white px-10 py-4 rounded-full text-lg transition-all flex items-center gap-3"

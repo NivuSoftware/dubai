@@ -1,3 +1,4 @@
+import i18n, { getPreferredLanguage } from "../i18n";
 import { absoluteUrl } from "./seo";
 
 function normalizeWhatsAppUrl(rawUrl: string) {
@@ -52,5 +53,8 @@ export function getCurrentPageUrl(pageUrl?: string) {
 }
 
 export function buildServiceInquiryMessage(pageUrl?: string) {
-  return `Hola! te he visto en ${getCurrentPageUrl(pageUrl)}, me gustaría saber sobre tu servicio`;
+  return i18n.t("whatsapp.inquiry", {
+    lng: getPreferredLanguage(),
+    url: getCurrentPageUrl(pageUrl),
+  });
 }

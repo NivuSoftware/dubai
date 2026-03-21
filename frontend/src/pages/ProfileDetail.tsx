@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import {
   BadgeCheck,
   Calendar,
@@ -17,7 +18,7 @@ import { getPublicModelo, Modelo } from "../services/modelosService";
 import {
   CONTACT_TELEGRAM_URL,
   CONTACT_WHATSAPP_NUMBER,
-  CONTACT_WHATSAPP_URL,
+  getContactWhatsAppUrl,
 } from "../constants/contact";
 import { absoluteUrl } from "../lib/seo";
 import { buildServiceInquiryMessage, withPrefilledMessage } from "../lib/whatsapp";
@@ -41,6 +42,7 @@ function categoryClasses(category: string) {
 }
 
 export default function ProfileDetail() {
+  useTranslation();
   const { id } = useParams();
   const [modelo, setModelo] = useState<Modelo | null>(null);
   const [isAdvertiserProfile, setIsAdvertiserProfile] = useState(false);
@@ -129,7 +131,7 @@ export default function ProfileDetail() {
   const reportMessage = encodeURIComponent(`Hola quiero reportar el perfil de ${modelo.nombre}`);
   const reportWhatsAppUrl = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${reportMessage}`;
   const detailWhatsAppUrlRaw =
-    isAdvertiserProfile && advertiserWhatsAppUrl ? advertiserWhatsAppUrl : CONTACT_WHATSAPP_URL;
+    isAdvertiserProfile && advertiserWhatsAppUrl ? advertiserWhatsAppUrl : getContactWhatsAppUrl();
   const prefilledMessage = buildServiceInquiryMessage(
     typeof window !== "undefined" ? window.location.href : `/profile/${id ?? ""}`
   );

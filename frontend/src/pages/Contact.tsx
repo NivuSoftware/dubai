@@ -1,13 +1,15 @@
 import Layout from '../components/Layout';
 import { MessageCircle, Phone, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Seo from '../components/Seo';
 import {
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_TEL,
-  CONTACT_WHATSAPP_URL,
+  getContactWhatsAppUrl,
 } from '../constants/contact';
 
 export default function Contact() {
+  useTranslation();
   return (
     <Layout>
       <Seo
@@ -39,7 +41,7 @@ export default function Contact() {
                 Atención directa para consultas rápidas y soporte inmediato.
               </p>
               <a
-                href={CONTACT_WHATSAPP_URL}
+                href={getContactWhatsAppUrl()}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-3"

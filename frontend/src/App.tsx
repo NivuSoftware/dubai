@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { RouterProvider } from 'react-router';
-import { router } from './routes';
+import { RouterProvider } from "react-router";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./components/LanguageSwitcher";
+import TranslationManager from "./components/TranslationManager";
+import { router } from "./routes";
 
 const AGE_GATE_KEY = "dubai_age_gate_status";
 
 type AgeGateStatus = "unknown" | "accepted" | "rejected";
 
 function App() {
+  const { t } = useTranslation();
   const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>("unknown");
   const pathname = window.location.pathname;
   const skipAgeGate =
@@ -45,13 +49,13 @@ function App() {
         <div className="text-center">
           <img src="/images/logo.png" alt="Dubai logo" className="mx-auto h-28 w-auto mb-6" />
           <h1 className="text-white text-xl sm:text-2xl">
-            Este sitio web solo esta dirigido a usuarios mayores de 18 años
+            {t("ageGate.rejectedTitle")}
           </h1>
           <button
             onClick={exitRejectedScreen}
             className="mt-6 rounded-lg border border-white/30 px-6 py-3 text-white hover:bg-white/10 transition"
           >
-            Salir
+            {t("ageGate.exit")}
           </button>
         </div>
       </div>
@@ -62,6 +66,9 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
+      <TranslationManager />
+      <LanguageSwitcher />
+
       <div className={showAgeGateModal ? "pointer-events-none blur-sm select-none" : ""}>
         <RouterProvider router={router} />
       </div>
@@ -75,17 +82,15 @@ function App() {
                 alt="Dubai logo"
                 className="mx-auto h-24 sm:h-32 w-auto"
               />
-              <p className="mt-3 text-sm sm:text-base text-gray-300">Dubai | Escorts Ecuador</p>
+              <p className="mt-3 text-sm sm:text-base text-gray-300">
+                {t("ageGate.brandSubtitle")}
+              </p>
             </div>
             <h1 className="text-white text-2xl sm:text-3xl mb-4">
-              Este es un sitio web para adultos
+              {t("ageGate.modalTitle")}
             </h1>
             <p className="text-gray-300 leading-relaxed text-sm sm:text-base mb-6">
-              Este sitio web contiene material restringido para menores de edad, que incluyen
-              desnudez y representaciones explicitas de actividad sexual. Al entrar, afirma que
-              tiene por lo menos 18 años de edad o la mayoria de edad en la jurisdiccion desde que
-              esta accediendo al sitio web y que da consentimiento en ver contenido sexualmente
-              explicito.
+              {t("ageGate.modalDescription")}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -93,13 +98,13 @@ function App() {
                 onClick={acceptAgeGate}
                 className="rounded-lg bg-[#a83d8e] hover:bg-[#922f79] text-white px-4 py-3 font-medium transition"
               >
-                Tengo 18 años o más - Ingresar
+                {t("ageGate.accept")}
               </button>
               <button
                 onClick={rejectAgeGate}
                 className="rounded-lg border border-red-400/70 text-red-300 hover:bg-red-400/10 px-4 py-3 font-medium transition"
               >
-                Soy menor de 18 años - Salir
+                {t("ageGate.reject")}
               </button>
             </div>
           </div>

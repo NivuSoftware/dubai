@@ -1,6 +1,7 @@
 import { BadgeCheck, MessageCircle, Eye } from 'lucide-react';
 import { Link } from 'react-router';
-import { CONTACT_WHATSAPP_URL } from '../constants/contact';
+import { useTranslation } from 'react-i18next';
+import { getContactWhatsAppUrl } from '../constants/contact';
 import { buildServiceInquiryMessage, withPrefilledMessage } from '../lib/whatsapp';
 
 export interface ProfileCardProps {
@@ -30,9 +31,10 @@ export default function ProfileCard({
   className,
   imageClassName,
 }: ProfileCardProps) {
+  useTranslation();
   const prefilledMessage = buildServiceInquiryMessage(`/profile/${id}`);
   const whatsappHref = withPrefilledMessage(
-    whatsappUrl || CONTACT_WHATSAPP_URL,
+    whatsappUrl || getContactWhatsAppUrl(),
     prefilledMessage
   );
 
