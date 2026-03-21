@@ -30,7 +30,7 @@ export default function ProfileCard({
   className,
   imageClassName,
 }: ProfileCardProps) {
-  const prefilledMessage = buildServiceInquiryMessage();
+  const prefilledMessage = buildServiceInquiryMessage(`/profile/${id}`);
   const whatsappHref = withPrefilledMessage(
     whatsappUrl || CONTACT_WHATSAPP_URL,
     prefilledMessage

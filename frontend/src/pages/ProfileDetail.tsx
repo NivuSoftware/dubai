@@ -130,7 +130,9 @@ export default function ProfileDetail() {
   const reportWhatsAppUrl = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${reportMessage}`;
   const detailWhatsAppUrlRaw =
     isAdvertiserProfile && advertiserWhatsAppUrl ? advertiserWhatsAppUrl : CONTACT_WHATSAPP_URL;
-  const prefilledMessage = buildServiceInquiryMessage();
+  const prefilledMessage = buildServiceInquiryMessage(
+    typeof window !== "undefined" ? window.location.href : `/profile/${id ?? ""}`
+  );
   const detailWhatsAppUrl = withPrefilledMessage(detailWhatsAppUrlRaw, prefilledMessage);
   const availability = modelo.disponibilidad
     .split(",")
