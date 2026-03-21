@@ -12,7 +12,7 @@ import {
 import ProfileCard from '../components/ProfileCard';
 import FeatureCard from '../components/FeatureCard';
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import * as Accordion from '@radix-ui/react-accordion';
 import Seo from '../components/Seo';
@@ -68,6 +68,8 @@ export default function Home() {
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [featuredError, setFeaturedError] = useState('');
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const ctaVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const loadFeaturedProfiles = async () => {
@@ -166,6 +168,75 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, [carouselApi, featuredProfiles.length]);
 
+  useEffect(() => {
+    const videos = [heroVideoRef.current, ctaVideoRef.current].filter(
+      (video): video is HTMLVideoElement => video !== null
+    );
+
+    if (!videos.length) {
+      return;
+    }
+
+    const prepareVideo = (video: HTMLVideoElement) => {
+      video.muted = true;
+      video.defaultMuted = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.disablePictureInPicture = true;
+      video.setAttribute('muted', '');
+      video.setAttribute('autoplay', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', 'true');
+    };
+
+    const tryPlay = (video: HTMLVideoElement) => {
+      prepareVideo(video);
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {
+          // Algunos navegadores móviles bloquean autoplay; reintentamos en la primera interacción.
+        });
+      }
+    };
+
+    const retryPlayback = () => {
+      videos.forEach((video) => {
+        if (video.paused) {
+          tryPlay(video);
+        }
+      });
+    };
+
+    videos.forEach((video) => {
+      prepareVideo(video);
+      if (video.readyState >= 2) {
+        tryPlay(video);
+        return;
+      }
+
+      const onCanPlay = () => tryPlay(video);
+      video.addEventListener('canplay', onCanPlay, { once: true });
+    });
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        retryPlayback();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('touchstart', retryPlayback, { passive: true });
+    window.addEventListener('pointerdown', retryPlayback, { passive: true });
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('touchstart', retryPlayback);
+      window.removeEventListener('pointerdown', retryPlayback);
+    };
+  }, []);
+
   const goToFeaturedProfiles = () => {
     document.getElementById('featured-profiles')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -204,12 +275,14 @@ export default function Home() {
         {/* Fondo */}
         <div className="absolute inset-0">
           <video
+            ref={heroVideoRef}
             src="/video/hero1.mp4"
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
+            disablePictureInPicture
             aria-hidden="true"
             className="w-full h-full object-cover"
           />
@@ -527,12 +600,14 @@ export default function Home() {
         {/* Fondo */}
         <div className="absolute inset-0 opacity-20">
           <video
-            src="/video/hero.mp4"
+            ref={ctaVideoRef}
+            src="/video/hero1.mp4"
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
+            disablePictureInPicture
             aria-hidden="true"
             className="w-full h-full object-cover"
           />
