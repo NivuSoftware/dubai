@@ -323,9 +323,12 @@ export default function Home() {
               >
                 Busca Perfiles
               </button>
-              <button className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all">
+              <Link
+                to="/safety"
+                className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all"
+              >
                 Indicaciones de Seguridad
-              </button>
+              </Link>
             </div>
 
             {/* Insignias de confianza */}
@@ -478,6 +481,60 @@ export default function Home() {
             </p>
           </div>
 
+          <div className="mb-10 overflow-hidden rounded-[28px] border border-[#d4af37]/30 bg-[radial-gradient(circle_at_top_left,_rgba(212,175,55,0.18),_transparent_32%),linear-gradient(135deg,#18110a_0%,#090909_45%,#13091a_100%)] p-6 sm:p-8 shadow-[0_0_40px_rgba(212,175,55,0.12)]">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                <h3 className="mt-4 text-3xl sm:text-5xl text-white leading-tight">
+                  ANUNCIATE EN LA PLATAFORMA
+                </h3>
+                <p className="mt-3 text-lg sm:text-xl text-[#f3d98b]">
+                  SIGUE 3 SIMPLES PASOS
+                </p>
+                <p className="mt-3 max-w-2xl text-gray-300">
+                  REGISTRATE, VERIFICA TU PERFIL Y PUBLICA
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to="/registro-anunciante"
+                  className="inline-flex items-center justify-center rounded-full bg-[#d4af37] px-6 py-3 text-sm font-semibold text-black transition-all hover:bg-[#e7c766] hover:shadow-[0_0_28px_rgba(212,175,55,0.35)]"
+                >
+                  Empezar registro
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+              {[
+                {
+                  step: "01",
+                  title: "REGISTRATE",
+                  description: "Crea tu cuenta de anunciante en pocos minutos con tus datos básicos.",
+                },
+                {
+                  step: "02",
+                  title: "VERIFICA TU PERFIL",
+                  description: "Completa la validación para publicar con mayor confianza y visibilidad.",
+                },
+                {
+                  step: "03",
+                  title: "PUBLICA",
+                  description: "Activa tu anuncio y empieza a recibir contactos desde la plataforma.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className="rounded-2xl border border-white/10 bg-black/25 p-5 backdrop-blur-sm"
+                >
+                  <div className="text-sm tracking-[0.3em] text-[#d4af37]">{item.step}</div>
+                  <h4 className="mt-3 text-xl text-white">{item.title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-300">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="rounded-2xl p-6 sm:p-8 border border-[#229ED9]/30 bg-gradient-to-r from-[#051017] via-[#0a0a0a] to-[#151008] shadow-[0_0_40px_rgba(34,158,217,0.15)]">
               <div className="inline-flex items-center rounded-full border border-[#229ED9]/50 bg-[#229ED9]/10 px-4 py-1 mb-4">
@@ -547,12 +604,12 @@ export default function Home() {
                 ))}
               </div>
               <div className="mt-7">
-                <a
-                  href="/safety"
+                <Link
+                  to="/safety"
                   className="inline-flex items-center justify-center border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-6 py-2.5 rounded-full transition-all"
                 >
                   Ver guía completa de seguridad
-                </a>
+                </Link>
               </div>
             </div>
           </div>

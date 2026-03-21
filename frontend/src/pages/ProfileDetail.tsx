@@ -20,6 +20,7 @@ import {
   CONTACT_WHATSAPP_URL,
 } from "../constants/contact";
 import { absoluteUrl } from "../lib/seo";
+import { buildServiceInquiryMessage, withPrefilledMessage } from "../lib/whatsapp";
 import { getPublicAnuncio } from "../services/anunciosService";
 
 function categoryClasses(category: string) {
@@ -129,20 +130,7 @@ export default function ProfileDetail() {
   const reportWhatsAppUrl = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${reportMessage}`;
   const detailWhatsAppUrlRaw =
     isAdvertiserProfile && advertiserWhatsAppUrl ? advertiserWhatsAppUrl : CONTACT_WHATSAPP_URL;
-  const withPrefilledMessage = (baseUrl: string, message: string) => {
-    try {
-      const url = new URL(baseUrl);
-      url.searchParams.set("text", message);
-      return url.toString();
-    } catch {
-      return baseUrl;
-    }
-  };
-  const profileUrl =
-    typeof window !== "undefined"
-      ? window.location.href
-      : `/profile/${id ?? ""}`;
-  const prefilledMessage = `Hola! he visto tu perfil en ${profileUrl}, quiero preguntarte por el servicio ... `;
+  const prefilledMessage = buildServiceInquiryMessage();
   const detailWhatsAppUrl = withPrefilledMessage(detailWhatsAppUrlRaw, prefilledMessage);
   const availability = modelo.disponibilidad
     .split(",")
