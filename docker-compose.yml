@@ -1,19 +1,17 @@
 services:
   postgres:
-    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
+    image: postgres:16-alpine
     container_name: dubai-postgres
     restart: always
     environment:
       POSTGRES_DB: dubai_db
       POSTGRES_USER: dubai_user
       POSTGRES_PASSWORD: dubai_password
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dubai_user -d dubai_db"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 10
     networks:
@@ -24,25 +22,23 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      args:
-        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-python:3.11-slim}
     container_name: dubai-backend
     env_file:
       - ./backend/.env
     environment:
-      - FLASK_APP=app
-      - FLASK_DEBUG=1
-      - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql+psycopg2://dubai_user:dubai_password@postgres:5432/dubai_db
+      FLASK_APP: app
+      PYTHONUNBUFFERED: "1"
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     volumes:
-      - ./backend:/app
+      - modelos_data:/app/modelos
+      - anuncios_data:/app/anuncios
+      - verification_requests_data:/app/verification_requests
     command:
       [
         "sh",
         "-c",
-        "flask --app app db upgrade && flask --app app run --host=0.0.0.0 --port=5000 --debug",
+        "flask --app app db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 3 --timeout 120 --forwarded-allow-ips='*' 'app:app'",
       ]
     depends_on:
       postgres:
@@ -51,38 +47,25 @@ services:
     networks:
       - dubai-network
 
-  dubai_dev:
+  frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE:-node:20-alpine}
     container_name: dubai-frontend
-    working_dir: /app
-    volumes:
-      - ./frontend:/app:cached
-      - /app/node_modules
     ports:
-      - "5173:5173"
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=100
-      - WATCHPACK_POLLING=true
-      - WDS_SOCKET_PORT=5173
-    command:
-      [
-        "sh",
-        "-c",
-        "npm install && (chmod +x node_modules/.bin/vite node_modules/esbuild/bin/esbuild node_modules/@esbuild/linux-x64/bin/esbuild 2>/dev/null || true) && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort",
-      ]
+      - "127.0.0.1:8080:80"
     depends_on:
       - backend
+    restart: always
     networks:
       - dubai-network
+
 networks:
   dubai-network:
     driver: bridge
 
 volumes:
   postgres_data:
+  modelos_data:
+  anuncios_data:
+  verification_requests_data:

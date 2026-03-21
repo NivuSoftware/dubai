@@ -1,13 +1,39 @@
 ARG NODE_BASE_IMAGE=node:20-alpine
-FROM ${NODE_BASE_IMAGE}
+FROM ${NODE_BASE_IMAGE} AS build
 
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-EXPOSE 5173
+RUN npm run build
 
-CMD ["npm", "run", "dev", "--", "--host"]
+FROM nginx:1.27-alpine
+
+RUN printf '%s\n' \
+  'server {' \
+  '  listen 80;' \
+  '  server_name _;' \
+  '' \
+  '  root /usr/share/nginx/html;' \
+  '  index index.html;' \
+  '' \
+  '  location /assets/ {' \
+  '    expires 1y;' \
+  '    add_header Cache-Control "public, immutable";' \
+  '    try_files $uri =404;' \
+  '  }' \
+  '' \
+  '  location / {' \
+  '    try_files $uri $uri/ /index.html;' \
+  '  }' \
+  '}' \
+  > /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
