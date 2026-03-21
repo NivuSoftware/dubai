@@ -24,12 +24,12 @@ export default function Footer() {
               >
                 Ver perfiles
               </Link>
-              <Link
-                to="/safety"
+              <a
+                href="/safety"
                 className="inline-flex items-center justify-center border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-5 py-2.5 rounded-full text-sm transition-all"
               >
                 Guía de seguridad
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -54,9 +54,9 @@ export default function Footer() {
           <div>
             <h4 className="text-white mb-4 text-lg">Legal</h4>
             <div className="space-y-3">
-              <Link to="/safety" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
+              <a href="/safety" className="block text-gray-400 hover:text-[#d4af37] text-sm sm:text-base transition-colors">
                 Guías de seguridad
-              </Link>
+              </a>
               <a
                 href="/archives/TERMINOSYCONDICIONES.pdf"
                 target="_blank"

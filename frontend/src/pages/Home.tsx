@@ -481,24 +481,24 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mb-10 overflow-hidden rounded-[28px] border border-[#d4af37]/30 bg-[radial-gradient(circle_at_top_left,_rgba(212,175,55,0.18),_transparent_32%),linear-gradient(135deg,#18110a_0%,#090909_45%,#13091a_100%)] p-6 sm:p-8 shadow-[0_0_40px_rgba(212,175,55,0.12)]">
+          <div className="mb-10 overflow-hidden rounded-[28px] border border-[#38bdf8]/35 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.22),_transparent_34%),linear-gradient(135deg,#06131a_0%,#090909_45%,#09111b_100%)] p-6 sm:p-8 shadow-[0_0_40px_rgba(56,189,248,0.16)]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <h3 className="mt-4 text-3xl sm:text-5xl text-white leading-tight">
                   ANUNCIATE EN LA PLATAFORMA
                 </h3>
-                <p className="mt-3 text-lg sm:text-xl text-[#f3d98b]">
+                <p className="mt-3 text-lg sm:text-xl text-[#67e8f9]">
                   SIGUE 3 SIMPLES PASOS
                 </p>
                 <p className="mt-3 max-w-2xl text-gray-300">
-                  REGISTRATE, VERIFICA TU PERFIL Y PUBLICA
+                  Registro rapido, validacion confiable y activacion inmediata desde un solo lugar.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/registro-anunciante"
-                  className="inline-flex items-center justify-center rounded-full bg-[#d4af37] px-6 py-3 text-sm font-semibold text-black transition-all hover:bg-[#e7c766] hover:shadow-[0_0_28px_rgba(212,175,55,0.35)]"
+                  className="inline-flex items-center justify-center rounded-full bg-[#38bdf8] px-6 py-3 text-sm font-semibold text-black transition-all hover:bg-[#67e8f9] hover:shadow-[0_0_28px_rgba(56,189,248,0.4)]"
                 >
                   Empezar registro
                 </Link>
@@ -509,25 +509,27 @@ export default function Home() {
               {[
                 {
                   step: "01",
-                  title: "REGISTRATE",
-                  description: "Crea tu cuenta de anunciante en pocos minutos con tus datos básicos.",
+                  title: "REGÍSTRATE 🔒",
+                  description: "En minutos, datos rápidos. ¡Seguro y fácil!",
                 },
                 {
                   step: "02",
-                  title: "VERIFICA TU PERFIL",
-                  description: "Completa la validación para publicar con mayor confianza y visibilidad.",
+                  title: "VERIFICA TU PERFIL ⭐ (¡GRATIS 48h!)",
+                  description:
+                    "Valida ya: confianza total + discreción absoluta. Verificación + anuncio GRATIS solo 48 horas. Más contactos reales. ¡Aprovecha!",
                 },
                 {
                   step: "03",
-                  title: "PUBLICA",
-                  description: "Activa tu anuncio y empieza a recibir contactos desde la plataforma.",
+                  title: "SUBE FOTOS DE CALIDAD 📸",
+                  description:
+                    "Las mejores fotos -> activa (gratis en trial) -> recibe contactos por WhatsApp ya. ¡Exclusivo desde hoy!",
                 },
               ].map((item) => (
                 <div
                   key={item.step}
-                  className="rounded-2xl border border-white/10 bg-black/25 p-5 backdrop-blur-sm"
+                  className="rounded-2xl border border-[#38bdf8]/20 bg-black/25 p-5 backdrop-blur-sm"
                 >
-                  <div className="text-sm tracking-[0.3em] text-[#d4af37]">{item.step}</div>
+                  <div className="text-sm tracking-[0.3em] text-[#38bdf8]">{item.step}</div>
                   <h4 className="mt-3 text-xl text-white">{item.title}</h4>
                   <p className="mt-2 text-sm leading-relaxed text-gray-300">{item.description}</p>
                 </div>
