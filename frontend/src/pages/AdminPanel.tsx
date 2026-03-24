@@ -41,6 +41,7 @@ interface AdminState {
 type AdminView = "menu" | "modelos" | "advertisers";
 
 const MAX_IMAGES_PER_MODELO = 5;
+const SHOW_MODELOS_MODULE = false;
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -73,6 +74,12 @@ export default function AdminPanel() {
   const [verificationRequestsLoading, setVerificationRequestsLoading] = useState(false);
   const [adRequests, setAdRequests] = useState<AdRequestItem[]>([]);
   const [adRequestsLoading, setAdRequestsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!SHOW_MODELOS_MODULE && activeView === "modelos") {
+      setActiveView("menu");
+    }
+  }, [activeView]);
 
   useEffect(() => {
     const urls = selectedFiles.map((file) => URL.createObjectURL(file));
@@ -122,6 +129,10 @@ export default function AdminPanel() {
   };
 
   const openModelosView = async () => {
+    if (!SHOW_MODELOS_MODULE) {
+      setActiveView("menu");
+      return;
+    }
     if (!token) return;
     clearMessages();
     setActiveView("modelos");
@@ -422,18 +433,20 @@ export default function AdminPanel() {
 
           {activeView === "menu" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <button
-                onClick={openModelosView}
-                className="rounded-2xl border border-[#a83d8e]/30 bg-[#121a2a] p-8 text-left transition hover:border-[#a83d8e]/70 hover:shadow-[0_0_24px_rgba(168,61,142,0.25)]"
-              >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#a83d8e]/35">
-                  <Users className="h-6 w-6 text-[#fde7ff]" />
-                </div>
-                <h3 className="text-xl font-semibold text-white">Modelos</h3>
-                <p className="mt-2 text-sm text-gray-300">
-                  Administrar perfiles, imágenes, precios y categorías.
-                </p>
-              </button>
+              {SHOW_MODELOS_MODULE ? (
+                <button
+                  onClick={openModelosView}
+                  className="rounded-2xl border border-[#a83d8e]/30 bg-[#121a2a] p-8 text-left transition hover:border-[#a83d8e]/70 hover:shadow-[0_0_24px_rgba(168,61,142,0.25)]"
+                >
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#a83d8e]/35">
+                    <Users className="h-6 w-6 text-[#fde7ff]" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">Modelos</h3>
+                  <p className="mt-2 text-sm text-gray-300">
+                    Administrar perfiles, imágenes, precios y categorías.
+                  </p>
+                </button>
+              ) : null}
 
               <button
                 onClick={openAdvertisersView}
@@ -450,7 +463,7 @@ export default function AdminPanel() {
             </div>
           ) : null}
 
-          {activeView === "modelos" ? (
+          {SHOW_MODELOS_MODULE && activeView === "modelos" ? (
             <div className="rounded-2xl border border-[#a83d8e]/30 bg-[#121a2a] p-6">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-lg text-white">Listado de modelos</h3>

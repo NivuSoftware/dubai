@@ -112,7 +112,7 @@ export default function Profiles() {
       "@type": "CollectionPage",
       name: "Perfiles verificados en Ecuador",
       description:
-        "Listado de perfiles, putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas",
+        "Listado de perfiles, putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañía verificadas",
       url: absoluteUrl("/profiles"),
       mainEntity: {
         "@type": "ItemList",
@@ -131,7 +131,7 @@ export default function Profiles() {
   return (
     <Layout>
       <Seo
-        title="Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañia verificadas"
+        title="Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañía verificadas"
         description="Revisa perfiles verificados y anuncios activos, filtra por ciudad y encuentra publicaciones recientes en Ecuador."
         path="/profiles"
         image="/images/logo.png"

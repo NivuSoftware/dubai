@@ -29,19 +29,19 @@ const resources = {
         },
       },
       ageGate: {
-        rejectedTitle: "Este sitio web solo esta dirigido a usuarios mayores de 18 anos",
+        rejectedTitle: "Este sitio web solo está dirigido a usuarios mayores de 18 años",
         exit: "Salir",
         brandSubtitle: "Dubai | Escorts Ecuador",
         modalTitle: "Este es un sitio web para adultos",
         modalDescription:
-          "Este sitio web contiene material restringido para menores de edad, que incluyen desnudez y representaciones explicitas de actividad sexual. Al entrar, afirma que tiene por lo menos 18 anos de edad o la mayoria de edad en la jurisdiccion desde que esta accediendo al sitio web y que da consentimiento en ver contenido sexualmente explicito.",
-        accept: "Tengo 18 anos o mas - Ingresar",
-        reject: "Soy menor de 18 anos - Salir",
+          "Este sitio web contiene material restringido para menores de edad, que incluyen desnudez y representaciones explícitas de actividad sexual. Al entrar, afirma que tiene por lo menos 18 años de edad o la mayoría de edad en la jurisdicción desde que está accediendo al sitio web y que da consentimiento en ver contenido sexualmente explícito.",
+        accept: "Tengo 18 años o más - Ingresar",
+        reject: "Soy menor de 18 años - Salir",
       },
       whatsapp: {
-        defaultMessage: "Hola, quiero mas informacion sobre Dubai",
+        defaultMessage: "Hola, quiero más información sobre Dubai",
         inquiry:
-          "Hola! te he visto en {{url}}, me gustaria saber sobre tu servicio",
+          "Hola, te he visto en {{url}}, me gustaría saber sobre tu servicio",
       },
     },
   },

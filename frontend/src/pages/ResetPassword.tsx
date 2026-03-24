@@ -31,7 +31,7 @@ export default function ResetPassword() {
     const runValidation = async () => {
       if (!token) {
         if (isMounted) {
-          setTokenError("El enlace no es valido o esta incompleto.");
+          setTokenError("El enlace no es válido o está incompleto.");
           setValidatingToken(false);
         }
         return;
@@ -50,7 +50,7 @@ export default function ResetPassword() {
         setTokenError(
           caughtError instanceof Error
             ? caughtError.message
-            : "El enlace ya no es valido o ha expirado."
+            : "El enlace ya no es válido o ha expirado."
         );
       } finally {
         if (isMounted) {
@@ -72,7 +72,7 @@ export default function ResetPassword() {
     setSuccess("");
 
     if (!token) {
-      setFormError("El enlace no es valido o esta incompleto.");
+      setFormError("El enlace no es válido o está incompleto.");
       return;
     }
 
@@ -147,7 +147,7 @@ export default function ResetPassword() {
             <>
               <p className="mb-7 text-sm leading-relaxed text-gray-300">
                 Define una nueva contraseña para <span className="text-white">{email}</span>. El
-                enlace es valido por 2 horas.
+                enlace es válido por 2 horas.
               </p>
 
               <form onSubmit={onSubmit} className="space-y-4">

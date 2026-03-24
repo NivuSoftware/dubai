@@ -95,7 +95,7 @@ export default function Contact() {
               ¿QUIERES TRABAJAR CON NOSOTROS?
             </h3>
             <p className="text-base sm:text-lg text-gray-200 mb-6">
-              Escanea el código QR y envíanos un mensaje por Telegram o Whatsapp. Proceso directo,
+              Escanea el código QR y envíanos un mensaje por Telegram o WhatsApp. Proceso directo,
               reservado y rápido.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 place-items-center">
@@ -119,7 +119,7 @@ export default function Contact() {
             </div>
             <div className="mt-5 text-center">
               <span className="inline-flex items-center justify-center rounded-full bg-[#229ED9] text-white px-5 py-2 text-sm font-medium shadow-[0_0_24px_rgba(34,158,217,0.45)]">
-                Escanea el codigo y envianos un mensaje!
+                Escanea el código y envíanos un mensaje.
               </span>
             </div>
           </div>

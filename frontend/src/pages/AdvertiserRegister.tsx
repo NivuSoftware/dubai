@@ -156,14 +156,14 @@ export default function AdvertiserRegister() {
                   className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-[#06090f] accent-[#1f7fd8]"
                 />
                 <span>
-                  He leido y acepto los{" "}
+                  He leído y acepto los{" "}
                   <a
                     href="/archives/TERMINOSYCONDICIONES.pdf"
                     target="_blank"
                     rel="noreferrer"
                     className="text-[#93c5fd] underline underline-offset-4 hover:text-white"
                   >
-                    terminos y condiciones
+                    términos y condiciones
                   </a>
                 </span>
               </label>

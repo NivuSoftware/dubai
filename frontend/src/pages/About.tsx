@@ -47,22 +47,21 @@ export default function About() {
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">2. Revisa los detalles</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Cada perfil incluye información sobre la zona de ubicación e informacion de la modelo.
+                  Cada perfil incluye información sobre la zona de ubicación e información de la modelo.
                 </p>
               </div>
 
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">3. Contacta directamente</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Conecta por WhatsApp. Todos los acuerdos,
-                  incluidos horarios y precios, se gestionan con confidencialidad.
+                  Contacta por WhatsApp directamente con las  anunciantes . Ten siempre en cuenta las normas de seguridad y respeto, reporta y bloquea ante cualquier actividad ilícita o chantaje.
                 </p>
               </div>
 
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">4. Reúnete y vive la experiencia DUBAI - VIP</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Reunete con tu modelo, paga de forma segura y disfruta de una experiencia premium con la máxima discreción.
+                  Reúnete con tu modelo, paga de forma segura y disfruta de una experiencia premium con la máxima discreción.
                 </p>
               </div>
             </div>

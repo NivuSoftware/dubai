@@ -35,7 +35,7 @@ const FAQ_ITEMS = [
   },
   {
     question: '¿Esta es una plataforma de reservas?',
-    answer: 'Proporcionamos información de contacto de perfiles verificados. Todos los acuerdos se realizan directamente entre las partes.',
+    answer: 'Verificamos que los perfiles sean reales y cumplan las reglas de mayoría de edad, más no actuamos como intermediarios ni trabajamos con ninguna de las partes.',
   },
   {
     question: '¿Cómo contacto a los perfiles?',
@@ -43,23 +43,23 @@ const FAQ_ITEMS = [
   },
   {
     question: '¿Es legal?',
-    answer: 'Si!, Dubai Escorts esta constituida y respaldada legalmente en Ecuador, ademas contamos con cumplimiento estricto de la ley de proteccion de datos.',
+    answer: 'Sí, Dubai Escorts está constituida y respaldada legalmente en Ecuador, además contamos con cumplimiento estricto de la ley de protección de datos.',
   },
   {
     question: '¿Cómo puedo reportar un perfil?',
     answer: 'Cada perfil tiene un botón de "Reportar perfil". También puedes contactar a nuestro equipo de soporte desde la página de contacto.',
   },
   {
-    question: 'Privacidad y protescción de datos',
+    question: 'Privacidad y protección de datos',
     answer: 'Nos tomamos la privacidad muy en serio. Todos los datos están cifrados y nunca compartimos información personal sin consentimiento. Lee nuestra Política de privacidad para más detalles.',
   },
   {
     question: '¿Hay costos por publicar o navegar?',
-    answer: 'Los perfiles son publicados por personas verificadas. No hay costo por navegar. Contacta a los perfiles directamente para cualquier acuerdo. Si deseas publicar, puedes registrarte y publicar tu anuncion facilmente.',
+    answer: 'Los perfiles son publicados por personas verificadas. No hay costo por navegar. Contacta a los perfiles directamente para cualquier acuerdo. Si deseas publicar, puedes registrarte y publicar tu anuncio fácilmente.',
   },
   {
     question: '¿Qué prácticas de seguridad debo seguir?',
-    answer: 'Dubai Escorts, no pide dinero por adelantado no llámanos ni escribimos a nadie EVITA ESTAFAS o EXTORSIONES y repporta los perfiles inmediatamente!',
+    answer: 'Dubai Escorts, no pide dinero por adelantado no llámanos ni escribimos a nadie EVITA ESTAFAS o EXTORSIONES y reporta los perfiles inmediatamente!',
   },
 ];
 
@@ -267,7 +267,7 @@ export default function Home() {
     <Layout>
       <Seo
         title="Escorts verificadas en Ecuador | Dubai - VIP"
-        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañia verificadas con contacto directo y seguro. listas para proporcionarte servicios eroticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
+        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañía verificadas con contacto directo y seguro. Listas para proporcionarte servicios eróticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
         path="/"
         image="/images/logo.png"
         jsonLd={homeSchema}
@@ -487,13 +487,13 @@ export default function Home() {
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <h3 className="mt-4 text-3xl sm:text-5xl text-white leading-tight">
-                  ANUNCIATE EN LA PLATAFORMA
+                  ANÚNCIATE EN LA PLATAFORMA
                 </h3>
                 <p className="mt-3 text-lg sm:text-xl text-[#67e8f9]">
                   SIGUE 3 SIMPLES PASOS
                 </p>
                 <p className="mt-3 max-w-2xl text-gray-300">
-                  Registro rapido, validacion confiable y activacion inmediata desde un solo lugar.
+                  Registro rápido, validación confiable y activación inmediata desde un solo lugar.
                 </p>
               </div>
 
@@ -516,7 +516,7 @@ export default function Home() {
                 },
                 {
                   step: "02",
-                  title: "VERIFICA TU PERFIL ⭐ (¡GRATIS 48h!)",
+                  title: "VERIFICA TU PERFIL ⭐",
                   description:
                     "Valida ya: confianza total + discreción absoluta. Verificación + anuncio GRATIS solo 48 horas. Más contactos reales. ¡Aprovecha!",
                 },
