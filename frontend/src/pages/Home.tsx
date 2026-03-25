@@ -31,7 +31,7 @@ import {
 const FAQ_ITEMS = [
   {
     question: '¿Cómo funciona la verificación?',
-    answer: 'Todos los perfiles pasan por un proceso estricto de verificación, incluyendo identidad, confirmación de edad y revisiones para garantizar seguridad y autenticidad.',
+    answer: 'Todos los perfiles pasan por un proceso de verificación (digital) de edad e identidad para garantizar seguridad y autenticidad. ',
   },
   {
     question: '¿Esta es una plataforma de reservas?',
@@ -39,7 +39,7 @@ const FAQ_ITEMS = [
   },
   {
     question: '¿Cómo contacto a los perfiles?',
-    answer: 'Cada perfil tiene opciones de contacto por WhatsApp y teléfono. Puedes comunicarte directamente por esos canales para acordar encuentros.',
+    answer: 'Cada perfil tiene opciones de contacto por WhatsApp personal de cada anunciante. Puedes comunicarte directamente por esos canales para acordar encuentros.',
   },
   {
     question: '¿Es legal?',
@@ -471,7 +471,7 @@ export default function Home() {
 
 
 
-      {/* Trabaja con nosotros y compromiso de seguridad */}
+      {/* Registro de anunciantes y compromiso de seguridad */}
       <section className="py-20 px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
           <div className="text-center mb-16">
@@ -539,49 +539,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="rounded-2xl p-6 sm:p-8 border border-[#229ED9]/30 bg-gradient-to-r from-[#051017] via-[#0a0a0a] to-[#151008] shadow-[0_0_40px_rgba(34,158,217,0.15)]">
-              <div className="inline-flex items-center rounded-full border border-[#229ED9]/50 bg-[#229ED9]/10 px-4 py-1 mb-4">
-                <span className="text-[#7dd3fc] text-xs tracking-[0.2em]">NUEVAS VACANTES</span>
-              </div>
-              <h3 className="text-2xl sm:text-4xl text-white leading-tight mb-3">
-                ¿QUIERES TRABAJAR CON NOSOTROS?
-              </h3>
-              <p className="text-base sm:text-lg text-gray-200 mb-6">
-                Escanea el código QR y envíanos un mensaje por Telegram. Proceso directo,
-                reservado y rápido.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 place-items-center">
-                <a
-                  href="https://t.me/DBE593"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block w-full"
-                >
-                  <img
-                    src="/images/telegram.png"
-                    alt="Código QR de Telegram"
-                    className="w-full max-w-[320px] mx-auto"
-                  />
-                </a>
-                <img
-                  src="/images/wpp.png"
-                  alt="Código QR de WhatsApp"
-                  className="w-full max-w-[320px] mx-auto"
-                />
-              </div>
-              <div className="mt-5 text-center">
-                <a
-                  href="https://t.me/DBE593"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full bg-[#24A1DE] hover:bg-[#1b8fc9] text-white px-6 py-2.5 text-sm font-medium transition-all shadow-[0_0_24px_rgba(36,161,222,0.45)]"
-                >
-                  Escribir por Telegram @DBE593
-                </a>
-              </div>
-            </div>
-
+          <div>
             <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#a83d8e]/20">
               <h3 className="text-2xl text-white mb-3 flex items-center gap-3">
                 <Shield className="w-7 h-7 text-[#a83d8e]" />

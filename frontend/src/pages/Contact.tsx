@@ -14,7 +14,7 @@ export default function Contact() {
     <Layout>
       <Seo
         title="Contacto y soporte"
-        description="Canales oficiales de contacto, soporte y postulaciones de Dubai Ecuador por WhatsApp, Telegram y teléfono."
+        description="Canales oficiales de contacto y soporte de Dubai Ecuador por WhatsApp, Telegram y teléfono."
         path="/contact"
         image="/images/logo.png"
       />
@@ -57,7 +57,7 @@ export default function Contact() {
               </div>
               <h3 className="text-2xl text-white mb-3">Telegram</h3>
               <p className="text-gray-400 mb-4 leading-relaxed">
-                Contáctanos directamente por Telegram para soporte y postulaciones.
+                Contáctanos directamente por Telegram para soporte y consultas.
               </p>
               
               <a
@@ -84,43 +84,6 @@ export default function Contact() {
               >
                 {CONTACT_PHONE_DISPLAY}
               </a>
-            </div>
-          </div>
-
-          <div className="rounded-2xl p-6 sm:p-8 border border-[#229ED9]/30 bg-gradient-to-r from-[#051017] via-[#0a0a0a] to-[#151008] shadow-[0_0_40px_rgba(34,158,217,0.15)]">
-            <div className="inline-flex items-center rounded-full border border-[#229ED9]/50 bg-[#229ED9]/10 px-4 py-1 mb-4">
-              <span className="text-[#7dd3fc] text-xs tracking-[0.2em]">NUEVAS VACANTES</span>
-            </div>
-            <h3 className="text-2xl sm:text-4xl text-white leading-tight mb-3">
-              ¿QUIERES TRABAJAR CON NOSOTROS?
-            </h3>
-            <p className="text-base sm:text-lg text-gray-200 mb-6">
-              Escanea el código QR y envíanos un mensaje por Telegram o WhatsApp. Proceso directo,
-              reservado y rápido.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 place-items-center">
-              <a
-                href="https://t.me/DBE593"
-                target="_blank"
-                rel="noreferrer"
-                className="block w-full"
-              >
-                <img
-                  src="/images/telegram.png"
-                  alt="Código QR de Telegram"
-                  className="w-full max-w-[320px] mx-auto"
-                />
-              </a>
-              <img
-                src="/images/wpp.png"
-                alt="Código QR de WhatsApp"
-                className="w-full max-w-[320px] mx-auto"
-              />
-            </div>
-            <div className="mt-5 text-center">
-              <span className="inline-flex items-center justify-center rounded-full bg-[#229ED9] text-white px-5 py-2 text-sm font-medium shadow-[0_0_24px_rgba(34,158,217,0.45)]">
-                Escanea el código y envíanos un mensaje.
-              </span>
             </div>
           </div>
 

@@ -28,13 +28,12 @@ export default function About() {
           <section className="mb-16">
             <h2 className="text-4xl text-white mb-6">Nuestra misión</h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
-              DUBAI es una plataforma de escorts premium diseñada para conectar con modelos verificadas y sus servicios de calidad en Ecuador.
-              Priorizamos la seguridad, la discreción y el profesionalismo en cada interacción.
+              DUBAI es una plataforma de anuncios de escorts de calidad en Ecuador, priorizamos la seguridad del cliente y autenticidad de los anunciantes y sus perfiles.
             </p>
           </section>
 
           <section className="mb-16">
-            <h2 className="text-4xl text-white mb-8">Cómo funciona</h2>
+            <h2 className="text-4xl text-white mb-8">¿Cómo funciona?</h2>
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">1. Explora perfiles verificados</h3>
@@ -75,7 +74,7 @@ export default function About() {
               actividad ilegal en nuestra plataforma.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed">
-              Todas las modelos publicadas son verificadas y mayores de edad (18+). Promovemos el comportamiento responsable y el respeto mutuo.
+              Todas las modelos publicadas son verificadas y mayores de edad (18+).
             </p>
           </section>
 
