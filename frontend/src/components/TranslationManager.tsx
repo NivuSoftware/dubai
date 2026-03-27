@@ -18,22 +18,45 @@ export default function TranslationManager() {
 
   useEffect(() => {
     document.documentElement.lang = language;
-    ensureGoogleTranslateScript();
-    scheduleGoogleTranslate(language, [50, 500, 1200]);
+    void ensureGoogleTranslateScript();
+    const cancelScheduledTranslation = scheduleGoogleTranslate(language, [0, 400, 1200]);
+
+    return () => {
+      cancelScheduledTranslation();
+    };
   }, [language]);
 
   useEffect(() => {
-    return subscribeToNavigationChanges(() => {
-      scheduleGoogleTranslate(getLanguage(i18n.resolvedLanguage), [120, 700, 1800]);
+    let cancelScheduledTranslation = () => undefined;
+
+    const unsubscribe = subscribeToNavigationChanges(() => {
+      cancelScheduledTranslation();
+      cancelScheduledTranslation = scheduleGoogleTranslate(
+        getLanguage(i18n.resolvedLanguage),
+        [120, 700, 1800]
+      );
     });
+
+    return () => {
+      cancelScheduledTranslation();
+      unsubscribe();
+    };
   }, [i18n.resolvedLanguage]);
 
   useEffect(() => {
-    return observeTranslationTargets(() => {
+    let cancelScheduledTranslation = () => undefined;
+
+    const unsubscribe = observeTranslationTargets(() => {
       if (getLanguage(i18n.resolvedLanguage) === "en") {
-        scheduleGoogleTranslate("en", [150, 900]);
+        cancelScheduledTranslation();
+        cancelScheduledTranslation = scheduleGoogleTranslate("en", [150, 900]);
       }
     });
+
+    return () => {
+      cancelScheduledTranslation();
+      unsubscribe();
+    };
   }, [i18n.resolvedLanguage]);
 
   return <div id="google_translate_element" className="hidden skiptranslate" aria-hidden="true" />;

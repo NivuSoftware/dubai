@@ -326,10 +326,10 @@ export default function Home() {
                 Busca Perfiles
               </button>
               <Link
-                to="/safety"
+                to="/registro-anunciante"
                 className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all"
               >
-                Indicaciones de Seguridad
+                Quiero anunciarme
               </Link>
             </div>
 

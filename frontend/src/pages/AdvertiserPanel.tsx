@@ -745,8 +745,8 @@ export default function AdvertiserPanel() {
                     Coco Chanel
                   </p>
                   <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#f6ddeb] sm:text-base">
-                    Diseñado para una presencia elegante, constante y segura dentro de la plataforma.
-                    Elige el tiempo de visibilidad que mejor se adapte a tu ritmo.
+                    Si una nueva anunciante se une a la plataforma por tu recomendacion, tu perfil
+                    puede recibir 24 horas adicionales de visibilidad.
                   </p>
                 </div>
               </div>
