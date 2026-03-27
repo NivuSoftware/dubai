@@ -437,40 +437,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Por qué este directorio */}
-      <section className="py-20 px-8 bg-gradient-to-b from-[#0a0a0a] to-black">
-        <div className="max-w-[1440px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
-              Por qué escoger a DUBAI
-            </h2>
-            <p className="text-gray-400 text-lg">
-              Directorio premium, verificado, discreto y VIP
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={BadgeCheck}
-              title="Sitio oficial y perfiles verificados"
-              description="Este es nuestro único sitio oficial. Todas las modelos están verificadas para ayudarte a evitar estafas y extorsiones."
-            />
-            <FeatureCard
-              icon={Lock}
-              title="Experiencia discreta"
-              description="Sistema de contacto privado que protege tu identidad y mantiene total confidencialidad."
-            />
-            <FeatureCard
-              icon={Shield}
-              title="Mayores de edad y control sanitario"
-              description="Todas las modelos son mayores de edad y cuentan con carné de salud vigente."
-            />
-          </div>
-        </div>
-      </section>
-
-
-
       {/* Registro de anunciantes y compromiso de seguridad */}
       <section className="py-20 px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
@@ -658,6 +624,38 @@ export default function Home() {
               <MessageCircle className="w-5 h-5" />
               Hablar por WhatsApp
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Por qué este directorio */}
+      <section className="py-20 px-8 bg-gradient-to-b from-[#0a0a0a] to-black">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+              ¿Por qué escoger a DUBAI?
+            </h2>
+            <p className="text-gray-400 text-lg">
+              Directorio premium, verificado, discreto y VIP
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={BadgeCheck}
+              title="Sitio oficial y perfiles verificados"
+              description="Este es nuestro único sitio oficial. Todas las modelos están verificadas para ayudarte a evitar estafas y extorsiones."
+            />
+            <FeatureCard
+              icon={Lock}
+              title="Experiencia discreta"
+              description="Sistema de contacto privado que protege tu identidad y mantiene total confidencialidad."
+            />
+            <FeatureCard
+              icon={Shield}
+              title="Mayores de edad y control sanitario"
+              description="Todas las modelos son mayores de edad y cuentan con carné de salud vigente."
+            />
           </div>
         </div>
       </section>
