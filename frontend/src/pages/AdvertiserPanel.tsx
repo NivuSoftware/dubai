@@ -455,6 +455,12 @@ export default function AdvertiserPanel() {
     setShowPaymentModal(true);
   };
 
+  const goToAdsView = () => {
+    setError("");
+    setSuccess("");
+    setActiveView("ads");
+  };
+
   const openReactivateAnuncio = (anuncio: Anuncio) => {
     if (!data?.is_verified) {
       setError("Solo los anunciantes verificados pueden activar anuncios.");
@@ -792,9 +798,7 @@ export default function AdvertiserPanel() {
                     </ul>
                     <button
                       type="button"
-                      onClick={() => {
-                        openCreateAnuncio(plan.plan);
-                      }}
+                      onClick={goToAdsView}
                       className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                     >
                       <Plus className="h-4 w-4" />
