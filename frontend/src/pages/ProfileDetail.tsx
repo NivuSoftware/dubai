@@ -281,8 +281,6 @@ export default function ProfileDetail() {
                     <div className="mb-6">
                       <h1 className="text-4xl text-white mb-2">{modelo.nombre}</h1>
                       <div className="flex items-center gap-4 text-gray-400">
-                        <span>{modelo.edad} años</span>
-                        <span>•</span>
                         <div className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
                           {modelo.ubicacion}
@@ -434,8 +432,6 @@ export default function ProfileDetail() {
                     <div className="mb-6">
                       <h1 className="text-4xl text-white mb-2">{modelo.nombre}</h1>
                       <div className="flex items-center gap-4 text-gray-400">
-                        <span>{modelo.edad} años</span>
-                        <span>•</span>
                         <div className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
                           {modelo.ubicacion}

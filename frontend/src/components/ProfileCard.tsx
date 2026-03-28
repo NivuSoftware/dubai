@@ -21,7 +21,6 @@ export interface ProfileCardProps {
 export default function ProfileCard({
   id,
   name,
-  age,
   city,
   verified,
   tagline,
@@ -82,7 +81,7 @@ export default function ProfileCard({
           <div>
             <h3 className="text-lg sm:text-xl text-white mb-1">{name}</h3>
             <p className="text-sm text-gray-400">
-              {city} • {age} años
+              {city}
             </p>
           </div>
         </div>
