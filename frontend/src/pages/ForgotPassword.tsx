@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, Mail } from "lucide-react";
 import Seo from "../components/Seo";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 import { requestPasswordReset } from "../services/authService";
 
 export default function ForgotPassword() {
@@ -44,6 +45,10 @@ export default function ForgotPassword() {
         <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[#a83d8e]/25 blur-3xl" />
         <div className="absolute -right-20 bottom-14 h-72 w-72 rounded-full bg-[#d4af37]/20 blur-3xl" />
         <div className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1f7fd8]/15 blur-3xl" />
+      </div>
+
+      <div className="relative z-20 flex justify-end px-4 pt-4 sm:px-6 sm:pt-6">
+        <LanguageSwitcher compact />
       </div>
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-14">

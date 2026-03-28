@@ -3,7 +3,15 @@ import { AppLanguage, normalizeLanguage } from "../i18n";
 
 const LANGUAGES: AppLanguage[] = ["es", "en"];
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  compact?: boolean;
+  className?: string;
+}
+
+export default function LanguageSwitcher({
+  compact = false,
+  className = "",
+}: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation();
   const activeLanguage = normalizeLanguage(i18n.resolvedLanguage);
 
@@ -16,9 +24,15 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="notranslate fixed right-4 top-4 z-[140] rounded-full border border-white/15 bg-black/80 p-1 shadow-[0_18px_45px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+    <div
+      className={`notranslate inline-flex shrink-0 rounded-full border border-white/15 bg-black/80 p-1 shadow-[0_18px_45px_rgba(0,0,0,0.45)] backdrop-blur-xl ${className}`}
+    >
       <div className="flex items-center gap-1">
-        <span className="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 sm:px-3">
+        <span
+          className={`px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 sm:px-3 ${
+            compact ? "hidden sm:inline-flex" : ""
+          }`}
+        >
           {t("language.label")}
         </span>
         {LANGUAGES.map((language) => {
@@ -29,7 +43,9 @@ export default function LanguageSwitcher() {
               type="button"
               onClick={() => handleLanguageChange(language)}
               aria-pressed={isActive}
-              className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition ${
+              className={`rounded-full font-semibold uppercase tracking-[0.18em] transition ${
+                compact ? "px-2.5 py-2 text-[11px] sm:px-3" : "px-3 py-2 text-xs"
+              } ${
                 isActive
                   ? "bg-[#a83d8e] text-white shadow-[0_0_22px_rgba(168,61,142,0.45)]"
                   : "text-gray-300 hover:bg-white/10 hover:text-white"

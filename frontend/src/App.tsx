@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "./components/LanguageSwitcher";
 import TranslationManager from "./components/TranslationManager";
 import { router } from "./routes";
 
@@ -67,7 +66,6 @@ function App() {
   return (
     <div className="relative min-h-screen">
       <TranslationManager />
-      <LanguageSwitcher />
 
       <div className={showAgeGateModal ? "pointer-events-none blur-sm select-none" : ""}>
         <RouterProvider router={router} />

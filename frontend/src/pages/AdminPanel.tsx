@@ -31,6 +31,7 @@ import {
   rejectVerificationRequest,
 } from "../services/verificationRequestsService";
 import { AdRequestItem, approveAdRequest, listAdRequests } from "../services/adRequestsService";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 interface AdminState {
   email: string;
@@ -377,7 +378,7 @@ export default function AdminPanel() {
     <section className="min-h-screen bg-[#06090f]">
       <Seo title="Panel administrativo" path="/admin/panel" robots="noindex, nofollow" />
       <header className="sticky top-0 z-50 border-b border-[#1f7fd8]/30 bg-[#090d16]/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-24 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#a83d8e] to-[#1f7fd8] text-white">
               <ShieldCheck className="h-6 w-6" />
@@ -388,7 +389,8 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center justify-end gap-2 sm:gap-3">
+            <LanguageSwitcher compact />
             <button
               onClick={logout}
               className="inline-flex items-center gap-2 rounded-lg border border-[#d4af37] px-4 py-2.5 text-sm text-[#d4af37] transition hover:bg-[#d4af37] hover:text-black"

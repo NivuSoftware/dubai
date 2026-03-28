@@ -43,7 +43,7 @@ async function loadEnv() {
 }
 
 function normalizeUrl(url, fallback) {
-  const candidate = (url || fallback || "https://example.com").trim();
+  const candidate = (url || fallback || "https://dubaiec.net").trim();
   const withProtocol = /^https?:\/\//i.test(candidate) ? candidate : `https://${candidate}`;
   return withProtocol.replace(/\/+$/, "");
 }
@@ -117,7 +117,7 @@ const staticEntries = [
   { path: "/contact", lastmod: today, changefreq: "monthly", priority: "0.5" },
 ];
 
-const dynamicEntries = await getDynamicEntries(apiBaseUrl === "https://example.com" ? "" : apiBaseUrl);
+const dynamicEntries = await getDynamicEntries(apiBaseUrl === "https://dubaiec.net" ? "" : apiBaseUrl);
 const allEntries = [...staticEntries, ...dynamicEntries];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

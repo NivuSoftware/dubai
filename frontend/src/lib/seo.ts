@@ -22,7 +22,7 @@ export function getSiteUrl(): string {
     return window.location.origin.replace(/\/+$/, "");
   }
 
-  return "https://example.com";
+  return "https://dubaiec.net";
 }
 
 export function absoluteUrl(path = "/"): string {

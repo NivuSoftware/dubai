@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
   const location = useLocation();
@@ -31,7 +32,7 @@ export default function Header() {
           : 'bg-transparent'
       }`}
     >
-      <div className="max-w-[1440px] mx-auto px-8 py-4 flex items-center justify-between">
+      <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 px-4 py-4 sm:px-8">
         <Link to="/" className="inline-flex items-center">
           <img
             src="/images/logo.png"
@@ -55,7 +56,8 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3 lg:gap-4">
+          <LanguageSwitcher compact />
           <Link
             to="/login"
             className="border border-[#d4af37] text-[#f5d97a] hover:bg-[#d4af37] hover:text-black px-6 py-2 rounded-full text-base font-medium transition-all"
@@ -76,15 +78,18 @@ export default function Header() {
           </Link>
         </div>
 
-        <button
-          type="button"
-          aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={mobileMenuOpen}
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          className="md:hidden inline-flex items-center justify-center rounded-md border border-[#d4af37]/60 p-2 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <LanguageSwitcher compact />
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="inline-flex items-center justify-center rounded-md border border-[#d4af37]/60 p-2 text-[#d4af37] hover:bg-[#d4af37] hover:text-black transition-all"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {mobileMenuOpen && (
