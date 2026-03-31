@@ -18,6 +18,7 @@ import { Link } from 'react-router';
 import * as Accordion from '@radix-ui/react-accordion';
 import Seo from '../components/Seo';
 import { getContactWhatsAppUrl } from '../constants/contact';
+import { usePrerenderReady } from '../lib/prerender';
 import { absoluteUrl } from '../lib/seo';
 import { listPublicModelos, Modelo } from '../services/modelosService';
 import { Anuncio, listPublicAnuncios } from '../services/anunciosService';
@@ -72,6 +73,8 @@ export default function Home() {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const ctaVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  usePrerenderReady(!loadingFeatured);
 
   useEffect(() => {
     const loadFeaturedProfiles = async () => {

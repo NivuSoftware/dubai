@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "node ./node_modules/vite/bin/vite.js --host",
-    "build": "node ./scripts/generate-seo.mjs && node ./node_modules/vite/bin/vite.js build",
+    "build": "npm run build:seo",
+    "build:seo": "node ./node_modules/vite/bin/vite.js build && node ./scripts/prerender.mjs && node ./scripts/generate-seo.mjs",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
     "start": "serve -s dist -l 19133"
   },
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@prerenderer/renderer-puppeteer": "^1.2.4",
     "@tailwindcss/postcss": "^4.1.10",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.1.2",
@@ -75,6 +77,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-prerender": "^1.0.8"
   }
 }

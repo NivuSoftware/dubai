@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
 import Layout from "../components/Layout";
 import Seo from "../components/Seo";
+import { usePrerenderReady } from "../lib/prerender";
 import { registerAdvertiser } from "../services/authService";
 
 export default function AdvertiserRegister() {
+  usePrerenderReady(true);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

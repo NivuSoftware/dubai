@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AppLanguage, normalizeLanguage } from "../i18n";
+import { isPrerendering } from "../lib/prerender";
 import {
   ensureGoogleTranslateScript,
   observeTranslationTargets,
@@ -18,6 +19,10 @@ export default function TranslationManager() {
 
   useEffect(() => {
     document.documentElement.lang = language;
+    if (isPrerendering()) {
+      return;
+    }
+
     void ensureGoogleTranslateScript();
     const cancelScheduledTranslation = scheduleGoogleTranslate(language, [0, 400, 1200]);
 
@@ -27,6 +32,10 @@ export default function TranslationManager() {
   }, [language]);
 
   useEffect(() => {
+    if (isPrerendering()) {
+      return;
+    }
+
     let cancelScheduledTranslation = () => undefined;
 
     const unsubscribe = subscribeToNavigationChanges(() => {
@@ -44,6 +53,10 @@ export default function TranslationManager() {
   }, [i18n.resolvedLanguage]);
 
   useEffect(() => {
+    if (isPrerendering()) {
+      return;
+    }
+
     let cancelScheduledTranslation = () => undefined;
 
     const unsubscribe = observeTranslationTargets(() => {

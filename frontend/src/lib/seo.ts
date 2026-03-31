@@ -1,7 +1,8 @@
-export const SITE_NAME = "Dubai Escorts Ecuador | Putas Prepagos Verificadas";
+export const SITE_NAME = "Dubai Ecuador";
 export const DEFAULT_OG_IMAGE = "/images/logo.png";
-export const DEFAULT_TITLE = "Escorts Ecuador | Putas Quito Guayaquil Cuenca | Dubai Prepagos Verificadas";
-export const DEFAULT_DESCRIPTION = "Escorts verificadas Ecuador: putas Quito, prepagos Guayaquil, damas Cuenca. Contacto WhatsApp directo Dubai Escorts. Fotos reales, servicios VIP eróticos seguros discretos en todo Ecuador.";
+export const DEFAULT_TITLE = "Dubai Ecuador | Perfiles verificados y anuncios en Ecuador";
+export const DEFAULT_DESCRIPTION =
+  "Explora perfiles verificados y anuncios activos en Ecuador con contacto directo, información clara y un enfoque en seguridad.";
 
 function ensureProtocol(url: string): string {
   if (/^https?:\/\//i.test(url)) {
@@ -16,6 +17,10 @@ export function getSiteUrl(): string {
 
   if (siteUrl) {
     return ensureProtocol(siteUrl).replace(/\/+$/, "");
+  }
+
+  if (typeof window !== "undefined" && window.__PRERENDER_INJECTED?.siteUrl) {
+    return ensureProtocol(window.__PRERENDER_INJECTED.siteUrl).replace(/\/+$/, "");
   }
 
   if (typeof window !== "undefined" && window.location.origin) {

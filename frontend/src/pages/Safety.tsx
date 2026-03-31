@@ -1,6 +1,7 @@
 import Layout from '../components/Layout';
 import { Link } from 'react-router';
 import Seo from '../components/Seo';
+import { usePrerenderReady } from '../lib/prerender';
 import {
   AlertTriangle,
   Flag,
@@ -11,6 +12,8 @@ import {
 } from 'lucide-react';
 
 export default function Safety() {
+  usePrerenderReady(true);
+
   return (
     <Layout>
       <Seo

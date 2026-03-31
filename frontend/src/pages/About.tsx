@@ -2,8 +2,11 @@ import Layout from '../components/Layout';
 import { Link } from 'react-router';
 import { Shield, Lock, UserCheck, Eye } from 'lucide-react';
 import Seo from '../components/Seo';
+import { usePrerenderReady } from '../lib/prerender';
 
 export default function About() {
+  usePrerenderReady(true);
+
   return (
     <Layout>
       <Seo

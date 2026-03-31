@@ -3,6 +3,7 @@ import { Filter, MapPin } from "lucide-react";
 import Layout from "../components/Layout";
 import ProfileCard from "../components/ProfileCard";
 import Seo from "../components/Seo";
+import { usePrerenderReady } from "../lib/prerender";
 import { absoluteUrl } from "../lib/seo";
 import { Modelo, listPublicModelos } from "../services/modelosService";
 import { Anuncio, listPublicAnuncios } from "../services/anunciosService";
@@ -14,6 +15,8 @@ export default function Profiles() {
   const [error, setError] = useState("");
   const [selectedCiudad, setSelectedCiudad] = useState("all");
   const [showFiltros, setShowFiltros] = useState(true);
+
+  usePrerenderReady(!loading);
 
   useEffect(() => {
     const load = async () => {

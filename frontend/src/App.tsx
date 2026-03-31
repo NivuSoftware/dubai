@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router";
 import { useTranslation } from "react-i18next";
 import TranslationManager from "./components/TranslationManager";
+import { isPrerendering } from "./lib/prerender";
 import { router } from "./routes";
 
 const AGE_GATE_KEY = "dubai_age_gate_status";
@@ -10,7 +11,9 @@ type AgeGateStatus = "unknown" | "accepted" | "rejected";
 
 function App() {
   const { t } = useTranslation();
-  const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>("unknown");
+  const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>(() =>
+    isPrerendering() ? "accepted" : "unknown"
+  );
   const pathname = window.location.pathname;
   const skipAgeGate =
     /^\/admin(\/|$)/.test(pathname) ||

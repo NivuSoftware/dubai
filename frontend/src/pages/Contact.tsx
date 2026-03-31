@@ -2,6 +2,7 @@ import Layout from '../components/Layout';
 import { MessageCircle, Phone, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Seo from '../components/Seo';
+import { usePrerenderReady } from '../lib/prerender';
 import {
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_TEL,
@@ -10,6 +11,8 @@ import {
 
 export default function Contact() {
   useTranslation();
+  usePrerenderReady(true);
+
   return (
     <Layout>
       <Seo

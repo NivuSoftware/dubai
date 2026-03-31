@@ -20,6 +20,7 @@ import {
   CONTACT_WHATSAPP_NUMBER,
   getContactWhatsAppUrl,
 } from "../constants/contact";
+import { usePrerenderReady } from "../lib/prerender";
 import { absoluteUrl } from "../lib/seo";
 import { buildServiceInquiryMessage, withPrefilledMessage } from "../lib/whatsapp";
 import { getPublicAnuncio } from "../services/anunciosService";
@@ -50,6 +51,8 @@ export default function ProfileDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeImage, setActiveImage] = useState(0);
+
+  usePrerenderReady(!loading);
 
   useEffect(() => {
     const load = async () => {

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import {
   absoluteUrl,
   buildPageTitle,
@@ -54,12 +54,12 @@ export default function Seo({
   robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
   jsonLd,
 }: SeoProps) {
-  useEffect(() => {
-    const canonicalUrl = absoluteUrl(path);
-    const ogImage = absoluteUrl(image);
-    const resolvedTitle = buildPageTitle(title);
-    const resolvedDescription = cleanDescription(description);
+  const canonicalUrl = absoluteUrl(path);
+  const ogImage = absoluteUrl(image);
+  const resolvedTitle = buildPageTitle(title);
+  const resolvedDescription = cleanDescription(description);
 
+  useLayoutEffect(() => {
     document.title = resolvedTitle;
 
     upsertMeta('meta[name="description"]', {
@@ -98,6 +98,10 @@ export default function Seo({
       property: "og:image",
       content: ogImage,
     });
+    upsertMeta('meta[property="og:image:alt"]', {
+      property: "og:image:alt",
+      content: resolvedTitle,
+    });
     upsertMeta('meta[property="og:locale"]', {
       property: "og:locale",
       content: "es_EC",
@@ -118,6 +122,10 @@ export default function Seo({
       name: "twitter:image",
       content: ogImage,
     });
+    upsertMeta('meta[name="twitter:image:alt"]', {
+      name: "twitter:image:alt",
+      content: resolvedTitle,
+    });
     upsertLink('link[rel="canonical"]', {
       rel: "canonical",
       href: canonicalUrl,
@@ -136,7 +144,7 @@ export default function Seo({
       script.text = JSON.stringify(jsonLd);
       document.head.appendChild(script);
     }
-  }, [description, image, jsonLd, path, robots, title, type]);
+  }, [canonicalUrl, jsonLd, ogImage, resolvedDescription, resolvedTitle, robots, type]);
 
   return null;
 }
