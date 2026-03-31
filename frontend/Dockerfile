@@ -3,6 +3,11 @@ FROM ${NODE_BASE_IMAGE} AS build
 
 WORKDIR /app
 
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN apk add --no-cache chromium
+
 COPY package.json package-lock.json* ./
 RUN npm ci
 

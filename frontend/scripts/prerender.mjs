@@ -9,6 +9,7 @@ const distDir = path.join(projectRoot, "dist");
 const PRERENDER_EVENT = "dubai:prerender-ready";
 const PRERENDER_TIMEOUT_MS = 4000;
 const PRERENDER_STATUS_KEY = "__DUBAI_PRERENDER_STATUS";
+const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH?.trim();
 
 const CONTENT_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -125,6 +126,7 @@ const server = await startStaticServer();
 
 const browser = await puppeteer.launch({
   args: process.platform === "linux" ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
+  ...(executablePath ? { executablePath } : {}),
   headless: true,
 });
 
