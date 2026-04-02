@@ -143,9 +143,12 @@ export default function ProfileDetail() {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+  const categoryLabel = !isAdvertiserProfile && modelo.categoria ? `${modelo.categoria} · ` : "";
   const seoDescription = [
-    `Escort, prepago, puta, verificada en ${modelo.ubicacion}.`,
+    `${modelo.nombre} — escort verificada en ${modelo.ubicacion}.`,
+    categoryLabel ? `Categoría: ${modelo.categoria}.` : "",
     modelo.descripcion,
+    `Contacto directo en Dubai Ecuador.`,
   ]
     .filter(Boolean)
     .join(" ");

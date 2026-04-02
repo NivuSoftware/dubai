@@ -262,6 +262,18 @@ export default function Home() {
         url: absoluteUrl('/'),
         logo: absoluteUrl('/images/logo.png'),
       },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: FAQ_ITEMS.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      },
     ],
     []
   );

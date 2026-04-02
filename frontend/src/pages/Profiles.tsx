@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Filter, MapPin } from "lucide-react";
 import Layout from "../components/Layout";
 import ProfileCard from "../components/ProfileCard";
@@ -9,12 +10,21 @@ import { Modelo, listPublicModelos } from "../services/modelosService";
 import { Anuncio, listPublicAnuncios } from "../services/anunciosService";
 
 export default function Profiles() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedCiudad, setSelectedCiudad] = useState("all");
+  const selectedCiudad = searchParams.get("ciudad") ?? "all";
   const [showFiltros, setShowFiltros] = useState(true);
+
+  const setSelectedCiudad = (ciudad: string) => {
+    if (ciudad === "all") {
+      setSearchParams({}, { replace: true });
+    } else {
+      setSearchParams({ ciudad }, { replace: true });
+    }
+  };
 
   usePrerenderReady(!loading);
 
@@ -109,14 +119,23 @@ export default function Profiles() {
     return mixed;
   }, [anuncios, modelos, selectedCiudad]);
 
+  const seoTitle = selectedCiudad === "all"
+    ? "Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañía verificadas"
+    : `Escorts y prepagos en ${selectedCiudad} | Dubai Ecuador`;
+
+  const seoDescription = selectedCiudad === "all"
+    ? "Revisa perfiles verificados y anuncios activos, filtra por ciudad y encuentra publicaciones recientes en Ecuador."
+    : `Perfiles verificados, escorts y prepagos en ${selectedCiudad}. Anuncios activos con contacto directo en Dubai Ecuador.`;
+
+  const seoPath = selectedCiudad === "all" ? "/profiles" : `/profiles?ciudad=${encodeURIComponent(selectedCiudad)}`;
+
   const listingSchema = useMemo(
     () => ({
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: "Perfiles verificados en Ecuador",
-      description:
-        "Listado de perfiles, putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañía verificadas",
-      url: absoluteUrl("/profiles"),
+      name: selectedCiudad === "all" ? "Perfiles verificados en Ecuador" : `Perfiles verificados en ${selectedCiudad}`,
+      description: seoDescription,
+      url: absoluteUrl(seoPath),
       mainEntity: {
         "@type": "ItemList",
         numberOfItems: mixedProfiles.length,
@@ -128,15 +147,15 @@ export default function Profiles() {
         })),
       },
     }),
-    [mixedProfiles]
+    [mixedProfiles, selectedCiudad, seoDescription, seoPath]
   );
 
   return (
     <Layout>
       <Seo
-        title="Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañía verificadas"
-        description="Revisa perfiles verificados y anuncios activos, filtra por ciudad y encuentra publicaciones recientes en Ecuador."
-        path="/profiles"
+        title={seoTitle}
+        description={seoDescription}
+        path={seoPath}
         image="/images/logo.png"
         jsonLd={listingSchema}
       />
