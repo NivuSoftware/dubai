@@ -43,6 +43,14 @@ ${entries
   const robots = `User-agent: *
 Allow: /
 
+# Bloquear rutas privadas (paneles y autenticación)
+Disallow: /admin/
+Disallow: /admin/panel
+Disallow: /admin/login
+Disallow: /advertiser/panel
+Disallow: /olvide-mi-contrasena
+Disallow: /restablecer-contrasena
+
 Sitemap: ${siteUrl}/sitemap.xml
 `;
 
