@@ -120,12 +120,12 @@ export default function Profiles() {
   }, [anuncios, modelos, selectedCiudad]);
 
   const seoTitle = selectedCiudad === "all"
-    ? "Listado de perfiles, putas, escorts, prepagos, mujeres, chicas prepago, damas de compañía verificadas"
-    : `Escorts y prepagos en ${selectedCiudad} | Dubai Ecuador`;
+    ? "Escorts en Ecuador | Perfiles verificados — Dubai Escorts Ecuador"
+    : `Escorts en ${selectedCiudad} | Perfiles verificados — Dubai Escorts Ecuador`;
 
   const seoDescription = selectedCiudad === "all"
-    ? "Revisa perfiles verificados y anuncios activos, filtra por ciudad y encuentra publicaciones recientes en Ecuador."
-    : `Perfiles verificados, escorts y prepagos en ${selectedCiudad}. Anuncios activos con contacto directo en Dubai Ecuador.`;
+    ? "Directorio de escorts verificadas en Ecuador. Filtra por ciudad — Quito, Guayaquil, Cuenca — y contacta directamente por WhatsApp."
+    : `Escorts verificadas en ${selectedCiudad}. Perfiles reales con contacto directo por WhatsApp. Dubai Escorts Ecuador.`;
 
   const seoPath = selectedCiudad === "all" ? "/profiles" : `/profiles?ciudad=${encodeURIComponent(selectedCiudad)}`;
 

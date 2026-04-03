@@ -198,7 +198,7 @@ export default function ProfileDetail() {
   return (
     <Layout>
       <Seo
-        title={`${modelo.nombre} en ${modelo.ubicacion}`}
+        title={`${modelo.nombre} — Escort en ${modelo.ubicacion} | Dubai Escorts Ecuador`}
         description={seoDescription}
         path={profilePath}
         image={images[0]?.url || "/images/logo.png"}

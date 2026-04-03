@@ -281,8 +281,8 @@ export default function Home() {
   return (
     <Layout>
       <Seo
-        title="Escorts verificadas en Ecuador | Dubai - VIP"
-        description="Explora perfiles putas, escorts, prepagos, mujeres prostitutas, chicas prepago, damas de compañía verificadas con contacto directo y seguro. Listas para proporcionarte servicios eróticos VIP en Quito, Guayaquil, Cuenca y más. Disfruta de una experiencia discreta y segura con Dubai Ecuador."
+        title="Dubai Escorts Ecuador | Directorio verificado"
+        description="Dubai Escorts Ecuador — Directorio de escorts verificadas en Quito, Guayaquil y Cuenca. Perfiles reales con contacto directo por WhatsApp. Discreción y seguridad garantizada."
         path="/"
         image="/images/logo.png"
         jsonLd={homeSchema}
@@ -315,7 +315,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-6xl md:text-7xl mb-6 bg-gradient-to-r from-[#a83d8e] via-[#d4af37] to-[#a83d8e] bg-clip-text text-transparent">
-             Dubai - Escorts Ecuador
+             Dubai Escorts Ecuador
             </h1>
             <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
               +18 años

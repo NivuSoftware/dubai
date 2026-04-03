@@ -1,8 +1,8 @@
-export const SITE_NAME = "Dubai Ecuador";
+export const SITE_NAME = "Dubai Escorts Ecuador";
 export const DEFAULT_OG_IMAGE = "/images/logo.png";
-export const DEFAULT_TITLE = "Dubai Ecuador | Perfiles verificados y anuncios en Ecuador";
+export const DEFAULT_TITLE = "Dubai Escorts Ecuador | Perfiles verificados en Quito y Guayaquil";
 export const DEFAULT_DESCRIPTION =
-  "Explora perfiles verificados y anuncios activos en Ecuador con contacto directo, información clara y un enfoque en seguridad.";
+  "Dubai Escorts Ecuador — Directorio de escorts verificadas en Quito, Guayaquil y Cuenca. Perfiles reales con contacto directo por WhatsApp. Discreción y seguridad garantizada.";
 
 function ensureProtocol(url: string): string {
   if (/^https?:\/\//i.test(url)) {
