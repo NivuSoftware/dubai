@@ -14,6 +14,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 import Seo from "../components/Seo";
 import {
   ADMIN_TOKEN_KEY,
@@ -246,6 +247,7 @@ export default function AdvertiserPanel() {
     plan: "monthly",
     payment_receipt_image: null,
   });
+  const [copiedPaymentField, setCopiedPaymentField] = useState("");
   const [paymentFlowMode, setPaymentFlowMode] = useState<PaymentFlowMode>("create");
   const [anuncioToReactivate, setAnuncioToReactivate] = useState<Anuncio | null>(null);
   const [anuncioForm, setAnuncioForm] = useState<AnuncioFormState>({
@@ -295,6 +297,18 @@ export default function AdvertiserPanel() {
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [anuncioFiles]);
+
+  useEffect(() => {
+    if (!copiedPaymentField) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setCopiedPaymentField("");
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [copiedPaymentField]);
 
   useEffect(() => {
     document.body.classList.add("admin-private-page");
@@ -549,6 +563,21 @@ export default function AdvertiserPanel() {
       setError(err instanceof Error ? err.message : "No se pudo guardar el borrador del anuncio.");
     } finally {
       setAnuncioSaving(false);
+    }
+  };
+
+  const handleCopyPaymentInfo = async (fieldKey: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedPaymentField(fieldKey);
+      toast.success("Dato copiado", {
+        description: "Ya puedes pegarlo en tu app bancaria.",
+      });
+    } catch {
+      setError("No se pudo copiar el dato. Intenta mantener presionado y copiar manualmente.");
+      toast.error("No se pudo copiar", {
+        description: "Mantén presionado el dato para copiarlo manualmente.",
+      });
     }
   };
 
@@ -1020,17 +1049,68 @@ export default function AdvertiserPanel() {
                 />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
-                  <p className="font-semibold text-white">Cuenta Banco Guayaquil</p>
-                  <p>Tipo: Cuenta de ahorros</p>
-                  <p>Cuenta: 21417526</p>
-                  <p>Ci: 1719906578</p>
-                </div>
-                <div className="rounded-lg border border-emerald-500/50 bg-[linear-gradient(180deg,rgba(16,185,129,0.18),rgba(18,26,42,0.96))] p-3 text-sm text-gray-200 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
-                  <p className="font-semibold text-white">Cuenta Produbanco</p>
-                  <p>Tipo: Cuenta Corriente</p>
-                  <p>Cuenta: 27059155332</p>
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#93c5fd]">
+                  O si prefieres, transfiere manualmente
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-[#a83d8e]/50 bg-[linear-gradient(180deg,rgba(168,61,142,0.2),rgba(18,26,42,0.96))] p-4 text-sm text-gray-200 shadow-[0_0_24px_rgba(168,61,142,0.12)]">
+                    <p className="text-base font-semibold text-white">Banco Guayaquil</p>
+                    <div className="mt-3 space-y-3">
+                      <p className="rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                        <span className="block text-[11px] uppercase tracking-[0.16em] text-gray-400">Tipo de cuenta</span>
+                        <span className="font-medium text-white">Ahorros</span>
+                      </p>
+                      <div className="rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                        <span className="block text-[11px] uppercase tracking-[0.16em] text-gray-400">Nro. de cuenta</span>
+                        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <span className="break-all font-mono text-base text-white">21417526</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPaymentInfo("guayaquil-account", "21417526")}
+                            className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-white/15 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/15 sm:min-h-0 sm:w-auto"
+                          >
+                            {copiedPaymentField === "guayaquil-account" ? "Copiado" : "Copiar"}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                        <span className="block text-[11px] uppercase tracking-[0.16em] text-gray-400">C.I.</span>
+                        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <span className="break-all font-mono text-white">1719906578</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPaymentInfo("guayaquil-id", "1719906578")}
+                            className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-white/15 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/15 sm:min-h-0 sm:w-auto"
+                          >
+                            {copiedPaymentField === "guayaquil-id" ? "Copiado" : "Copiar"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-emerald-500/50 bg-[linear-gradient(180deg,rgba(16,185,129,0.18),rgba(18,26,42,0.96))] p-4 text-sm text-gray-200 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
+                    <p className="text-base font-semibold text-white">Produbanco</p>
+                    <div className="mt-3 space-y-3">
+                      <p className="rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                        <span className="block text-[11px] uppercase tracking-[0.16em] text-gray-400">Tipo de cuenta</span>
+                        <span className="font-medium text-white">Corriente</span>
+                      </p>
+                      <div className="rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                        <span className="block text-[11px] uppercase tracking-[0.16em] text-gray-400">Nro. de cuenta</span>
+                        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <span className="break-all font-mono text-base text-white">27059155332</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPaymentInfo("produbanco-account", "27059155332")}
+                            className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-white/15 bg-white/8 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/15 sm:min-h-0 sm:w-auto"
+                          >
+                            {copiedPaymentField === "produbanco-account" ? "Copiado" : "Copiar"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

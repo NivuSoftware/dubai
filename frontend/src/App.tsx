@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router";
 import { useTranslation } from "react-i18next";
+import { Toaster } from "sonner";
 import TranslationManager from "./components/TranslationManager";
 import { isPrerendering } from "./lib/prerender";
 import { router } from "./routes";
@@ -69,6 +70,17 @@ function App() {
   return (
     <div className="relative min-h-screen">
       <TranslationManager />
+      <Toaster
+        position="top-center"
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: "border border-white/10 bg-[#0d1320] text-white shadow-xl",
+            title: "text-sm font-medium",
+            description: "text-xs text-gray-300",
+          },
+        }}
+      />
 
       <div className={showAgeGateModal ? "pointer-events-none blur-sm select-none" : ""}>
         <RouterProvider router={router} />
