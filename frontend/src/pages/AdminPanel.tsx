@@ -30,7 +30,14 @@ import {
   listVerificationRequests,
   rejectVerificationRequest,
 } from "../services/verificationRequestsService";
-import { AdRequestItem, approveAdRequest, listAdRequests } from "../services/adRequestsService";
+import {
+  AdRequestItem,
+  approveAdRequest,
+  deactivateAdRequest,
+  deleteAdRequest,
+  listActiveAds,
+  listAdRequests,
+} from "../services/adRequestsService";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 
 interface AdminState {
@@ -74,6 +81,8 @@ export default function AdminPanel() {
   const [verificationRequestsLoading, setVerificationRequestsLoading] = useState(false);
   const [adRequests, setAdRequests] = useState<AdRequestItem[]>([]);
   const [adRequestsLoading, setAdRequestsLoading] = useState(false);
+  const [activeAds, setActiveAds] = useState<AdRequestItem[]>([]);
+  const [activeAdsLoading, setActiveAdsLoading] = useState(false);
 
   useEffect(() => {
     const urls = selectedFiles.map((file) => URL.createObjectURL(file));
@@ -133,7 +142,7 @@ export default function AdminPanel() {
     if (!token) return;
     clearMessages();
     setActiveView("advertisers");
-    await Promise.all([loadVerificationRequests(token), loadAdRequests(token)]);
+    await Promise.all([loadVerificationRequests(token), loadAdRequests(token), loadActiveAds(token)]);
   };
 
   const logout = () => {
@@ -316,6 +325,18 @@ export default function AdminPanel() {
     }
   };
 
+  const loadActiveAds = async (sessionToken: string) => {
+    setActiveAdsLoading(true);
+    try {
+      const items = await listActiveAds(sessionToken);
+      setActiveAds(items);
+    } catch {
+      setError("No se pudieron cargar los anuncios activos.");
+    } finally {
+      setActiveAdsLoading(false);
+    }
+  };
+
   const handleApproveVerificationRequest = async (requestId: number) => {
     if (!token) return;
     clearMessages();
@@ -345,10 +366,42 @@ export default function AdminPanel() {
     clearMessages();
     try {
       await approveAdRequest(token, requestId);
-      await loadAdRequests(token);
+      await Promise.all([loadAdRequests(token), loadActiveAds(token)]);
       setSuccess("Solicitud de anuncio aprobada correctamente");
     } catch {
       setError("No se pudo aprobar la solicitud de anuncio.");
+    }
+  };
+
+  const handleDeactivateAd = async (requestId: number) => {
+    if (!token) return;
+    const confirmed = window.confirm("¿Seguro que deseas retirar este anuncio activo?");
+    if (!confirmed) return;
+
+    clearMessages();
+    try {
+      await deactivateAdRequest(token, requestId);
+      await Promise.all([loadAdRequests(token), loadActiveAds(token)]);
+      setSuccess("Anuncio retirado correctamente");
+    } catch {
+      setError("No se pudo retirar el anuncio.");
+    }
+  };
+
+  const handleDeleteAd = async (requestId: number) => {
+    if (!token) return;
+    const confirmed = window.confirm(
+      "¿Seguro que deseas eliminar este anuncio? Esta acción borra también sus imágenes."
+    );
+    if (!confirmed) return;
+
+    clearMessages();
+    try {
+      await deleteAdRequest(token, requestId);
+      await Promise.all([loadAdRequests(token), loadActiveAds(token)]);
+      setSuccess("Anuncio eliminado correctamente");
+    } catch {
+      setError("No se pudo eliminar el anuncio.");
     }
   };
 
@@ -365,6 +418,8 @@ export default function AdminPanel() {
     if (plan === "princesa") return "Plan Princesa (legado)";
     return plan;
   };
+
+  const formatAdStatus = (ad: AdRequestItem) => `${ad.estado} · ${ad.pago}`;
 
   if (authLoading) {
     return (
@@ -884,6 +939,194 @@ export default function AdminPanel() {
                                   >
                                     <Check className="h-3.5 w-3.5" />
                                     Aprobar
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-emerald-500/30 bg-[#121a2a] p-6">
+                <h3 className="mb-4 text-lg text-white">Anuncios activos</h3>
+                {activeAdsLoading ? (
+                  <p className="text-gray-300">Cargando anuncios activos...</p>
+                ) : activeAds.length === 0 ? (
+                  <p className="text-sm text-gray-400">No hay anuncios activos en este momento.</p>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-3 md:hidden">
+                      {activeAds.map((ad) => (
+                        <article
+                          key={`active-ad-mobile-${ad.id}`}
+                          className="rounded-xl border border-white/10 bg-[#0d1320] p-5"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-white">{ad.titulo}</p>
+                              <p className="text-xs text-gray-400">{ad.advertiser_email}</p>
+                              <p className="mt-1 text-xs text-gray-300">
+                                {getPlanLabel(ad.plan)} · ${Number(ad.precio).toFixed(2)}
+                              </p>
+                              <p className="text-xs text-gray-400">{ad.ubicacion}</p>
+                              <p className="mt-1 text-xs text-emerald-300">{formatAdStatus(ad)}</p>
+                            </div>
+                            <span className="rounded-full border border-white/15 px-2 py-1 text-xs text-gray-300">
+                              {ad.images.length} fotos
+                            </span>
+                          </div>
+
+                          <div className="mt-4 space-y-2">
+                            <p className="text-xs font-medium text-gray-300">Comprobante de pago</p>
+                            <a
+                              href={ad.imagen_comprobante_pago_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block overflow-hidden rounded-lg border border-emerald-400/30"
+                            >
+                              <img
+                                src={ad.imagen_comprobante_pago_url}
+                                alt="Comprobante de pago"
+                                className="h-40 w-full object-cover"
+                              />
+                            </a>
+                          </div>
+
+                          {ad.images.length > 0 ? (
+                            <div className="mt-4 space-y-2">
+                              <p className="text-xs font-medium text-gray-300">Imágenes publicadas</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {ad.images.map((image) => (
+                                  <a
+                                    key={image.id}
+                                    href={image.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block overflow-hidden rounded-lg border border-white/15"
+                                  >
+                                    <img
+                                      src={image.url}
+                                      alt={`Imagen anuncio ${ad.titulo}`}
+                                      className="h-28 w-full object-cover"
+                                    />
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+
+                          <div className="mt-4 grid grid-cols-2 gap-2">
+                            <button
+                              onClick={() => handleDeactivateAd(ad.id)}
+                              className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-400/70 bg-amber-500/10 px-3 py-2.5 text-sm font-medium text-amber-300 transition hover:bg-amber-400/20"
+                            >
+                              <X className="h-4 w-4" />
+                              Retirar
+                            </button>
+                            <button
+                              onClick={() => handleDeleteAd(ad.id)}
+                              className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-400/70 px-3 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-400/15"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </button>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+
+                    <div className="hidden overflow-x-auto rounded-xl border border-white/10 md:block">
+                      <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-[#0f1728]">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Anunciante
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Título
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Estado
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Expira
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Comprobante
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-400">
+                              Imágenes
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs uppercase tracking-wide text-gray-400">
+                              Acción
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/10 bg-[#0d1320]">
+                          {activeAds.map((ad) => (
+                            <tr key={ad.id}>
+                              <td className="px-4 py-3 text-sm text-white">{ad.advertiser_email}</td>
+                              <td className="px-4 py-3 text-sm text-gray-300">{ad.titulo}</td>
+                              <td className="px-4 py-3 text-sm text-emerald-300">{formatAdStatus(ad)}</td>
+                              <td className="px-4 py-3 text-sm text-gray-300">
+                                {new Date(ad.fecha_hasta).toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3">
+                                <a
+                                  href={ad.imagen_comprobante_pago_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="block h-16 w-16 overflow-hidden rounded-lg border border-emerald-400/30"
+                                >
+                                  <img
+                                    src={ad.imagen_comprobante_pago_url}
+                                    alt="Comprobante de pago"
+                                    className="h-full w-full object-cover"
+                                  />
+                                </a>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  {ad.images.length === 0 ? (
+                                    <span className="text-xs text-gray-500">Sin imágenes</span>
+                                  ) : (
+                                    ad.images.slice(0, 4).map((image) => (
+                                      <a
+                                        key={image.id}
+                                        href={image.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="block h-12 w-12 overflow-hidden rounded-md border border-white/15"
+                                      >
+                                        <img
+                                          src={image.url}
+                                          alt={`Imagen anuncio ${ad.titulo}`}
+                                          className="h-full w-full object-cover"
+                                        />
+                                      </a>
+                                    ))
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    onClick={() => handleDeactivateAd(ad.id)}
+                                    className="inline-flex items-center gap-1 rounded-md border border-amber-400/70 px-3 py-1.5 text-xs text-amber-300 transition hover:bg-amber-400/15"
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                    Retirar
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteAd(ad.id)}
+                                    className="inline-flex items-center gap-1 rounded-md border border-red-400/60 px-3 py-1.5 text-xs text-red-300 transition hover:bg-red-400/15"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Eliminar
                                   </button>
                                 </div>
                               </td>

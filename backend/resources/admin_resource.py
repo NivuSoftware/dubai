@@ -141,22 +141,84 @@ def _require_admin():
         abort(403, message="No tienes permisos de administrador")
 
 
-@admin_bp.route("/ad-requests", methods=["GET"])
-@jwt_required()
-def list_ad_requests():
-    _require_admin()
+def _expire_outdated_ads():
     now = datetime.utcnow()
-    expired_requests = (
+    expired_ads = (
         Anuncio.query.filter(
             Anuncio.fecha_hasta < now,
             or_(Anuncio.estado != "INACTIVO", Anuncio.pago != "PENDIENTE"),
         ).all()
     )
-    if expired_requests:
-        for ad_request in expired_requests:
-            ad_request.estado = "INACTIVO"
-            ad_request.pago = "PENDIENTE"
-        db.session.commit()
+    if not expired_ads:
+        return
+
+    for ad in expired_ads:
+        ad.estado = "INACTIVO"
+        ad.pago = "PENDIENTE"
+
+    db.session.commit()
+
+
+def _ad_upload_root() -> Path:
+    upload_dir = current_app.config.get("ANUNCIO_UPLOAD_DIR", "anuncios")
+    root = Path(current_app.root_path) / upload_dir
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def _serialize_admin_ad(ad_request: Anuncio):
+    return {
+        "id": ad_request.id,
+        "owner_id": ad_request.owner_id,
+        "advertiser_email": ad_request.owner.email if ad_request.owner else "",
+        "titulo": ad_request.titulo,
+        "descripcion": ad_request.descripcion,
+        "precio": ad_request.precio,
+        "ubicacion": ad_request.ubicacion,
+        "plan": ad_request.plan,
+        "estado": ad_request.estado,
+        "pago": ad_request.pago,
+        "is_draft": ad_request.is_draft,
+        "fecha_hasta": ad_request.fecha_hasta.isoformat(),
+        "created_at": ad_request.created_at.isoformat(),
+        "imagen_comprobante_pago": ad_request.imagen_comprobante_pago,
+        "imagen_comprobante_pago_url": url_for(
+            "advertiser_anuncios.get_anuncio_file",
+            file_path=ad_request.imagen_comprobante_pago,
+            _external=True,
+        ),
+        "images": [
+            {
+                "id": image.id,
+                "path": image.path,
+                "url": url_for(
+                    "advertiser_anuncios.get_anuncio_file",
+                    file_path=image.path,
+                    _external=True,
+                ),
+            }
+            for image in ad_request.images
+        ],
+    }
+
+
+def _remove_ad_assets(ad_request: Anuncio):
+    ad_folder = _ad_upload_root() / str(ad_request.id)
+    if not ad_folder.exists():
+        return
+
+    for file_path in ad_folder.glob("*"):
+        if file_path.is_file():
+            file_path.unlink()
+
+    ad_folder.rmdir()
+
+
+@admin_bp.route("/ad-requests", methods=["GET"])
+@jwt_required()
+def list_ad_requests():
+    _require_admin()
+    _expire_outdated_ads()
 
     requests = (
         Anuncio.query.filter(Anuncio.estado.in_(["pending", "PENDIENTE"]), Anuncio.is_draft.is_(False))
@@ -164,44 +226,21 @@ def list_ad_requests():
         .all()
     )
 
-    items = []
-    for ad_request in requests:
-        items.append(
-            {
-                "id": ad_request.id,
-                "owner_id": ad_request.owner_id,
-                "advertiser_email": ad_request.owner.email if ad_request.owner else "",
-                "titulo": ad_request.titulo,
-                "descripcion": ad_request.descripcion,
-                "precio": ad_request.precio,
-                "ubicacion": ad_request.ubicacion,
-                "plan": ad_request.plan,
-                "estado": ad_request.estado,
-                "pago": ad_request.pago,
-                "fecha_hasta": ad_request.fecha_hasta.isoformat(),
-                "created_at": ad_request.created_at.isoformat(),
-                "imagen_comprobante_pago": ad_request.imagen_comprobante_pago,
-                "imagen_comprobante_pago_url": url_for(
-                    "advertiser_anuncios.get_anuncio_file",
-                    file_path=ad_request.imagen_comprobante_pago,
-                    _external=True,
-                ),
-                "images": [
-                    {
-                        "id": image.id,
-                        "path": image.path,
-                        "url": url_for(
-                            "advertiser_anuncios.get_anuncio_file",
-                            file_path=image.path,
-                            _external=True,
-                        ),
-                    }
-                    for image in ad_request.images
-                ],
-            }
-        )
+    return {"items": [_serialize_admin_ad(ad_request) for ad_request in requests]}
 
-    return {"items": items}
+
+@admin_bp.route("/active-ads", methods=["GET"])
+@jwt_required()
+def list_active_ads():
+    _require_admin()
+    _expire_outdated_ads()
+
+    active_ads = (
+        Anuncio.query.filter_by(estado="ACTIVO", pago="PAGADO", is_draft=False)
+        .order_by(Anuncio.created_at.desc())
+        .all()
+    )
+    return {"items": [_serialize_admin_ad(ad_request) for ad_request in active_ads]}
 
 
 @admin_bp.route("/ad-requests/<int:request_id>/approve", methods=["POST"])
@@ -218,6 +257,36 @@ def approve_ad_request(request_id):
     db.session.commit()
 
     return {"message": "Solicitud de anuncio aprobada correctamente"}
+
+
+@admin_bp.route("/ad-requests/<int:request_id>/deactivate", methods=["POST"])
+@jwt_required()
+def deactivate_ad_request(request_id):
+    _require_admin()
+
+    ad_request = db.session.get(Anuncio, request_id)
+    if not ad_request:
+        abort(404, message="Anuncio no encontrado")
+
+    ad_request.estado = "INACTIVO"
+    ad_request.pago = "PENDIENTE"
+    db.session.commit()
+    return {"message": "Anuncio retirado correctamente"}
+
+
+@admin_bp.route("/ad-requests/<int:request_id>", methods=["DELETE"])
+@jwt_required()
+def delete_ad_request(request_id):
+    _require_admin()
+
+    ad_request = db.session.get(Anuncio, request_id)
+    if not ad_request:
+        abort(404, message="Anuncio no encontrado")
+
+    _remove_ad_assets(ad_request)
+    db.session.delete(ad_request)
+    db.session.commit()
+    return {"message": "Anuncio eliminado correctamente"}
 
 
 @admin_bp.route("/verification-requests", methods=["GET"])
