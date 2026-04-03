@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import Seo from "../components/Seo";
 import {
   ADMIN_TOKEN_KEY,
+  USER_ROLE_KEY,
   fetchAdvertiserMe,
   requestAdvertiserVerification,
 } from "../services/authService";
@@ -328,6 +329,7 @@ export default function AdvertiserPanel() {
         setAnuncios(anunciosData);
       } catch {
         localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(USER_ROLE_KEY);
         setError("Sesión inválida o expirada. Inicia sesión nuevamente.");
         navigate("/login");
       } finally {
@@ -344,6 +346,7 @@ export default function AdvertiserPanel() {
 
   const logout = () => {
     localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(USER_ROLE_KEY);
     navigate("/login");
   };
 

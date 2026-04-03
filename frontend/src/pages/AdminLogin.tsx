@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Seo from "../components/Seo";
 import LanguageSwitcher from "../components/LanguageSwitcher";
-import { ADMIN_TOKEN_KEY, login } from "../services/authService";
+import { ADMIN_TOKEN_KEY, USER_ROLE_KEY, login } from "../services/authService";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ export default function AdminLogin() {
     try {
       const data = await login({ email, password });
       localStorage.setItem(ADMIN_TOKEN_KEY, data.access_token);
+      localStorage.setItem(USER_ROLE_KEY, data.user.role);
       if (data.user.role === "admin") {
         navigate("/admin/panel");
       } else if (data.user.role === "advertiser") {

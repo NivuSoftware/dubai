@@ -251,6 +251,10 @@ def approve_ad_request(request_id):
     ad_request = db.session.get(Anuncio, request_id)
     if not ad_request:
         abort(404, message="Solicitud de anuncio no encontrada")
+    if ad_request.is_draft:
+        abort(400, message="No puedes aprobar un borrador.")
+    if str(ad_request.estado).upper() not in {"PENDIENTE", "PENDING"}:
+        abort(400, message="Solo puedes aprobar anuncios pendientes.")
 
     ad_request.pago = "PAGADO"
     ad_request.estado = "ACTIVO"
@@ -267,6 +271,8 @@ def deactivate_ad_request(request_id):
     ad_request = db.session.get(Anuncio, request_id)
     if not ad_request:
         abort(404, message="Anuncio no encontrado")
+    if str(ad_request.estado).upper() != "ACTIVO" or str(ad_request.pago).upper() != "PAGADO":
+        abort(400, message="Solo puedes retirar anuncios activos y pagados.")
 
     ad_request.estado = "INACTIVO"
     ad_request.pago = "PENDIENTE"

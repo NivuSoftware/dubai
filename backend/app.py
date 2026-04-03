@@ -24,7 +24,9 @@ from seed import seed_admin_user
 def create_app():
     app = Flask(__name__)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-    CORS(app)
+    cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "https://dubaiec.net,https://www.dubaiec.net")
+    allowed_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+    CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
     app.config["API_TITLE"] = "Dubai API"
     app.config["API_VERSION"] = "v1"

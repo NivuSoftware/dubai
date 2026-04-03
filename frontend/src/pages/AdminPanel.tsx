@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import Seo from "../components/Seo";
-import { ADMIN_TOKEN_KEY, fetchAdminMe } from "../services/authService";
+import { ADMIN_TOKEN_KEY, USER_ROLE_KEY, fetchAdminMe } from "../services/authService";
 import {
   Modelo,
   ModeloPayload,
@@ -107,6 +107,7 @@ export default function AdminPanel() {
         setData(result.user);
       } catch {
         localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(USER_ROLE_KEY);
         setError("Sesión inválida o expirada. Inicia sesión nuevamente.");
         navigate("/login");
       } finally {
@@ -147,6 +148,7 @@ export default function AdminPanel() {
 
   const logout = () => {
     localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(USER_ROLE_KEY);
     navigate("/login");
   };
 

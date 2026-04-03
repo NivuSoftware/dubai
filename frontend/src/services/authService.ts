@@ -1,6 +1,7 @@
 import { apiRequest } from "./apiClient";
 
 export const ADMIN_TOKEN_KEY = "dubai_admin_token";
+export const USER_ROLE_KEY = "dubai_user_role";
 
 export interface LoginPayload {
   email: string;
