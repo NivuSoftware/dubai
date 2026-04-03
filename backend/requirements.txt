@@ -7,3 +7,4 @@ flask-sqlalchemy
 flask-jwt-extended
 psycopg2-binary
 flask-migrate
+Pillow

@@ -1,16 +1,15 @@
 import os
 from datetime import date
 from pathlib import Path
-from uuid import uuid4
 
 from flask import current_app, request
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
-from werkzeug.utils import secure_filename
 
 from extensions import db
 from models.user import User
 from models.verification_request import VerificationRequest
+from services.image_service import save_normalized_image
 
 advertiser_bp = Blueprint(
     "advertiser",
@@ -140,10 +139,6 @@ def _save_verification_file(file_storage, user_folder: Path, prefix: str) -> str
     if not _allowed_file(original_name):
         abort(400, message=f"Formato no permitido: {original_name}")
 
-    safe_name = secure_filename(original_name)
-    extension = safe_name.rsplit(".", 1)[1].lower()
-    final_name = f"{prefix}_{uuid4().hex}.{extension}"
-    absolute_path = user_folder / final_name
-    file_storage.save(absolute_path)
+    final_name = save_normalized_image(file_storage, user_folder, prefix)
 
     return os.path.join("verification_requests", user_folder.name, final_name)

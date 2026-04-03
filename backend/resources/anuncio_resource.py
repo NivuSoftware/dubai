@@ -2,18 +2,17 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
-from uuid import uuid4
 
 from flask import current_app, request, send_from_directory, url_for
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
 from sqlalchemy import or_
-from werkzeug.utils import secure_filename
 
 from extensions import db
 from models.anuncio import Anuncio, AnuncioImage
 from models.user import User
 from schemas.anuncio_schema import AnuncioSchema, AnuncioUpdateSchema
+from services.image_service import save_normalized_image
 
 advertiser_anuncio_bp = Blueprint(
     "advertiser_anuncios",
@@ -88,11 +87,7 @@ def _save_file(file_storage, target_folder: Path, prefix: str) -> str:
     if not _allowed_file(original_name):
         abort(400, message=f"Formato no permitido: {original_name}")
 
-    safe_name = secure_filename(original_name)
-    extension = safe_name.rsplit(".", 1)[1].lower()
-    final_name = f"{prefix}_{uuid4().hex}.{extension}"
-    absolute_path = target_folder / final_name
-    file_storage.save(absolute_path)
+    final_name = save_normalized_image(file_storage, target_folder, prefix)
     return os.path.join("anuncios", target_folder.name, final_name)
 
 

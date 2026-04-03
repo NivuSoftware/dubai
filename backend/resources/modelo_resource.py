@@ -1,15 +1,14 @@
 import os
 from pathlib import Path
-from uuid import uuid4
 
 from flask import current_app, request, send_from_directory, url_for
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
-from werkzeug.utils import secure_filename
 
 from extensions import db
 from models.modelo import Modelo, ModeloImage
 from schemas.modelo_schema import ModeloCreateSchema, ModeloSchema
+from services.image_service import save_normalized_image
 
 modelo_bp = Blueprint(
     "modelos",
@@ -122,12 +121,7 @@ def _save_images_for_modelo(modelo: Modelo):
         if not _allowed_file(original):
             abort(400, message=f"Formato no permitido: {original}")
 
-        safe_name = secure_filename(original)
-        ext = safe_name.rsplit(".", 1)[1].lower()
-        final_name = f"{uuid4().hex}.{ext}"
-
-        abs_path = model_folder / final_name
-        file.save(abs_path)
+        final_name = save_normalized_image(file, model_folder, "modelo")
 
         relative_path = os.path.join("modelos", str(modelo.id), final_name)
         image = ModeloImage(modelo_id=modelo.id, path=relative_path)
