@@ -1,6 +1,14 @@
 # macOS
 .DS_Store
 
+# Variables de entorno — nunca subir al repo
+.env
+.env.*
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
 # Python cache / compiled files
 __pycache__/
 *.py[cod]

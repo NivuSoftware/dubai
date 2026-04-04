@@ -29,11 +29,11 @@ def save_normalized_image(file_storage: FileStorage, target_folder: Path, prefix
 
             save_kwargs = {"format": output_format}
             if output_format == "JPEG":
-                save_kwargs.update({"quality": 90, "optimize": True})
+                save_kwargs.update({"quality": 80, "optimize": True})
             elif output_format == "PNG":
                 save_kwargs.update({"optimize": True})
             elif output_format == "WEBP":
-                save_kwargs.update({"quality": 90, "method": 6})
+                save_kwargs.update({"quality": 80, "method": 6})
 
             normalized.save(absolute_path, **save_kwargs)
             return final_name

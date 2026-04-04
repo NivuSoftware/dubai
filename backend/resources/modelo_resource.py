@@ -1,7 +1,10 @@
+import logging
 import os
 from pathlib import Path
 
 from flask import current_app, request, send_from_directory, url_for
+
+logger = logging.getLogger(__name__)
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
 
@@ -9,6 +12,7 @@ from extensions import db
 from models.modelo import Modelo, ModeloImage
 from schemas.modelo_schema import ModeloCreateSchema, ModeloSchema
 from services.image_service import save_normalized_image
+from utils.files import allowed_image_file
 
 modelo_bp = Blueprint(
     "modelos",
@@ -60,13 +64,6 @@ def _upload_root() -> Path:
     return root
 
 
-def _allowed_file(filename: str) -> bool:
-    allowed = current_app.config.get(
-        "ALLOWED_IMAGE_EXTENSIONS", {"png", "jpg", "jpeg", "webp", "avif"}
-    )
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
-
-
 def _serialize_modelo(modelo: Modelo):
     result = ModeloSchema().dump(modelo)
     result["images"] = [
@@ -86,8 +83,14 @@ def _remove_modelo_folder(modelo_id: int):
     if model_folder.exists():
         for file_path in model_folder.glob("*"):
             if file_path.is_file():
-                file_path.unlink()
-        model_folder.rmdir()
+                try:
+                    file_path.unlink()
+                except OSError:
+                    pass
+        try:
+            model_folder.rmdir()
+        except OSError:
+            pass
 
 
 def _save_images_for_modelo(modelo: Modelo):
@@ -118,7 +121,7 @@ def _save_images_for_modelo(modelo: Modelo):
         original = file.filename or ""
         if not original:
             continue
-        if not _allowed_file(original):
+        if not allowed_image_file(original):
             abort(400, message=f"Formato no permitido: {original}")
 
         final_name = save_normalized_image(file, model_folder, "modelo")
@@ -349,8 +352,18 @@ def get_modelo_file(file_path):
 
 @public_modelo_bp.route("", methods=["GET"])
 def list_public_modelos():
-    modelos = Modelo.query.order_by(Modelo.created_at.desc()).all()
-    return {"items": [_serialize_modelo(modelo) for modelo in modelos]}
+    page = max(1, request.args.get("page", 1, type=int))
+    limit = min(100, max(1, request.args.get("limit", 50, type=int)))
+    pagination = (
+        Modelo.query.order_by(Modelo.created_at.desc())
+        .paginate(page=page, per_page=limit, error_out=False)
+    )
+    return {
+        "items": [_serialize_modelo(m) for m in pagination.items],
+        "total": pagination.total,
+        "page": pagination.page,
+        "pages": pagination.pages,
+    }
 
 
 @public_modelo_bp.route("/<int:modelo_id>", methods=["GET"])

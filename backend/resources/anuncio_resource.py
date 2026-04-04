@@ -1,9 +1,12 @@
+import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
 from flask import current_app, request, send_from_directory, url_for
+
+logger = logging.getLogger(__name__)
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
 from sqlalchemy import or_
@@ -13,6 +16,7 @@ from models.anuncio import Anuncio, AnuncioImage
 from models.user import User
 from schemas.anuncio_schema import AnuncioSchema, AnuncioUpdateSchema
 from services.image_service import save_normalized_image
+from utils.files import allowed_image_file
 
 advertiser_anuncio_bp = Blueprint(
     "advertiser_anuncios",
@@ -58,14 +62,8 @@ def _upload_root() -> Path:
     return root
 
 
-def _allowed_file(filename: str) -> bool:
-    allowed = current_app.config.get(
-        "ALLOWED_IMAGE_EXTENSIONS", {"png", "jpg", "jpeg", "webp", "avif"}
-    )
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
-
 def _calculate_expiration(plan: str, now: Optional[datetime] = None) -> datetime:
-    current_time = now or datetime.utcnow()
+    current_time = now or datetime.now(timezone.utc)
     config = PLAN_CONFIG[plan]
 
     if "hours" in config:
@@ -84,7 +82,7 @@ def _save_file(file_storage, target_folder: Path, prefix: str) -> str:
     original_name = file_storage.filename or ""
     if not original_name:
         abort(400, message="Archivo inválido.")
-    if not _allowed_file(original_name):
+    if not allowed_image_file(original_name):
         abort(400, message=f"Formato no permitido: {original_name}")
 
     final_name = save_normalized_image(file_storage, target_folder, prefix)
@@ -140,7 +138,7 @@ def _validate_anuncio_completion(anuncio: Anuncio):
 
 
 def _expire_outdated_ads(owner_id: Optional[int] = None):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     query = Anuncio.query.filter(
         Anuncio.fecha_hasta < now,
         or_(Anuncio.estado != "INACTIVO", Anuncio.pago != "PENDIENTE"),
@@ -431,8 +429,14 @@ def delete_advertiser_anuncio(anuncio_id):
     if ad_folder.exists():
         for file_path in ad_folder.glob("*"):
             if file_path.is_file():
-                file_path.unlink()
-        ad_folder.rmdir()
+                try:
+                    file_path.unlink()
+                except OSError:
+                    pass
+        try:
+            ad_folder.rmdir()
+        except OSError:
+            pass
 
     db.session.delete(anuncio)
     db.session.commit()
@@ -515,20 +519,27 @@ def get_anuncio_file(file_path):
 @public_anuncio_bp.route("", methods=["GET"])
 def list_public_anuncios():
     _expire_outdated_ads()
-    now = datetime.utcnow()
-    anuncios = (
+    now = datetime.now(timezone.utc)
+    page = max(1, request.args.get("page", 1, type=int))
+    limit = min(100, max(1, request.args.get("limit", 50, type=int)))
+    pagination = (
         Anuncio.query.filter_by(estado="ACTIVO", pago="PAGADO")
         .filter(Anuncio.fecha_hasta >= now)
         .order_by(Anuncio.created_at.desc())
-        .all()
+        .paginate(page=page, per_page=limit, error_out=False)
     )
-    return {"items": [_serialize_anuncio(anuncio) for anuncio in anuncios]}
+    return {
+        "items": [_serialize_anuncio(a) for a in pagination.items],
+        "total": pagination.total,
+        "page": pagination.page,
+        "pages": pagination.pages,
+    }
 
 
 @public_anuncio_bp.route("/<int:anuncio_id>", methods=["GET"])
 def get_public_anuncio(anuncio_id):
     _expire_outdated_ads()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     anuncio = Anuncio.query.filter_by(id=anuncio_id, estado="ACTIVO", pago="PAGADO").first()
     if not anuncio or anuncio.fecha_hasta < now:
         abort(404, message="Anuncio no encontrado")

@@ -1,14 +1,23 @@
+import logging
 import os
 import time
 
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_smorest import Api
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 from extensions import db, migrate
 import models  # noqa: F401
@@ -19,6 +28,8 @@ from resources.auth_resource import auth_bp
 from resources.mail_resource import mail_bp
 from resources.modelo_resource import advertiser_modelo_bp, modelo_bp, public_modelo_bp
 from seed import seed_admin_user
+
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
 
 def create_app():
@@ -50,6 +61,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     JWTManager(app)
+    limiter.init_app(app)
 
     api = Api(app)
     api.register_blueprint(mail_bp)
@@ -73,15 +85,15 @@ def seed_admin_with_retry(max_retries=10, wait_seconds=2):
         try:
             seeded = seed_admin_user()
             if seeded:
-                print("Seeder: usuario admin creado")
+                logger.info("Seeder: usuario admin creado")
             else:
-                print("Seeder: usuario admin ya existe")
+                logger.info("Seeder: usuario admin ya existe")
             return
         except Exception as exc:
             if attempt == max_retries:
-                print("Seeder omitido: aplica migraciones con `flask db upgrade` y reinicia.")
+                logger.warning("Seeder omitido: aplica migraciones con `flask db upgrade` y reinicia.")
                 return
-            print(f"DB no lista para seeder (intento {attempt}/{max_retries}), reintentando...")
+            logger.warning("DB no lista para seeder (intento %d/%d), reintentando...", attempt, max_retries)
             time.sleep(wait_seconds)
 
 

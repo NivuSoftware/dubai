@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from extensions import db
 
@@ -14,7 +14,7 @@ class User(db.Model):
     is_verification_requested = db.Column(db.Boolean, nullable=False, default=False)
     is_verification_rejected = db.Column(db.Boolean, nullable=False, default=False)
     has_used_free_trial = db.Column(db.Boolean, nullable=False, default=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     modelos = db.relationship("Modelo", back_populates="owner")
     anuncios = db.relationship(
         "Anuncio",

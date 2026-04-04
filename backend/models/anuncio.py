@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from extensions import db
 
@@ -16,15 +16,15 @@ class Anuncio(db.Model):
     ubicacion = db.Column(db.String(150), nullable=False)
     contact_country_code = db.Column(db.String(8), nullable=True)
     contact_number = db.Column(db.String(20), nullable=True)
-    estado = db.Column(db.String(30), nullable=False, default="pending", index=True)
-    pago = db.Column(db.String(30), nullable=False, default="pending", index=True)
+    estado = db.Column(db.String(30), nullable=False, default="PENDIENTE", index=True)
+    pago = db.Column(db.String(30), nullable=False, default="PENDIENTE", index=True)
     is_draft = db.Column(db.Boolean, nullable=False, default=False, index=True)
     plan = db.Column(db.String(20), nullable=False)
     imagen_comprobante_pago = db.Column(db.String(500), nullable=False)
     fecha_hasta = db.Column(db.DateTime, nullable=False, index=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
     owner = db.relationship("User", back_populates="anuncios")
@@ -44,6 +44,6 @@ class AnuncioImage(db.Model):
         db.Integer, db.ForeignKey("anuncios.id", ondelete="CASCADE"), nullable=False, index=True
     )
     path = db.Column(db.String(500), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     anuncio = db.relationship("Anuncio", back_populates="images")

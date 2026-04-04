@@ -1,9 +1,14 @@
-from flask_smorest import Blueprint, abort
-import smtplib
-from email.message import EmailMessage
-from schemas.mail_schema import MailSchema
+import logging
 import os
+import smtplib
 from datetime import datetime
+from email.message import EmailMessage
+
+from flask_smorest import Blueprint, abort
+
+from schemas.mail_schema import MailSchema
+
+logger = logging.getLogger(__name__)
 
 mail_bp = Blueprint("mail", __name__, url_prefix="/api", description="Endpoints para envio de correos")
 
@@ -142,5 +147,5 @@ Notificacion automatica - EFICORP-PCGerente Web
         return {"success": True, "message": "Correo enviado correctamente"}
 
     except Exception as e:
-        print("Error al enviar correo:", repr(e))
-        abort(500, message=f"No se pudo enviar el correo: {str(e)}")
+        logger.error("Error al enviar correo: %s", repr(e))
+        abort(500, message="No se pudo enviar el correo. Intenta mas tarde.")

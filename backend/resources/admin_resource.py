@@ -1,11 +1,15 @@
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import current_app, send_from_directory, url_for
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask_smorest import Blueprint, abort
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash
+
+logger = logging.getLogger(__name__)
 
 from extensions import db
 from models.anuncio import Anuncio
@@ -142,7 +146,7 @@ def _require_admin():
 
 
 def _expire_outdated_ads():
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expired_ads = (
         Anuncio.query.filter(
             Anuncio.fecha_hasta < now,
@@ -209,9 +213,14 @@ def _remove_ad_assets(ad_request: Anuncio):
 
     for file_path in ad_folder.glob("*"):
         if file_path.is_file():
-            file_path.unlink()
-
-    ad_folder.rmdir()
+            try:
+                file_path.unlink()
+            except OSError:
+                pass
+    try:
+        ad_folder.rmdir()
+    except OSError:
+        pass
 
 
 @admin_bp.route("/ad-requests", methods=["GET"])
@@ -221,7 +230,8 @@ def list_ad_requests():
     _expire_outdated_ads()
 
     requests = (
-        Anuncio.query.filter(Anuncio.estado.in_(["pending", "PENDIENTE"]), Anuncio.is_draft.is_(False))
+        Anuncio.query.options(joinedload(Anuncio.owner), joinedload(Anuncio.images))
+        .filter(Anuncio.estado == "PENDIENTE", Anuncio.is_draft.is_(False))
         .order_by(Anuncio.created_at.desc())
         .all()
     )
@@ -236,7 +246,8 @@ def list_active_ads():
     _expire_outdated_ads()
 
     active_ads = (
-        Anuncio.query.filter_by(estado="ACTIVO", pago="PAGADO", is_draft=False)
+        Anuncio.query.options(joinedload(Anuncio.owner), joinedload(Anuncio.images))
+        .filter_by(estado="ACTIVO", pago="PAGADO", is_draft=False)
         .order_by(Anuncio.created_at.desc())
         .all()
     )
@@ -253,7 +264,7 @@ def approve_ad_request(request_id):
         abort(404, message="Solicitud de anuncio no encontrada")
     if ad_request.is_draft:
         abort(400, message="No puedes aprobar un borrador.")
-    if str(ad_request.estado).upper() not in {"PENDIENTE", "PENDING"}:
+    if ad_request.estado != "PENDIENTE":
         abort(400, message="Solo puedes aprobar anuncios pendientes.")
 
     ad_request.pago = "PAGADO"
@@ -300,7 +311,8 @@ def delete_ad_request(request_id):
 def list_verification_requests():
     _require_admin()
     requests = (
-        VerificationRequest.query.filter_by(status="pending")
+        VerificationRequest.query.options(joinedload(VerificationRequest.user))
+        .filter_by(status="pending")
         .order_by(VerificationRequest.created_at.desc())
         .all()
     )

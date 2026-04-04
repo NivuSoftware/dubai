@@ -1,7 +1,10 @@
+import logging
+
 from flask_jwt_extended import create_access_token
 from flask_smorest import Blueprint, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from app import limiter
 from extensions import db
 from models.user import User
 from schemas.auth_schema import (
@@ -13,10 +16,12 @@ from schemas.auth_schema import (
 )
 from services.password_reset_service import send_password_reset_email, validate_password_reset_token
 
+logger = logging.getLogger(__name__)
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth", description="Autenticacion")
 
 
 @auth_bp.route("/register-advertiser", methods=["POST"])
+@limiter.limit("10 per hour")
 @auth_bp.arguments(AdvertiserRegisterSchema)
 def register_advertiser(data):
     email = data["email"].strip().lower()
@@ -55,6 +60,7 @@ def register_advertiser(data):
 
 
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("10 per minute")
 @auth_bp.arguments(LoginSchema)
 def login(data):
     email = data["email"].strip().lower()
@@ -84,6 +90,7 @@ def login(data):
 
 
 @auth_bp.route("/forgot-password", methods=["POST"])
+@limiter.limit("5 per hour")
 @auth_bp.arguments(ForgotPasswordSchema)
 def forgot_password(data):
     email = data["email"].strip().lower()
@@ -93,7 +100,7 @@ def forgot_password(data):
         try:
             send_password_reset_email(user)
         except Exception as exc:
-            print("Error al enviar correo de recuperacion:", repr(exc))
+            logger.error("Error al enviar correo de recuperacion: %s", repr(exc))
             abort(500, message="No se pudo enviar el correo de recuperacion")
 
     return {
@@ -118,11 +125,6 @@ def validate_reset_password_token(args):
     if not user or user.role != "advertiser":
         abort(400, message="El enlace ya no es valido o ha expirado")
 
-    try:
-        validate_password_reset_token(token, user=user)
-    except ValueError:
-        abort(400, message="El enlace ya no es valido o ha expirado")
-
     return {
         "message": "Token valido",
         "email": user.email,
@@ -142,11 +144,6 @@ def reset_password(data):
 
     user = db.session.get(User, payload["user_id"])
     if not user or user.role != "advertiser":
-        abort(400, message="El enlace ya no es valido o ha expirado")
-
-    try:
-        validate_password_reset_token(token, user=user)
-    except ValueError:
         abort(400, message="El enlace ya no es valido o ha expirado")
 
     user.password_hash = generate_password_hash(password)

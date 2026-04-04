@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from extensions import db
 
@@ -16,9 +16,9 @@ class VerificationRequest(db.Model):
     document_image_path = db.Column(db.String(500), nullable=False)
     portrait_image_path = db.Column(db.String(500), nullable=False)
     status = db.Column(db.String(30), nullable=False, default="pending", index=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
     user = db.relationship("User", back_populates="verification_requests")
