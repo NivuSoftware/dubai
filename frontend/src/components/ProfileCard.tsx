@@ -53,7 +53,7 @@ export default function ProfileCard({
       className={`bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] rounded-xl overflow-hidden border border-[#a83d8e]/20 hover:border-[#a83d8e]/60 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,61,142,0.3)] group ${className ?? ""}`}
     >
       <div
-        className={`relative bg-gradient-to-br from-[#a83d8e]/20 to-black overflow-hidden ${imageClassName ?? "h-[420px] sm:h-64"}`}
+        className={`relative bg-gradient-to-br from-[#a83d8e]/20 to-black overflow-hidden ${imageClassName ?? "h-56 sm:h-64"}`}
       >
         {imageUrl ? (
           <>

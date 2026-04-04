@@ -308,16 +308,16 @@ export default function Home() {
         </div>
 
         {/* Contenido */}
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 text-center">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-6xl md:text-7xl mb-6 bg-gradient-to-r from-[#a83d8e] via-[#d4af37] to-[#a83d8e] bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 bg-gradient-to-r from-[#a83d8e] via-[#d4af37] to-[#a83d8e] bg-clip-text text-transparent">
              Dubai Escorts Ecuador
             </h1>
-            <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-xl text-gray-300 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
               +18 años
             </p>
           </motion.div>
@@ -328,28 +328,28 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-6"
           >
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-400 max-w-2xl mx-auto">
               Busca, Contacta y Disfruta de una experiencia segura y privada.
             </p>
 
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={goToFeaturedProfiles}
-                className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-8 py-4 rounded-full transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50"
+                className="w-full sm:w-auto bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-8 py-4 rounded-full transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50"
               >
                 Busca Perfiles
               </button>
               <Link
                 to="/registro-anunciante"
-                className="border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all"
+                className="w-full sm:w-auto text-center border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-black px-8 py-4 rounded-full transition-all"
               >
                 Quiero anunciarme
               </Link>
             </div>
 
             {/* Insignias de confianza */}
-            <div className="flex items-center justify-center gap-8 mt-12 flex-wrap">
+            <div className="flex items-center justify-center gap-4 sm:gap-8 mt-8 sm:mt-12 flex-wrap">
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <span className="text-2xl">🔞</span>
                 <span>Solo 18+</span>
@@ -373,10 +373,10 @@ export default function Home() {
       </section>
 
       {/* Perfiles destacados */}
-      <section id="featured-profiles" className="py-20 px-8 bg-[#0a0a0a]">
+      <section id="featured-profiles" className="py-12 sm:py-20 px-4 sm:px-8 bg-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Perfiles destacados
             </h2>
           </div>
@@ -453,13 +453,13 @@ export default function Home() {
       </section>
 
       {/* Registro de anunciantes y compromiso de seguridad */}
-      <section className="py-20 px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
+      <section className="py-12 sm:py-20 px-4 sm:px-8 bg-gradient-to-b from-black to-[#0a0a0a]">
         <div className="max-w-[1440px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Oportunidad y confianza en un solo lugar
             </h2>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-400 text-sm sm:text-lg">
               Únete al directorio y conoce nuestro compromiso oficial de seguridad
             </p>
           </div>
@@ -560,13 +560,13 @@ export default function Home() {
       </section>
 
       {/* Sección de FAQ */}
-      <section id="faq" className="py-20 px-8 bg-[#0a0a0a]">
+      <section id="faq" className="py-12 sm:py-20 px-4 sm:px-8 bg-[#0a0a0a]">
         <div className="max-w-[900px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Preguntas frecuentes
             </h2>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-400 text-sm sm:text-lg">
               Todo lo que necesitas saber sobre nuestro directorio
             </p>
           </div>
@@ -596,7 +596,7 @@ export default function Home() {
       </section>
 
       {/* Llamado final a la acción */}
-      <section className="py-20 px-8 bg-gradient-to-b from-[#0a0a0a] to-black relative overflow-hidden">
+      <section className="py-12 sm:py-20 px-4 sm:px-8 bg-gradient-to-b from-[#0a0a0a] to-black relative overflow-hidden">
         {/* Fondo */}
         <div className="absolute inset-0 opacity-20">
           <video
@@ -615,17 +615,17 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-[1440px] mx-auto text-center">
-          <h2 className="text-5xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
             Explora perfiles verificados en Ecuador
           </h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-gray-300 mb-8 sm:mb-12 max-w-2xl mx-auto">
             Conecta directamente con acompañantes verificadas. Seguro, discreto y vive la mejor experiencia.
           </p>
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
               to="/profiles"
-              className="bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-10 py-4 rounded-full text-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50 flex items-center gap-3"
+              className="w-full sm:w-auto bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-8 sm:px-10 py-4 rounded-full text-base sm:text-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.6)] border border-[#a83d8e]/50 flex items-center justify-center gap-3"
             >
               <Eye className="w-5 h-5" />
               Buscar perfiles
@@ -634,7 +634,7 @@ export default function Home() {
               href={getContactWhatsAppUrl()}
               target="_blank"
               rel="noreferrer"
-              className="border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white px-10 py-4 rounded-full text-lg transition-all flex items-center gap-3"
+              className="w-full sm:w-auto border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white px-8 sm:px-10 py-4 rounded-full text-base sm:text-lg transition-all flex items-center justify-center gap-3"
             >
               <MessageCircle className="w-5 h-5" />
               Hablar por WhatsApp
@@ -644,13 +644,13 @@ export default function Home() {
       </section>
 
       {/* Por qué este directorio */}
-      <section className="py-20 px-8 bg-gradient-to-b from-[#0a0a0a] to-black">
+      <section className="py-12 sm:py-20 px-4 sm:px-8 bg-gradient-to-b from-[#0a0a0a] to-black">
         <div className="max-w-[1440px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl mb-4 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               ¿Por qué escoger a DUBAI?
             </h2>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-400 text-sm sm:text-lg">
               Directorio premium, verificado, discreto y VIP
             </p>
           </div>

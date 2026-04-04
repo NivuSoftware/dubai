@@ -16,27 +16,27 @@ export default function About() {
         image="/images/logo.png"
       />
       <div className="min-h-screen bg-black">
-        <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-8 border-b border-[#a83d8e]/20">
+        <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-12 sm:py-20 px-4 sm:px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">
-            <h1 className="text-6xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Sobre Dubai Escorts Ecuador
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-base sm:text-xl text-gray-300 leading-relaxed">
                 Gracias a Dubai vive y disfruta una experiencia premium con las mejores escorts de Ecuador!            
             </p>
           </div>
         </div>
 
-        <div className="max-w-[1000px] mx-auto px-8 py-20">
+        <div className="max-w-[1000px] mx-auto px-4 sm:px-8 py-12 sm:py-20">
           <section className="mb-16">
-            <h2 className="text-4xl text-white mb-6">Nuestra misión</h2>
+            <h2 className="text-2xl sm:text-4xl text-white mb-6">Nuestra misión</h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-4">
               DUBAI es una plataforma de anuncios de escorts de calidad en Ecuador, priorizamos la seguridad del cliente y autenticidad de los anunciantes y sus perfiles.
             </p>
           </section>
 
           <section className="mb-16">
-            <h2 className="text-4xl text-white mb-8">¿Cómo funciona?</h2>
+            <h2 className="text-2xl sm:text-4xl text-white mb-8">¿Cómo funciona?</h2>
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] rounded-xl p-6 border-l-4 border-[#a83d8e]">
                 <h3 className="text-xl text-white mb-2">1. Explora perfiles verificados</h3>
@@ -85,7 +85,7 @@ export default function About() {
             <div className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/40 px-4 py-1 mb-5">
               <span className="text-[#d4af37] text-xs tracking-[0.2em]">EXCLUSIVO DUBAI</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-semibold text-white leading-tight mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-semibold text-white leading-tight mb-4">
               Evita extorsiones y estafas.
               <span className="block bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
                 Elige Dubai Escorts Ecuador.

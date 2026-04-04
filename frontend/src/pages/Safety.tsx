@@ -23,18 +23,18 @@ export default function Safety() {
         image="/images/logo.png"
       />
       <div className="min-h-screen bg-black">
-        <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-20 px-8 border-b border-[#a83d8e]/20">
+        <div className="bg-gradient-to-b from-[#0a0a0a] to-black py-12 sm:py-20 px-4 sm:px-8 border-b border-[#a83d8e]/20">
           <div className="max-w-[1000px] mx-auto text-center">
-            <h1 className="text-6xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-[#a83d8e] to-[#d4af37] bg-clip-text text-transparent">
               Seguridad y confianza en DUBAI Escorts Ecuador
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-base sm:text-xl text-gray-300 leading-relaxed">
               Tu seguridad es nuestra prioridad. Sigue estas pautas para una experiencia segura.
             </p>
           </div>
         </div>
 
-        <div className="max-w-[1200px] mx-auto px-8 py-20">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-20">
           <section className="mb-16">
             <div className="bg-gradient-to-r from-[#a83d8e]/15 to-[#d4af37]/10 rounded-2xl p-8 border border-[#a83d8e]/30">
               <h2 className="text-3xl text-white mb-6">Compromiso oficial de seguridad</h2>
@@ -96,7 +96,7 @@ export default function Safety() {
 
           <section className="mb-16">
             <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl p-8 border border-[#d4af37]/20">
-              <h2 className="text-4xl text-white mb-8 flex items-center gap-3">
+              <h2 className="text-2xl sm:text-4xl text-white mb-8 flex items-center gap-3">
                 <AlertTriangle className="w-10 h-10 text-[#d4af37]" />
                 Reglas de la comunidad
               </h2>

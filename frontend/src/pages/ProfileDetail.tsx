@@ -206,7 +206,7 @@ export default function ProfileDetail() {
         jsonLd={profileSchema}
       />
       <div className="min-h-screen bg-black">
-        <div className="bg-[#0a0a0a] border-b border-[#a83d8e]/20 py-4 px-8">
+        <div className="bg-[#0a0a0a] border-b border-[#a83d8e]/20 py-4 px-4 sm:px-8">
           <div className="max-w-[1440px] mx-auto">
             <Link
               to="/profiles"
@@ -218,12 +218,12 @@ export default function ProfileDetail() {
           </div>
         </div>
 
-        <div className="max-w-[1440px] mx-auto px-8 py-12">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-8 py-6 sm:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-2xl overflow-hidden border border-[#a83d8e]/20">
                 <div className="lg:hidden">
-                  <div className="relative h-96 bg-gradient-to-br from-[#a83d8e]/20 to-black">
+                  <div className="relative h-60 sm:h-80 md:h-96 bg-gradient-to-br from-[#a83d8e]/20 to-black">
                     {images.length > 0 ? (
                       <img
                         src={images[activeImage].url}
@@ -283,9 +283,9 @@ export default function ProfileDetail() {
                     </div>
                   ) : null}
 
-                  <div className="p-8">
+                  <div className="p-4 sm:p-8">
                     <div className="mb-6">
-                      <h1 className="text-4xl text-white mb-2">{modelo.nombre}</h1>
+                      <h1 className="text-2xl sm:text-3xl md:text-4xl text-white mb-2">{modelo.nombre}</h1>
                       <div className="flex items-center gap-4 text-gray-400">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
@@ -434,9 +434,9 @@ export default function ProfileDetail() {
                     ) : null}
                   </div>
 
-                  <div className="p-8">
+                  <div className="p-4 sm:p-8">
                     <div className="mb-6">
-                      <h1 className="text-4xl text-white mb-2">{modelo.nombre}</h1>
+                      <h1 className="text-2xl sm:text-3xl md:text-4xl text-white mb-2">{modelo.nombre}</h1>
                       <div className="flex items-center gap-4 text-gray-400">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
