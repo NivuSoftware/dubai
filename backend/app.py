@@ -5,8 +5,6 @@ import time
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from flask_smorest import Api
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -19,7 +17,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from extensions import db, migrate
+from extensions import db, limiter, migrate
 import models  # noqa: F401
 from resources.admin_resource import admin_bp
 from resources.advertiser_resource import advertiser_bp
@@ -28,9 +26,6 @@ from resources.auth_resource import auth_bp
 from resources.mail_resource import mail_bp
 from resources.modelo_resource import advertiser_modelo_bp, modelo_bp, public_modelo_bp
 from seed import seed_admin_user
-
-limiter = Limiter(key_func=get_remote_address, default_limits=[])
-
 
 def create_app():
     app = Flask(__name__)

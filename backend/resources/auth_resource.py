@@ -4,8 +4,7 @@ from flask_jwt_extended import create_access_token
 from flask_smorest import Blueprint, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import limiter
-from extensions import db
+from extensions import db, limiter
 from models.user import User
 from schemas.auth_schema import (
     AdvertiserRegisterSchema,
