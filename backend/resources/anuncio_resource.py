@@ -540,7 +540,11 @@ def list_public_anuncios():
 def get_public_anuncio(anuncio_id):
     _expire_outdated_ads()
     now = datetime.now(timezone.utc)
-    anuncio = Anuncio.query.filter_by(id=anuncio_id, estado="ACTIVO", pago="PAGADO").first()
-    if not anuncio or anuncio.fecha_hasta < now:
+    anuncio = (
+        Anuncio.query.filter_by(id=anuncio_id, estado="ACTIVO", pago="PAGADO")
+        .filter(Anuncio.fecha_hasta >= now)
+        .first()
+    )
+    if not anuncio:
         abort(404, message="Anuncio no encontrado")
     return _serialize_anuncio(anuncio)
