@@ -31,6 +31,10 @@ import {
 
 const FAQ_ITEMS = [
   {
+    question: '¿Qué es Dubai Escorts Ecuador?',
+    answer: 'Dubai Escorts Ecuador es el directorio de prepagos, escorts y acompañantes verificadas más exclusivo de Ecuador. Contamos con perfiles reales en Quito, Guayaquil, Cuenca y otras ciudades, con contacto directo por WhatsApp y verificación de identidad y edad.',
+  },
+  {
     question: '¿Cómo funciona la verificación?',
     answer: 'Todos los perfiles pasan por un proceso de verificación (digital) de edad e identidad para garantizar seguridad y autenticidad. ',
   },
@@ -281,8 +285,8 @@ export default function Home() {
   return (
     <Layout>
       <Seo
-        title="Dubai Escorts Ecuador | Directorio verificado"
-        description="Dubai Escorts Ecuador — Directorio de escorts verificadas en Quito, Guayaquil y Cuenca. Perfiles reales con contacto directo por WhatsApp. Discreción y seguridad garantizada."
+        title="Dubai Escorts Ecuador | Prepagos y acompañantes verificadas"
+        description="Dubai Escorts Ecuador — Directorio de prepagos, escorts y acompañantes verificadas en Quito, Guayaquil y Cuenca. Perfiles reales con contacto directo por WhatsApp. Discreción garantizada."
         path="/"
         image="/images/logo.png"
         jsonLd={homeSchema}
@@ -318,7 +322,7 @@ export default function Home() {
              Dubai Escorts Ecuador
             </h1>
             <p className="text-base sm:text-xl text-gray-300 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
-              +18 años
+              Prepagos y acompañantes verificadas en Quito, Guayaquil y Cuenca — Solo +18
             </p>
           </motion.div>
 

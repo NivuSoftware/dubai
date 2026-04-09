@@ -120,12 +120,12 @@ export default function Profiles() {
   }, [anuncios, modelos, selectedCiudad]);
 
   const seoTitle = selectedCiudad === "all"
-    ? "Escorts en Ecuador | Perfiles verificados — Dubai Escorts Ecuador"
-    : `Escorts en ${selectedCiudad} | Perfiles verificados — Dubai Escorts Ecuador`;
+    ? "Prepagos y escorts en Ecuador | Perfiles verificados — Dubai Escorts Ecuador"
+    : `Prepagos y escorts en ${selectedCiudad} | Perfiles verificados — Dubai Escorts Ecuador`;
 
   const seoDescription = selectedCiudad === "all"
-    ? "Directorio de escorts verificadas en Ecuador. Filtra por ciudad — Quito, Guayaquil, Cuenca — y contacta directamente por WhatsApp."
-    : `Escorts verificadas en ${selectedCiudad}. Perfiles reales con contacto directo por WhatsApp. Dubai Escorts Ecuador.`;
+    ? "Directorio de prepagos, escorts y acompañantes verificadas en Ecuador. Filtra por ciudad — Quito, Guayaquil, Cuenca — y contacta directamente por WhatsApp."
+    : `Prepagos y escorts verificadas en ${selectedCiudad}. Acompañantes reales con contacto directo por WhatsApp. Dubai Escorts Ecuador.`;
 
   // Canonical siempre apunta a /profiles (sin query params) para evitar contenido duplicado
   const seoPath = "/profiles";
