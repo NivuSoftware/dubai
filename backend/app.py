@@ -25,6 +25,7 @@ from resources.anuncio_resource import advertiser_anuncio_bp, public_anuncio_bp
 from resources.auth_resource import auth_bp
 from resources.mail_resource import mail_bp
 from resources.modelo_resource import advertiser_modelo_bp, modelo_bp, public_modelo_bp
+from resources.sitemap_resource import sitemap_bp
 from seed import seed_admin_user
 
 def create_app():
@@ -57,6 +58,8 @@ def create_app():
     migrate.init_app(app, db)
     JWTManager(app)
     limiter.init_app(app)
+
+    app.register_blueprint(sitemap_bp)
 
     api = Api(app)
     api.register_blueprint(mail_bp)

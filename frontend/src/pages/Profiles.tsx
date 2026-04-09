@@ -127,7 +127,9 @@ export default function Profiles() {
     ? "Directorio de escorts verificadas en Ecuador. Filtra por ciudad — Quito, Guayaquil, Cuenca — y contacta directamente por WhatsApp."
     : `Escorts verificadas en ${selectedCiudad}. Perfiles reales con contacto directo por WhatsApp. Dubai Escorts Ecuador.`;
 
-  const seoPath = selectedCiudad === "all" ? "/profiles" : `/profiles?ciudad=${encodeURIComponent(selectedCiudad)}`;
+  // Canonical siempre apunta a /profiles (sin query params) para evitar contenido duplicado
+  const seoPath = "/profiles";
+  const seoCanonicalPath = selectedCiudad === "all" ? "/profiles" : `/profiles?ciudad=${encodeURIComponent(selectedCiudad)}`;
 
   const listingSchema = useMemo(
     () => ({
@@ -147,7 +149,7 @@ export default function Profiles() {
         })),
       },
     }),
-    [mixedProfiles, selectedCiudad, seoDescription, seoPath]
+    [mixedProfiles, selectedCiudad, seoDescription, seoCanonicalPath]
   );
 
   return (

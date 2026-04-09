@@ -57,7 +57,7 @@ export default function ProfileCard({
       >
         {imageUrl ? (
           <>
-            <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+            <img src={imageUrl} alt={`${name} — escort verificada en ${city}`} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-black/25" />
           </>
         ) : (

@@ -227,7 +227,7 @@ export default function ProfileDetail() {
                     {images.length > 0 ? (
                       <img
                         src={images[activeImage].url}
-                        alt={modelo.nombre}
+                        alt={`${modelo.nombre} — escort verificada en ${modelo.ubicacion} | Dubai Escorts Ecuador`}
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -375,7 +375,7 @@ export default function ProfileDetail() {
                       {images.length > 0 ? (
                         <img
                           src={images[activeImage].url}
-                          alt={modelo.nombre}
+                          alt={`${modelo.nombre} — escort verificada en ${modelo.ubicacion} | Dubai Escorts Ecuador`}
                           className="h-full w-full object-cover"
                         />
                       ) : (

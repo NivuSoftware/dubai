@@ -120,6 +120,16 @@ export default function Safety() {
               </div>
             </div>
           </section>
+
+          <section className="max-w-[1000px] mx-auto px-4 sm:px-8 py-10 text-center">
+            <p className="text-gray-300 mb-4">¿Lista para explorar perfiles verificados?</p>
+            <Link
+              to="/profiles"
+              className="inline-flex items-center justify-center bg-[#a83d8e] hover:bg-[#a83d8e]/90 text-white px-10 py-3 rounded-lg transition-all hover:shadow-[0_0_30px_rgba(168,61,142,0.65)]"
+            >
+              Ver perfiles verificados
+            </Link>
+          </section>
         </div>
       </div>
     </Layout>
